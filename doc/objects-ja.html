@@ -1,0 +1,246 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD html 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>pg_dbms_stats</title>
+<link rel="home" title="pg_dbms_stats" href="index.html">
+<link rel="stylesheet" TYPE="text/css"href="style.css">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+</head>
+
+<body>
+<h1 id="pg_dbms_stats">pg_dbms_stats</h1>
+<div class="navigation">
+  <a href="pg_dbms_stats-ja.html">pg_dbms_stats</a> &gt;
+  <a href="objects-ja.html">Appendix A. オブジェクト一覧</a>
+</div>
+
+<div class="index">
+<ol>
+<li><a href="#functions">関数</a></li>
+<li><a href="#table">テーブル</a></li>
+<li><a href="#view">ビュー</a></li>
+</ol>
+</div>
+
+<h2 id="functions">関数</h2>
+<p>
+pg_dbms_stats は下記の関数を含みます。
+<br>
+<p>各関数の意味は以下の通りです。</p>
+<table>
+<thead>
+<tr>
+<tr><th>機能</th><th>関数</th><th>引数</th><th>オブジェクト単位</th><th>戻り値</th></tr>
+</tr>
+</thead>
+<tbody>
+<tr><td rowspan="6" nowrap>バックアップ</td>
+  <td nowrap>dbms_stats.backup_database_stats</td>
+  <td nowrap>comment</td>
+  <td nowrap>データベース</td>
+  <td rowspan="6">int8</td></tr>
+<tr><td nowrap>dbms_stats.backup_schema_stats</td>
+  <td nowrap>schemaname、comment</td>
+  <td>スキーマ</td></tr>
+<tr><td rowspan="2" nowrap>dbms_stats.backup_table_stats</td>
+  <td nowrap>relname、comment</td>
+  <td rowspan="2">テーブル</td></tr>
+<tr><td nowrap>schemaname、tablename、comment</td></tr>
+<tr><td rowspan="2" nowrap>dbms_stats.backup_column_stats</td>
+  <td nowrap>relname、attname、comment</td>
+  <td rowspan="2">カラム</td></tr>
+<tr><td nowrap>schemaname、tablename、attname、comment</td></tr>
+<tr><td rowspan="7" nowrap>リストア</td>
+  <td nowrap>dbms_stats.restore_database_stats</td>
+  <td nowrap>timestamp</td>
+  <td nowrap>データベース</td>
+  <td rowspan="7">regclass</td></tr>
+<tr><td nowrap>dbms_stats.restore_schema_stats</td>
+  <td nowrap>schemaname、timestamp</td>
+  <td>スキーマ</td></tr>
+<tr><td rowspan="2" nowrap>dbms_stats.restore_table_stats</td>
+  <td nowrap>relname、timestamp</td>
+  <td rowspan="2">テーブル</td></tr>
+<tr><td nowrap>schemaname、tablename、timestamp</td></tr>
+<tr><td rowspan="2" nowrap>dbms_stats.restore_column_stats</td>
+  <td nowrap>relname、attname、timestamp</td>
+  <td rowspan="2">カラム</td></tr>
+<tr><td nowrap>schemaname、tablename、attname、timestamp</td></tr>
+<tr><td nowrap>dbms_stats.restore_stats</td>
+  <td nowrap>backup_id</td>
+  <td>バックアップ</td></tr>
+<tr><td rowspan="6" nowrap>ロック</td>
+  <td nowrap>dbms_stats.lock_database_stats</td>
+  <td nowrap>(なし)</td>
+  <td nowrap>データベース</td>
+  <td rowspan="6">regclass</td></tr>
+<tr><td nowrap>dbms_stats.lock_schema_stats</td>
+  <td nowrap>schemaname</td>
+  <td>スキーマ</td></tr>
+<tr><td rowspan="2" nowrap>dbms_stats.lock_table_stats</td>
+  <td nowrap>relname</td>
+  <td rowspan="2">テーブル</td></tr>
+<tr><td nowrap>schemaname、tablename</td></tr>
+<tr><td rowspan="2" nowrap>dbms_stats.lock_column_stats</td>
+  <td nowrap>relname、attname</td>
+  <td rowspan="2">カラム</td></tr>
+<tr><td nowrap>schemaname、tablename、attname</td></tr>
+<tr><td rowspan="6" nowrap>ロック解除</td>
+  <td nowrap>dbms_stats.unlock_database_stats</td>
+  <td nowrap>(なし)</td>
+  <td nowrap>データベース</td>
+  <td rowspan="6">regclass</td></tr>
+<tr><td nowrap>dbms_stats.unlock_schema_stats</td>
+  <td nowrap>schemaname</td>
+  <td>スキーマ</td></tr>
+<tr><td rowspan="2" nowrap>dbms_stats.unlock_table_stats</td>
+  <td nowrap>relname</td>
+  <td rowspan="2">テーブル</td></tr>
+<tr><td nowrap>schemaname、tablename</td></tr>
+<tr><td rowspan="2" nowrap>dbms_stats.unlock_column_stats</td>
+  <td nowrap>relname、attname</td>
+  <td rowspan="2">カラム</td></tr>
+<tr><td nowrap>schemaname、tablename、attname</td></tr>
+<tr><td rowspan="6" nowrap>インポート</td>
+  <td nowrap>dbms_stats.import_database_stats</td>
+  <td nowrap>src</td>
+  <td nowrap>データベース</td>
+  <td rowspan="6">void</td></tr>
+<tr><td nowrap>dbms_stats.import_schema_stats</td>
+  <td nowrap>schemaname、src</td>
+  <td>スキーマ</td></tr>
+<tr><td rowspan="2" nowrap>dbms_stats.import_table_stats</td>
+  <td nowrap>relname、src</td>
+  <td rowspan="2">テーブル</td></tr>
+<tr><td nowrap>schemaname、tablename、src</td></tr>
+<tr><td rowspan="2" nowrap>dbms_stats.import_column_stats</td>
+  <td nowrap>relname、attname、src</td>
+  <td rowspan="2">カラム</td></tr>
+<tr><td nowrap>schemaname、tablename、attname、src</td></tr>
+<tr><td nowrap>パージ</td>
+  <td nowrap>dbms_stats.purge_stats</td>
+  <td nowrap>backup_id、force</td>
+  <td>バックアップ</td>
+  <td>dbms_stats.backup_history</td></tr>
+</tbody>
+</table>
+
+<p>各関数で用いられている引数の意味は以下の通りです。</p>
+<table>
+<thead>
+<tr>
+<tr><th>引数</th><th>データ型</th><th>意味</th></tr>
+</tr>
+</thead>
+<tbody>
+<tr><td nowrap>schemaname</td>
+  <td nowrap>text</td>
+  <td>処理対象のスキーマ名です。</td></tr>
+<tr><td nowrap>relname</td>
+  <td nowrap>regclass</td>
+  <td>処理対象のテーブル名です。ただし、(スキーマ名).(テーブル名) という形になります。</td></tr>
+<tr><td nowrap>tablename</td>
+  <td nowrap>text</td>
+  <td>処理対象のテーブル名です。</td></tr>
+<tr><td nowrap>attname</td>
+  <td nowrap>text</td>
+  <td>処理対象のカラム名です。</td></tr>
+<tr><td nowrap>comment</td>
+  <td nowrap>text</td>
+  <td>バックアップを識別するためのコメントです。</td></tr>
+<tr><td nowrap>as_of_timestamp</td>
+  <td nowrap>timestamptz</td>
+  <td>リストアしたいタイミングの基準になるタイムスタンプです。このタイムスタンプ以前で最新のバックアップデータをリストアします。該当するバックアップが存在しない場合、統計情報は現在プランナが見ている値から変更されません。</td></tr>
+<tr><td nowrap>src</td>
+  <td nowrap>text</td>
+  <td>インポート対象のファイルの絶対パスです。</td></tr>
+<tr><td nowrap>backup_id</td>
+  <td nowrap>bigint</td>
+  <td>リストアやパージの対象となるバックアップIDです。
+リストアの場合、一致するバックアップIDのバックアップデータをリストアします。
+パージの場合、一致するバックアップID以前のバックアップを削除します。
+</td></tr>
+<tr><td nowrap>force</td>
+  <td nowrap>bool</td>
+  <td>パージするとき、バックアップを強制的に削除するかを決める変数です。
+trueの場合、対象範囲のバックアップを全て削除します。
+falseの場合、対象範囲外にデータベース単位のバックアップデータが存在しなければ、警告メッセージを出力して処理を中断します。
+デフォルトはfalseです。
+</td></tr>
+</tbody>
+</table>
+<p>また、統計情報のエクスポート機能は、SQLファイルで実装しています。
+<br>
+各SQLファイルの意味は以下の通りです。なお、出力ファイル名のデフォルトはexport_stats.dmpです。</p>
+<table>
+<thead>
+<tr>
+<tr><th>ファイル名</th><th>対象統計情報</th><th>備考</th></tr>
+</tr>
+</thead>
+<tbody>
+<tr><td nowrap>export_effective_stats.sql.sample</td>
+  <td nowrap>プランナが見ている統計情報</td>
+  <td>-</td></tr>
+<tr>
+  <td nowrap>export_plain_stats.sql.sample</td>
+  <td nowrap>真の統計情報のみ</td>
+  <td>pg_dbms_stats未インストールでも使用可能です。</td></tr>
+</tbody>
+</table>
+
+<h2 id="table">テーブル</h2>
+<p>pg_dbms_statsは以下のテーブルを含みます。</p>
+<p>各テーブルの意味は以下の通りです。</p>
+<table>
+<thead>
+<tr>
+<tr><th>テーブル名</th><th>列名</th><th>データ型</th><th>意味</th></tr>
+</tr>
+</thead>
+<tbody>
+<tr><td rowspan="4" nowrap>dbms_stats.backup_history</td>
+  <td nowrap>id</td>
+  <td nowrap>int8</td>
+  <td>バックアップ時に付与されたバックアップIDです。</td></tr>
+<tr><td nowrap>time</td>
+  <td nowrap>timestamptz</td>
+  <td>バックアップ時のタイムスタンプです。</td></tr>
+<tr><td nowrap>unit</td>
+  <td nowrap>char(1)</td>
+  <td>バックアップ時のオブジェクト単位です。<br>
+d:データベース、s:スキーマ、t:テーブル、c:列</td></tr>
+<tr><td nowrap>comment</td>
+  <td nowrap>text</td>
+  <td>バックアップ時に指定したコメントです。</td></tr>
+</tbody>
+</table>
+
+<h2 id="view">ビュー</h2>
+<p>pg_dbms_stats は下記のビューを含みます。</p>
+<p>各ビューの意味は以下の通りです。</p>
+<table>
+<thead>
+<tr>
+<tr><th>ビュー名</th><th>意味</th></tr>
+</tr>
+</thead>
+<tbody>
+<tr><td nowrap>dbms_stats.relation_stats_effective</td>
+  <td>プランナに見せるテーブルごとの統計情報を表示します。PostgreSQLのpg_classカタログに対応します。</td></tr>
+<tr><td nowrap>dbms_stats.column_stats_effective</td>
+  <td>プランナに見せるカラムごとの統計情報を表示します。PostgreSQLのpg_statisticカタログに対応します。</td></tr>
+<tr><td nowrap>dbms_stats.status</td>
+  <td>プランナに見せるカラムごとの統計情報のうち、ユーザが読み取り可能なものを表示します。PostgreSQLのpg_statsビューに対応します。</td></tr>
+</tbody>
+</table>
+
+<h2 id="seealso">関連項目</h2>
+<a href="http://www.postgresql.jp/document/current/html/app-psql.html">psql</a>,
+<a href="http://www.postgresql.jp/document/current/html/app-vacuumdb.html">vacuumdb</a>
+
+<hr />
+<p class="footer">Copyright (c) 2009-2012, NIPPON TELEGRAPH AND TELEPHONE CORPORATION</p>
+
+</body>
+</html>

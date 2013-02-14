@@ -1,0 +1,69 @@
+/*
+ * If you want the statistics of per-relation or per-column, please modify
+ * nspname, relname, and attname in 'WHERE' clause.
+ */
+
+BEGIN TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+/*
+ * If you want to chage the output file name, please modify the following name.
+ */
+\o export_stats.dmp
+
+COPY (SELECT n2.nspname,
+             c.relname,
+             c.relpages,
+             c.reltuples,
+             (pg_relation_size(c.oid) / current_setting('block_size')::int4)::int4
+                 AS curpages,
+             pg_catalog.pg_stat_get_last_analyze_time(c.oid)
+                 AS last_analyze,
+             pg_catalog.pg_stat_get_last_autoanalyze_time(c.oid)
+                 AS last_autoanalyze,
+             COALESCE(a.attname, ''),
+             n1.nspname AS schemaname_of_atttype,
+             t.typname,
+             a.atttypmod,
+             s.stainherit,
+             s.stanullfrac,
+             s.stawidth,
+             s.stadistinct,
+             s.stakind1,
+             s.stakind2,
+             s.stakind3,
+             s.stakind4,
+             s.staop1,
+             s.staop2,
+             s.staop3,
+             s.staop4,
+             s.stanumbers1,
+             s.stanumbers2,
+             s.stanumbers3,
+             s.stanumbers4,
+             s.stavalues1,
+             s.stavalues2,
+             s.stavalues3,
+             s.stavalues4
+        FROM pg_statistic s
+        JOIN pg_attribute a
+          ON (s.starelid = a.attrelid AND s.staattnum = a.attnum)
+        JOIN pg_type t
+          ON a.atttypid = t.oid
+        JOIN pg_namespace n1
+          ON t.typnamespace = n1.oid
+       RIGHT JOIN pg_catalog.pg_class c
+          ON s.starelid = c.oid
+        JOIN pg_catalog.pg_namespace n2
+          ON c.relnamespace = n2.oid
+       WHERE c.relkind IN ('r', 'i')
+         AND NOT n2.nspname IN ('pg_catalog',
+                                'pg_toast',
+                                'information_schema',
+                                'dbms_stats')
+        -- AND n2.nspname = 'public'
+        -- AND c.relname = 'test'
+        -- AND a.attname = 'id'
+       ORDER BY starelid, staattnum)
+TO STDOUT
+(FORMAT 'binary');
+\o
+COMMIT;

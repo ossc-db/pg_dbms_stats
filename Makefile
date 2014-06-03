@@ -15,8 +15,7 @@ REGRESS = init-common ut_fdw_init init-$(MAJORVERSION) ut-common \
 
 REGRESS_OPTS = --encoding=UTF8
 
-DOCS = export_effective_stats-$(MAJORVERSION).sql.sample \
-	   export_plain_stats-$(MAJORVERSION).sql.sample
+DOCS = export_effective_stats.sql.sample export_plain_stats.sql.sample
 
 EXTRA_CLEAN = sql/ut_anyarray-*.sql expected/ut_anyarray-*.out \
 			  sql/ut_imp_exp-*.sql expected/ut_imp_exp-*.out \
@@ -32,3 +31,5 @@ all: $(DATA) $(DOCS)
 $(DATA): %.sql: %-$(MAJORVERSION).sql
 	cp $< $@
 
+$(DOCS): %.sql.sample: %-$(MAJORVERSION).sql.sample
+	cp $< $@

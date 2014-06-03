@@ -60,8 +60,9 @@ BEGIN
 END;
 $$LANGUAGE plpgsql;
 CREATE VIEW lockd_io AS
-       SELECT relname, heap_blks_read hbr, heap_blks_hit hbh,
-              idx_blks_read ibr, idx_blks_hit ibh
+       SELECT relname,
+              heap_blks_read + heap_blks_hit > 0  hb_fetch,
+              idx_blks_read  + idx_blks_hit  > 0  ib_fetch
          FROM pg_statio_user_tables
         WHERE schemaname = 'dbms_stats'
           AND relname LIKE '%stats_locked'

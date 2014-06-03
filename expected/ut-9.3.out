@@ -170,57 +170,57 @@ Triggers:
  stavalues4  | dbms_stats.anyarray |           | extended | 
  stavalues5  | dbms_stats.anyarray |           | extended | 
 View definition:
- SELECT m.starelid, 
-    m.staattnum, 
-    m.stainherit, 
-    m.stanullfrac, 
-    m.stawidth, 
-    m.stadistinct, 
-    m.stakind1, 
-    m.stakind2, 
-    m.stakind3, 
-    m.stakind4, 
-    m.stakind5, 
-    m.staop1, 
-    m.staop2, 
-    m.staop3, 
-    m.staop4, 
-    m.staop5, 
-    m.stanumbers1, 
-    m.stanumbers2, 
-    m.stanumbers3, 
-    m.stanumbers4, 
-    m.stanumbers5, 
-    m.stavalues1, 
-    m.stavalues2, 
-    m.stavalues3, 
-    m.stavalues4, 
+ SELECT m.starelid,
+    m.staattnum,
+    m.stainherit,
+    m.stanullfrac,
+    m.stawidth,
+    m.stadistinct,
+    m.stakind1,
+    m.stakind2,
+    m.stakind3,
+    m.stakind4,
+    m.stakind5,
+    m.staop1,
+    m.staop2,
+    m.staop3,
+    m.staop4,
+    m.staop5,
+    m.stanumbers1,
+    m.stanumbers2,
+    m.stanumbers3,
+    m.stanumbers4,
+    m.stanumbers5,
+    m.stavalues1,
+    m.stavalues2,
+    m.stavalues3,
+    m.stavalues4,
     m.stavalues5
-   FROM ( SELECT (dbms_stats.merge(v.*, s.*)).starelid AS starelid, 
-            (dbms_stats.merge(v.*, s.*)).staattnum AS staattnum, 
-            (dbms_stats.merge(v.*, s.*)).stainherit AS stainherit, 
-            (dbms_stats.merge(v.*, s.*)).stanullfrac AS stanullfrac, 
-            (dbms_stats.merge(v.*, s.*)).stawidth AS stawidth, 
-            (dbms_stats.merge(v.*, s.*)).stadistinct AS stadistinct, 
-            (dbms_stats.merge(v.*, s.*)).stakind1 AS stakind1, 
-            (dbms_stats.merge(v.*, s.*)).stakind2 AS stakind2, 
-            (dbms_stats.merge(v.*, s.*)).stakind3 AS stakind3, 
-            (dbms_stats.merge(v.*, s.*)).stakind4 AS stakind4, 
-            (dbms_stats.merge(v.*, s.*)).stakind5 AS stakind5, 
-            (dbms_stats.merge(v.*, s.*)).staop1 AS staop1, 
-            (dbms_stats.merge(v.*, s.*)).staop2 AS staop2, 
-            (dbms_stats.merge(v.*, s.*)).staop3 AS staop3, 
-            (dbms_stats.merge(v.*, s.*)).staop4 AS staop4, 
-            (dbms_stats.merge(v.*, s.*)).staop5 AS staop5, 
-            (dbms_stats.merge(v.*, s.*)).stanumbers1 AS stanumbers1, 
-            (dbms_stats.merge(v.*, s.*)).stanumbers2 AS stanumbers2, 
-            (dbms_stats.merge(v.*, s.*)).stanumbers3 AS stanumbers3, 
-            (dbms_stats.merge(v.*, s.*)).stanumbers4 AS stanumbers4, 
-            (dbms_stats.merge(v.*, s.*)).stanumbers5 AS stanumbers5, 
-            (dbms_stats.merge(v.*, s.*)).stavalues1 AS stavalues1, 
-            (dbms_stats.merge(v.*, s.*)).stavalues2 AS stavalues2, 
-            (dbms_stats.merge(v.*, s.*)).stavalues3 AS stavalues3, 
-            (dbms_stats.merge(v.*, s.*)).stavalues4 AS stavalues4, 
+   FROM ( SELECT (dbms_stats.merge(v.*, s.*)).starelid AS starelid,
+            (dbms_stats.merge(v.*, s.*)).staattnum AS staattnum,
+            (dbms_stats.merge(v.*, s.*)).stainherit AS stainherit,
+            (dbms_stats.merge(v.*, s.*)).stanullfrac AS stanullfrac,
+            (dbms_stats.merge(v.*, s.*)).stawidth AS stawidth,
+            (dbms_stats.merge(v.*, s.*)).stadistinct AS stadistinct,
+            (dbms_stats.merge(v.*, s.*)).stakind1 AS stakind1,
+            (dbms_stats.merge(v.*, s.*)).stakind2 AS stakind2,
+            (dbms_stats.merge(v.*, s.*)).stakind3 AS stakind3,
+            (dbms_stats.merge(v.*, s.*)).stakind4 AS stakind4,
+            (dbms_stats.merge(v.*, s.*)).stakind5 AS stakind5,
+            (dbms_stats.merge(v.*, s.*)).staop1 AS staop1,
+            (dbms_stats.merge(v.*, s.*)).staop2 AS staop2,
+            (dbms_stats.merge(v.*, s.*)).staop3 AS staop3,
+            (dbms_stats.merge(v.*, s.*)).staop4 AS staop4,
+            (dbms_stats.merge(v.*, s.*)).staop5 AS staop5,
+            (dbms_stats.merge(v.*, s.*)).stanumbers1 AS stanumbers1,
+            (dbms_stats.merge(v.*, s.*)).stanumbers2 AS stanumbers2,
+            (dbms_stats.merge(v.*, s.*)).stanumbers3 AS stanumbers3,
+            (dbms_stats.merge(v.*, s.*)).stanumbers4 AS stanumbers4,
+            (dbms_stats.merge(v.*, s.*)).stanumbers5 AS stanumbers5,
+            (dbms_stats.merge(v.*, s.*)).stavalues1 AS stavalues1,
+            (dbms_stats.merge(v.*, s.*)).stavalues2 AS stavalues2,
+            (dbms_stats.merge(v.*, s.*)).stavalues3 AS stavalues3,
+            (dbms_stats.merge(v.*, s.*)).stavalues4 AS stavalues4,
             (dbms_stats.merge(v.*, s.*)).stavalues5 AS stavalues5
            FROM pg_statistic s
       FULL JOIN dbms_stats._column_stats_locked v USING (starelid, staattnum, stainherit)
@@ -243,13 +243,13 @@ View definition:
  last_analyze     | timestamp with time zone |           | plain    | 
  last_autoanalyze | timestamp with time zone |           | plain    | 
 View definition:
- SELECT c.oid AS relid, 
-    dbms_stats.relname(n.nspname::text, c.relname::text) AS relname, 
-    COALESCE(v.relpages, c.relpages) AS relpages, 
-    COALESCE(v.reltuples, c.reltuples) AS reltuples, 
-    COALESCE(v.relallvisible, c.relallvisible) AS relallvisible, 
-    COALESCE(v.curpages, (pg_relation_size(c.oid::regclass) / current_setting('block_size'::text)::integer)::integer) AS curpages, 
-    COALESCE(v.last_analyze, pg_stat_get_last_analyze_time(c.oid)) AS last_analyze, 
+ SELECT c.oid AS relid,
+    dbms_stats.relname(n.nspname::text, c.relname::text) AS relname,
+    COALESCE(v.relpages, c.relpages) AS relpages,
+    COALESCE(v.reltuples, c.reltuples) AS reltuples,
+    COALESCE(v.relallvisible, c.relallvisible) AS relallvisible,
+    COALESCE(v.curpages, (pg_relation_size(c.oid::regclass) / current_setting('block_size'::text)::integer)::integer) AS curpages,
+    COALESCE(v.last_analyze, pg_stat_get_last_analyze_time(c.oid)) AS last_analyze,
     COALESCE(v.last_autoanalyze, pg_stat_get_last_autoanalyze_time(c.oid)) AS last_autoanalyze
    FROM pg_class c
    JOIN pg_namespace n ON c.relnamespace = n.oid
@@ -276,13 +276,13 @@ View definition:
  most_common_elem_freqs | real[]              |           | extended | 
  elem_count_histogram   | real[]              |           | extended | 
 View definition:
- SELECT n.nspname AS schemaname, 
-    c.relname AS tablename, 
-    a.attname, 
-    s.stainherit AS inherited, 
-    s.stanullfrac AS null_frac, 
-    s.stawidth AS avg_width, 
-    s.stadistinct AS n_distinct, 
+ SELECT n.nspname AS schemaname,
+    c.relname AS tablename,
+    a.attname,
+    s.stainherit AS inherited,
+    s.stanullfrac AS null_frac,
+    s.stawidth AS avg_width,
+    s.stadistinct AS n_distinct,
         CASE
             WHEN s.stakind1 = 1 THEN s.stavalues1
             WHEN s.stakind2 = 1 THEN s.stavalues2
@@ -290,7 +290,7 @@ View definition:
             WHEN s.stakind4 = 1 THEN s.stavalues4
             WHEN s.stakind5 = 1 THEN s.stavalues5
             ELSE NULL::dbms_stats.anyarray
-        END AS most_common_vals, 
+        END AS most_common_vals,
         CASE
             WHEN s.stakind1 = 1 THEN s.stanumbers1
             WHEN s.stakind2 = 1 THEN s.stanumbers2
@@ -298,7 +298,7 @@ View definition:
             WHEN s.stakind4 = 1 THEN s.stanumbers4
             WHEN s.stakind5 = 1 THEN s.stanumbers5
             ELSE NULL::real[]
-        END AS most_common_freqs, 
+        END AS most_common_freqs,
         CASE
             WHEN s.stakind1 = 2 THEN s.stavalues1
             WHEN s.stakind2 = 2 THEN s.stavalues2
@@ -306,7 +306,7 @@ View definition:
             WHEN s.stakind4 = 2 THEN s.stavalues4
             WHEN s.stakind5 = 2 THEN s.stavalues5
             ELSE NULL::dbms_stats.anyarray
-        END AS histogram_bounds, 
+        END AS histogram_bounds,
         CASE
             WHEN s.stakind1 = 3 THEN s.stanumbers1[1]
             WHEN s.stakind2 = 3 THEN s.stanumbers2[1]
@@ -314,7 +314,7 @@ View definition:
             WHEN s.stakind4 = 3 THEN s.stanumbers4[1]
             WHEN s.stakind5 = 3 THEN s.stanumbers5[1]
             ELSE NULL::real
-        END AS correlation, 
+        END AS correlation,
         CASE
             WHEN s.stakind1 = 4 THEN s.stavalues1
             WHEN s.stakind2 = 4 THEN s.stavalues2
@@ -322,7 +322,7 @@ View definition:
             WHEN s.stakind4 = 4 THEN s.stavalues4
             WHEN s.stakind5 = 4 THEN s.stavalues5
             ELSE NULL::dbms_stats.anyarray
-        END AS most_common_elems, 
+        END AS most_common_elems,
         CASE
             WHEN s.stakind1 = 4 THEN s.stanumbers1
             WHEN s.stakind2 = 4 THEN s.stanumbers2
@@ -330,7 +330,7 @@ View definition:
             WHEN s.stakind4 = 4 THEN s.stanumbers4
             WHEN s.stakind5 = 4 THEN s.stanumbers5
             ELSE NULL::real[]
-        END AS most_common_elem_freqs, 
+        END AS most_common_elem_freqs,
         CASE
             WHEN s.stakind1 = 5 THEN s.stanumbers1
             WHEN s.stakind2 = 5 THEN s.stanumbers2
@@ -377,31 +377,31 @@ View definition:
  stavalues4  | dbms_stats.anyarray |           | extended | 
  stavalues5  | dbms_stats.anyarray |           | extended | 
 View definition:
- SELECT _column_stats_locked.starelid, 
-    _column_stats_locked.staattnum, 
-    _column_stats_locked.stainherit, 
-    _column_stats_locked.stanullfrac, 
-    _column_stats_locked.stawidth, 
-    _column_stats_locked.stadistinct, 
-    _column_stats_locked.stakind1, 
-    _column_stats_locked.stakind2, 
-    _column_stats_locked.stakind3, 
-    _column_stats_locked.stakind4, 
-    _column_stats_locked.stakind5, 
-    _column_stats_locked.staop1, 
-    _column_stats_locked.staop2, 
-    _column_stats_locked.staop3, 
-    _column_stats_locked.staop4, 
-    _column_stats_locked.staop5, 
-    _column_stats_locked.stanumbers1, 
-    _column_stats_locked.stanumbers2, 
-    _column_stats_locked.stanumbers3, 
-    _column_stats_locked.stanumbers4, 
-    _column_stats_locked.stanumbers5, 
-    _column_stats_locked.stavalues1, 
-    _column_stats_locked.stavalues2, 
-    _column_stats_locked.stavalues3, 
-    _column_stats_locked.stavalues4, 
+ SELECT _column_stats_locked.starelid,
+    _column_stats_locked.staattnum,
+    _column_stats_locked.stainherit,
+    _column_stats_locked.stanullfrac,
+    _column_stats_locked.stawidth,
+    _column_stats_locked.stadistinct,
+    _column_stats_locked.stakind1,
+    _column_stats_locked.stakind2,
+    _column_stats_locked.stakind3,
+    _column_stats_locked.stakind4,
+    _column_stats_locked.stakind5,
+    _column_stats_locked.staop1,
+    _column_stats_locked.staop2,
+    _column_stats_locked.staop3,
+    _column_stats_locked.staop4,
+    _column_stats_locked.staop5,
+    _column_stats_locked.stanumbers1,
+    _column_stats_locked.stanumbers2,
+    _column_stats_locked.stanumbers3,
+    _column_stats_locked.stanumbers4,
+    _column_stats_locked.stanumbers5,
+    _column_stats_locked.stavalues1,
+    _column_stats_locked.stavalues2,
+    _column_stats_locked.stavalues3,
+    _column_stats_locked.stavalues4,
     _column_stats_locked.stavalues5
    FROM dbms_stats._column_stats_locked
   WHERE has_column_privilege(_column_stats_locked.starelid, _column_stats_locked.staattnum, 'SELECT'::text);
@@ -420,13 +420,13 @@ View definition:
  last_analyze     | timestamp with time zone |           | plain    | 
  last_autoanalyze | timestamp with time zone |           | plain    | 
 View definition:
- SELECT _relation_stats_locked.relid, 
-    _relation_stats_locked.relname, 
-    _relation_stats_locked.relpages, 
-    _relation_stats_locked.reltuples, 
-    _relation_stats_locked.relallvisible, 
-    _relation_stats_locked.curpages, 
-    _relation_stats_locked.last_analyze, 
+ SELECT _relation_stats_locked.relid,
+    _relation_stats_locked.relname,
+    _relation_stats_locked.relpages,
+    _relation_stats_locked.reltuples,
+    _relation_stats_locked.relallvisible,
+    _relation_stats_locked.curpages,
+    _relation_stats_locked.last_analyze,
     _relation_stats_locked.last_autoanalyze
    FROM dbms_stats._relation_stats_locked;
 

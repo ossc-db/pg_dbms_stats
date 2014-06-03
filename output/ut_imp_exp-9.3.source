@@ -853,7 +853,7 @@ TO STDOUT
 (FORMAT 'binary');
 \o
 COMMIT;
-COPY dbms_stats.work FROM '/home/suzukitks/dbms_stats_directory/pg_dbms_stats/export_stats.dmp' (FORMAT 'binary');
+COPY dbms_stats.work FROM '@abs_srcdir@/export_stats.dmp' (FORMAT 'binary');
 SELECT * FROM work_v;
  nspname | relname | relpages | reltuples | relallvisible | curpages | attname | nspname_of_typename | typname | atttypmod | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 | stavalues1 | stavalues2 | stavalues3 | stavalues4 | stavalues5 
 ---------+---------+----------+-----------+---------------+----------+---------+---------------------+---------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+-------------+-------------+-------------+-------------+-------------+------------+------------+------------+------------+------------

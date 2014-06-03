@@ -67,8 +67,9 @@ DELETE FROM dbms_stats._relation_stats_locked;
 CREATE TABLE st3(id integer, name char(1000), num_arr char(5)[]);
 INSERT INTO st3 SELECT i, i , ARRAY[i::char, 'a'] FROM generate_series(1,10) g(i);
 ANALYZE st3;
-SELECT stavalues1 FROM pg_statistic
- WHERE starelid = 'public.st3'::regclass;
+SELECT staattnum, stavalues1 FROM pg_statistic
+ WHERE starelid = 'public.st3'::regclass
+ ORDER BY staattnum;
 \copy (SELECT stavalues1::dbms_stats.anyarray FROM dbms_stats.column_stats_effective WHERE starelid = 'st3'::regclass) TO 'results/anyarray_test.cp' binary
 CREATE TABLE st4 (arr dbms_stats.anyarray);
 

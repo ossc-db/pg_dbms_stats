@@ -859,6 +859,8 @@ SELECT dbms_stats.unlock_database_stats();
  */
 -- No.6-4-10
 SELECT dbms_stats.is_target_relkind('f');
+-- No.6-4-11
+SELECT dbms_stats.is_target_relkind('m');
 
 /*
  * No.7-1 dbms_stats.backup
@@ -867,6 +869,12 @@ DELETE FROM dbms_stats.backup_history;
 INSERT INTO dbms_stats.backup_history(id, time, unit) values(1, '2012-01-01', 'd');
 -- No.7-1-9
 SELECT dbms_stats.backup(1, 's0.sft0'::regclass, NULL);
+SELECT count(*) FROM dbms_stats.relation_stats_backup;
+SELECT count(*) FROM dbms_stats.column_stats_backup;
+
+-- No.7-1-10
+DELETE FROM dbms_stats.relation_stats_backup;
+SELECT dbms_stats.backup(1, 's0.smv0'::regclass, NULL);
 SELECT count(*) FROM dbms_stats.relation_stats_backup;
 SELECT count(*) FROM dbms_stats.column_stats_backup;
 
@@ -978,6 +986,11 @@ SELECT id, unit, comment FROM dbms_stats.backup_history;
 -- No.8-1-11
 DELETE FROM dbms_stats.backup_history;
 SELECT dbms_stats.backup('s0.sft0'::regclass, NULL, 'dummy comment');
+SELECT id, unit, comment FROM dbms_stats.backup_history;
+
+-- No.8-1-12
+DELETE FROM dbms_stats.backup_history;
+SELECT dbms_stats.backup('s0.smv0'::regclass, NULL, 'dummy comment');
 SELECT id, unit, comment FROM dbms_stats.backup_history;
 
 -- No.8-1-13
@@ -1338,6 +1351,25 @@ DELETE FROM dbms_stats.relation_stats_backup
  WHERE id = 3
    AND relname = 's0.sft0';
 
+-- No.9-1-22
+DELETE FROM dbms_stats._relation_stats_locked;
+INSERT INTO dbms_stats.relation_stats_backup(
+               id, relid, relname, relpages, reltuples,
+               relallvisible,
+               curpages)
+     VALUES (3, 's0.smv0'::regclass, 's0.smv0', 1, 1,
+             1,
+             1);
+SELECT * FROM relations_backup_v
+ WHERE id = 3
+   AND relname = 's0.smv0';
+SELECT dbms_stats.restore(2, 's0.smv0', NULL);
+SELECT count(*) FROM dbms_stats.column_stats_locked;
+SELECT count(*) FROM dbms_stats.relation_stats_locked;
+DELETE FROM dbms_stats.relation_stats_backup
+ WHERE id = 3
+   AND relname = 's0.smv0';
+
 -- No.9-1-23
 DELETE FROM dbms_stats._relation_stats_locked;
 INSERT INTO dbms_stats.relation_stats_backup(
@@ -1556,6 +1588,11 @@ DELETE FROM dbms_stats._relation_stats_locked;
 SELECT dbms_stats.lock('s0.sft0', 'id');
 SELECT * FROM relations_locked_v;
 SELECT * FROM columns_locked_v c;
+-- No.11-1-13
+DELETE FROM dbms_stats._relation_stats_locked;
+SELECT dbms_stats.lock('s0.smv0', 'id');
+SELECT * FROM relations_locked_v;
+SELECT * FROM columns_locked_v c;
 -- No.11-1-14
 DELETE FROM dbms_stats._relation_stats_locked;
 SELECT dbms_stats.lock('pg_catalog.pg_class', 'id');
@@ -1653,6 +1690,11 @@ SELECT dbms_stats.lock('s0.sc0');
 -- No.11-2-9
 DELETE FROM dbms_stats._relation_stats_locked;
 SELECT dbms_stats.lock('s0.sft0');
+SELECT * FROM relations_locked_v;
+SELECT * FROM columns_locked_v c;
+-- No.11-2-10
+DELETE FROM dbms_stats._relation_stats_locked;
+SELECT dbms_stats.lock('s0.smv0');
 SELECT * FROM relations_locked_v;
 SELECT * FROM columns_locked_v c;
 -- No.11-2-11

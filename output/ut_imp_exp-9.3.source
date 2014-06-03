@@ -1,7 +1,7 @@
 \pset null '(null)'
 CREATE TABLE s0.st3();
 /*
- * No.16-1 export_plain_stats-9.2.sql.sample
+ * No.16-1 export_plain_stats-9.3.sql.sample
  */
 -- No.16-1-1
 ANALYZE;
@@ -24,9 +24,10 @@ SELECT dbms_stats.lock_database_stats();
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
  s0.st3
-(16 rows)
+(17 rows)
 
 UPDATE dbms_stats._relation_stats_locked
    SET (relpages, reltuples, relallvisible, curpages) = (0,0,0,0);
@@ -54,7 +55,7 @@ UPDATE dbms_stats._column_stats_locked SET
     stavalues3 = stavalues1,
     stavalues4 = stavalues4,
     stavalues5 = stavalues5;
-\i export_plain_stats-9.2.sql.sample
+\i export_plain_stats-9.3.sql.sample
 /*
  * If you want the statistics of per-relation or per-column, please modify
  * nspname, relname, and attname in 'WHERE' clause.
@@ -114,7 +115,7 @@ COPY (SELECT n2.nspname,
           ON s.starelid = c.oid
         JOIN pg_catalog.pg_namespace n2
           ON c.relnamespace = n2.oid
-       WHERE c.relkind IN ('r', 'i', 'f')
+       WHERE c.relkind IN ('r', 'i', 'f', 'm')
          AND NOT n2.nspname IN ('pg_catalog',
                                 'pg_toast',
                                 'information_schema',
@@ -141,6 +142,9 @@ SELECT * FROM work_v;
  public  | st1_exp |       30 |     10000 |             0 |       30 | lower   | pg_catalog          | text    |        -1 | f          |           0 |        5 |           3 |        1 |        3 |        0 |        0 |        0 |     98 |    664 |      0 |      0 |      0 | {0.3334,0.3333,0.3333} | {0.3332}    | (null)      | (null)      | (null)      | {1,0,2}                | (null)     | (null)     | (null)     | (null)
  public  | st1_idx |       30 |     10000 |             0 |       30 |         | (null)              | (null)  |    (null) | (null)     |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) | (null)                 | (null)      | (null)      | (null)      | (null)      | (null)                 | (null)     | (null)     | (null)     | (null)
  s0      | sft0    |        1 |        10 |             0 |        0 | id      | pg_catalog          | int4    |        -1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {1,2,3,4,5,6,7,8,9,10} | (null)     | (null)     | (null)     | (null)
+ s0      | smv0    |        1 |         2 |             1 |        1 | id      | pg_catalog          | int4    |        -1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {1,2}                  | (null)     | (null)     | (null)     | (null)
+ s0      | smv0    |        1 |         2 |             1 |        1 | num     | pg_catalog          | int4    |        -1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {10,20}                | (null)     | (null)     | (null)     | (null)
+ s0      | smv0    |        1 |         2 |             1 |        1 | txt     | pg_catalog          | text    |        -1 | f          |           0 |        3 |          -1 |        2 |        3 |        0 |        0 |        0 |    664 |    664 |      0 |      0 |      0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {1,test}               | (null)     | (null)     | (null)     | (null)
  s0      | st0     |        1 |         2 |             1 |        1 | id      | pg_catalog          | int4    |        -1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {1,2}                  | (null)     | (null)     | (null)     | (null)
  s0      | st0     |        1 |         2 |             1 |        1 | id      | pg_catalog          | int4    |        -1 | t          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {1,2,4,5,6}            | (null)     | (null)     | (null)     | (null)
  s0      | st0     |        1 |         2 |             1 |        1 | num     | pg_catalog          | int4    |        -1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {10,20}                | (null)     | (null)     | (null)     | (null)
@@ -155,12 +159,12 @@ SELECT * FROM work_v;
  s0      | st3     |        0 |         0 |             0 |        0 |         | (null)              | (null)  |    (null) | (null)     |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) | (null)                 | (null)      | (null)      | (null)      | (null)      | (null)                 | (null)     | (null)     | (null)     | (null)
  s1      | st0     |        1 |         4 |             1 |        1 | id      | pg_catalog          | int4    |        -1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {1,2,3,4}              | (null)     | (null)     | (null)     | (null)
  s1      | st0     |        1 |         4 |             1 |        1 | num     | pg_catalog          | int4    |        -1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {15,25,35,45}          | (null)     | (null)     | (null)     | (null)
-(24 rows)
+(27 rows)
 
 TRUNCATE dbms_stats.work;
 -- No.16-1-2
-\! sed '/ORDER/i\\ AND n2.nspname = '"\'s0\'" export_plain_stats-9.2.sql.sample > export_plain_stats-9.2.sql.sample_test
-\i export_plain_stats-9.2.sql.sample_test
+\! sed '/ORDER/i\\ AND n2.nspname = '"\'s0\'" export_plain_stats-9.3.sql.sample > export_plain_stats-9.3.sql.sample_test
+\i export_plain_stats-9.3.sql.sample_test
 /*
  * If you want the statistics of per-relation or per-column, please modify
  * nspname, relname, and attname in 'WHERE' clause.
@@ -220,7 +224,7 @@ COPY (SELECT n2.nspname,
           ON s.starelid = c.oid
         JOIN pg_catalog.pg_namespace n2
           ON c.relnamespace = n2.oid
-       WHERE c.relkind IN ('r', 'i', 'f')
+       WHERE c.relkind IN ('r', 'i', 'f', 'm')
          AND NOT n2.nspname IN ('pg_catalog',
                                 'pg_toast',
                                 'information_schema',
@@ -239,6 +243,9 @@ SELECT * FROM work_v;
  nspname | relname | relpages | reltuples | relallvisible | curpages | attname | nspname_of_typename | typname | atttypmod | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 |       stavalues1       | stavalues2 | stavalues3 | stavalues4 | stavalues5 
 ---------+---------+----------+-----------+---------------+----------+---------+---------------------+---------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+-------------+-------------+-------------+-------------+-------------+------------------------+------------+------------+------------+------------
  s0      | sft0    |        1 |        10 |             0 |        0 | id      | pg_catalog          | int4    |        -1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2,3,4,5,6,7,8,9,10} | (null)     | (null)     | (null)     | (null)
+ s0      | smv0    |        1 |         2 |             1 |        1 | id      | pg_catalog          | int4    |        -1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2}                  | (null)     | (null)     | (null)     | (null)
+ s0      | smv0    |        1 |         2 |             1 |        1 | num     | pg_catalog          | int4    |        -1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)      | {1}         | (null)      | (null)      | (null)      | {10,20}                | (null)     | (null)     | (null)     | (null)
+ s0      | smv0    |        1 |         2 |             1 |        1 | txt     | pg_catalog          | text    |        -1 | f          |           0 |        3 |          -1 |        2 |        3 |        0 |        0 |        0 |    664 |    664 |      0 |      0 |      0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,test}               | (null)     | (null)     | (null)     | (null)
  s0      | st0     |        1 |         2 |             1 |        1 | id      | pg_catalog          | int4    |        -1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2}                  | (null)     | (null)     | (null)     | (null)
  s0      | st0     |        1 |         2 |             1 |        1 | id      | pg_catalog          | int4    |        -1 | t          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2,4,5,6}            | (null)     | (null)     | (null)     | (null)
  s0      | st0     |        1 |         2 |             1 |        1 | num     | pg_catalog          | int4    |        -1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)      | {1}         | (null)      | (null)      | (null)      | {10,20}                | (null)     | (null)     | (null)     | (null)
@@ -251,13 +258,13 @@ SELECT * FROM work_v;
  s0      | st2     |        1 |         3 |             1 |        1 | txt     | pg_catalog          | text    |        -1 | f          |           0 |        5 |          -1 |        2 |        3 |        0 |        0 |        0 |    664 |    664 |      0 |      0 |      0 | (null)      | {0.5}       | (null)      | (null)      | (null)      | {1,comment,test}       | (null)     | (null)     | (null)     | (null)
  s0      | st2_idx |        2 |         3 |             0 |        2 |         | (null)              | (null)  |    (null) | (null)     |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)                 | (null)     | (null)     | (null)     | (null)
  s0      | st3     |        0 |         0 |             0 |        0 |         | (null)              | (null)  |    (null) | (null)     |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)                 | (null)     | (null)     | (null)     | (null)
-(13 rows)
+(16 rows)
 
 TRUNCATE dbms_stats.work;
-\! rm export_plain_stats-9.2.sql.sample_test
+\! rm export_plain_stats-9.3.sql.sample_test
 -- No.16-1-3
-\! sed '/ORDER/i\\ AND c.relname = '"\'st0\'" export_plain_stats-9.2.sql.sample > export_plain_stats-9.2.sql.sample_test
-\i export_plain_stats-9.2.sql.sample_test
+\! sed '/ORDER/i\\ AND c.relname = '"\'st0\'" export_plain_stats-9.3.sql.sample > export_plain_stats-9.3.sql.sample_test
+\i export_plain_stats-9.3.sql.sample_test
 /*
  * If you want the statistics of per-relation or per-column, please modify
  * nspname, relname, and attname in 'WHERE' clause.
@@ -317,7 +324,7 @@ COPY (SELECT n2.nspname,
           ON s.starelid = c.oid
         JOIN pg_catalog.pg_namespace n2
           ON c.relnamespace = n2.oid
-       WHERE c.relkind IN ('r', 'i', 'f')
+       WHERE c.relkind IN ('r', 'i', 'f', 'm')
          AND NOT n2.nspname IN ('pg_catalog',
                                 'pg_toast',
                                 'information_schema',
@@ -346,10 +353,10 @@ SELECT * FROM work_v;
 (8 rows)
 
 TRUNCATE dbms_stats.work;
-\! rm export_plain_stats-9.2.sql.sample_test
+\! rm export_plain_stats-9.3.sql.sample_test
 -- No.16-1-4
-\! sed '/ORDER/i\\ AND c.relname = '"\'pg_toast_1262\'" export_plain_stats-9.2.sql.sample > export_plain_stats-9.2.sql.sample_test
-\i export_plain_stats-9.2.sql.sample_test
+\! sed '/ORDER/i\\ AND c.relname = '"\'pg_toast_1262\'" export_plain_stats-9.3.sql.sample > export_plain_stats-9.3.sql.sample_test
+\i export_plain_stats-9.3.sql.sample_test
 /*
  * If you want the statistics of per-relation or per-column, please modify
  * nspname, relname, and attname in 'WHERE' clause.
@@ -409,7 +416,7 @@ COPY (SELECT n2.nspname,
           ON s.starelid = c.oid
         JOIN pg_catalog.pg_namespace n2
           ON c.relnamespace = n2.oid
-       WHERE c.relkind IN ('r', 'i', 'f')
+       WHERE c.relkind IN ('r', 'i', 'f', 'm')
          AND NOT n2.nspname IN ('pg_catalog',
                                 'pg_toast',
                                 'information_schema',
@@ -430,10 +437,10 @@ SELECT * FROM work_v;
 (0 rows)
 
 TRUNCATE dbms_stats.work;
-\! rm export_plain_stats-9.2.sql.sample_test
+\! rm export_plain_stats-9.3.sql.sample_test
 -- No.16-1-5
-\! sed '/ORDER/i\\ AND c.relname = '"\'st0_idx\'" export_plain_stats-9.2.sql.sample > export_plain_stats-9.2.sql.sample_test
-\i export_plain_stats-9.2.sql.sample_test
+\! sed '/ORDER/i\\ AND c.relname = '"\'st0_idx\'" export_plain_stats-9.3.sql.sample > export_plain_stats-9.3.sql.sample_test
+\i export_plain_stats-9.3.sql.sample_test
 /*
  * If you want the statistics of per-relation or per-column, please modify
  * nspname, relname, and attname in 'WHERE' clause.
@@ -493,7 +500,7 @@ COPY (SELECT n2.nspname,
           ON s.starelid = c.oid
         JOIN pg_catalog.pg_namespace n2
           ON c.relnamespace = n2.oid
-       WHERE c.relkind IN ('r', 'i', 'f')
+       WHERE c.relkind IN ('r', 'i', 'f', 'm')
          AND NOT n2.nspname IN ('pg_catalog',
                                 'pg_toast',
                                 'information_schema',
@@ -516,10 +523,10 @@ SELECT * FROM work_v;
 (2 rows)
 
 TRUNCATE dbms_stats.work;
-\! rm export_plain_stats-9.2.sql.sample_test
+\! rm export_plain_stats-9.3.sql.sample_test
 -- No.16-1-6
-\! sed '/ORDER/i\\ AND c.relname = '"\'ss0\'" export_plain_stats-9.2.sql.sample > export_plain_stats-9.2.sql.sample_test
-\i export_plain_stats-9.2.sql.sample_test
+\! sed '/ORDER/i\\ AND c.relname = '"\'ss0\'" export_plain_stats-9.3.sql.sample > export_plain_stats-9.3.sql.sample_test
+\i export_plain_stats-9.3.sql.sample_test
 /*
  * If you want the statistics of per-relation or per-column, please modify
  * nspname, relname, and attname in 'WHERE' clause.
@@ -579,7 +586,7 @@ COPY (SELECT n2.nspname,
           ON s.starelid = c.oid
         JOIN pg_catalog.pg_namespace n2
           ON c.relnamespace = n2.oid
-       WHERE c.relkind IN ('r', 'i', 'f')
+       WHERE c.relkind IN ('r', 'i', 'f', 'm')
          AND NOT n2.nspname IN ('pg_catalog',
                                 'pg_toast',
                                 'information_schema',
@@ -600,10 +607,10 @@ SELECT * FROM work_v;
 (0 rows)
 
 TRUNCATE dbms_stats.work;
-\! rm export_plain_stats-9.2.sql.sample_test
+\! rm export_plain_stats-9.3.sql.sample_test
 -- No.16-1-7
-\! sed '/ORDER/i\\ AND c.relname = '"\'sc0\'" export_plain_stats-9.2.sql.sample > export_plain_stats-9.2.sql.sample_test
-\i export_plain_stats-9.2.sql.sample_test
+\! sed '/ORDER/i\\ AND c.relname = '"\'sc0\'" export_plain_stats-9.3.sql.sample > export_plain_stats-9.3.sql.sample_test
+\i export_plain_stats-9.3.sql.sample_test
 /*
  * If you want the statistics of per-relation or per-column, please modify
  * nspname, relname, and attname in 'WHERE' clause.
@@ -663,7 +670,7 @@ COPY (SELECT n2.nspname,
           ON s.starelid = c.oid
         JOIN pg_catalog.pg_namespace n2
           ON c.relnamespace = n2.oid
-       WHERE c.relkind IN ('r', 'i', 'f')
+       WHERE c.relkind IN ('r', 'i', 'f', 'm')
          AND NOT n2.nspname IN ('pg_catalog',
                                 'pg_toast',
                                 'information_schema',
@@ -684,10 +691,10 @@ SELECT * FROM work_v;
 (0 rows)
 
 TRUNCATE dbms_stats.work;
-\! rm export_plain_stats-9.2.sql.sample_test
+\! rm export_plain_stats-9.3.sql.sample_test
 -- No.16-1-8
-\! sed '/ORDER/i\\ AND c.relname = '"\'sft0\'" export_plain_stats-9.2.sql.sample > export_plain_stats-9.2.sql.sample_test
-\i export_plain_stats-9.2.sql.sample_test
+\! sed '/ORDER/i\\ AND c.relname = '"\'sft0\'" export_plain_stats-9.3.sql.sample > export_plain_stats-9.3.sql.sample_test
+\i export_plain_stats-9.3.sql.sample_test
 /*
  * If you want the statistics of per-relation or per-column, please modify
  * nspname, relname, and attname in 'WHERE' clause.
@@ -747,7 +754,7 @@ COPY (SELECT n2.nspname,
           ON s.starelid = c.oid
         JOIN pg_catalog.pg_namespace n2
           ON c.relnamespace = n2.oid
-       WHERE c.relkind IN ('r', 'i', 'f')
+       WHERE c.relkind IN ('r', 'i', 'f', 'm')
          AND NOT n2.nspname IN ('pg_catalog',
                                 'pg_toast',
                                 'information_schema',
@@ -769,10 +776,10 @@ SELECT * FROM work_v;
 (1 row)
 
 TRUNCATE dbms_stats.work;
-\! rm export_plain_stats-9.2.sql.sample_test
--- No.16-1-10
-\! sed '/ORDER/i\\ AND n2.nspname = '"\'s0\'"' AND a.attname = '\'id\' export_plain_stats-9.2.sql.sample > export_plain_stats-9.2.sql.sample_test
-\i export_plain_stats-9.2.sql.sample_test
+\! rm export_plain_stats-9.3.sql.sample_test
+-- No.16-1-9
+\! sed '/ORDER/i\\ AND c.relname = '"\'smv0\'" export_plain_stats-9.3.sql.sample > export_plain_stats-9.3.sql.sample_test
+\i export_plain_stats-9.3.sql.sample_test
 /*
  * If you want the statistics of per-relation or per-column, please modify
  * nspname, relname, and attname in 'WHERE' clause.
@@ -832,7 +839,94 @@ COPY (SELECT n2.nspname,
           ON s.starelid = c.oid
         JOIN pg_catalog.pg_namespace n2
           ON c.relnamespace = n2.oid
-       WHERE c.relkind IN ('r', 'i', 'f')
+       WHERE c.relkind IN ('r', 'i', 'f', 'm')
+         AND NOT n2.nspname IN ('pg_catalog',
+                                'pg_toast',
+                                'information_schema',
+                                'dbms_stats')
+        -- AND n2.nspname = 'public'
+        -- AND c.relname = 'test'
+        -- AND a.attname = 'id'
+ AND c.relname = 'smv0'
+       ORDER BY starelid, staattnum)
+TO STDOUT
+(FORMAT 'binary');
+\o
+COMMIT;
+COPY dbms_stats.work FROM '/home/suzukitks/dbms_stats_directory/pg_dbms_stats/export_stats.dmp' (FORMAT 'binary');
+SELECT * FROM work_v;
+ nspname | relname | relpages | reltuples | relallvisible | curpages | attname | nspname_of_typename | typname | atttypmod | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 | stavalues1 | stavalues2 | stavalues3 | stavalues4 | stavalues5 
+---------+---------+----------+-----------+---------------+----------+---------+---------------------+---------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+-------------+-------------+-------------+-------------+-------------+------------+------------+------------+------------+------------
+ s0      | smv0    |        1 |         2 |             1 |        1 | id      | pg_catalog          | int4    |        -1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2}      | (null)     | (null)     | (null)     | (null)
+ s0      | smv0    |        1 |         2 |             1 |        1 | num     | pg_catalog          | int4    |        -1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)      | {1}         | (null)      | (null)      | (null)      | {10,20}    | (null)     | (null)     | (null)     | (null)
+ s0      | smv0    |        1 |         2 |             1 |        1 | txt     | pg_catalog          | text    |        -1 | f          |           0 |        3 |          -1 |        2 |        3 |        0 |        0 |        0 |    664 |    664 |      0 |      0 |      0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,test}   | (null)     | (null)     | (null)     | (null)
+(3 rows)
+
+TRUNCATE dbms_stats.work;
+\! rm export_plain_stats-9.3.sql.sample_test
+-- No.16-1-10
+\! sed '/ORDER/i\\ AND n2.nspname = '"\'s0\'"' AND a.attname = '\'id\' export_plain_stats-9.3.sql.sample > export_plain_stats-9.3.sql.sample_test
+\i export_plain_stats-9.3.sql.sample_test
+/*
+ * If you want the statistics of per-relation or per-column, please modify
+ * nspname, relname, and attname in 'WHERE' clause.
+ */
+BEGIN TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+/*
+ * If you want to chage the output file name, please modify the following name.
+ */
+\o export_stats.dmp
+COPY (SELECT n2.nspname,
+             c.relname,
+             c.relpages,
+             c.reltuples,
+             c.relallvisible,
+             (pg_relation_size(c.oid) / current_setting('block_size')::int4)::int4
+                 AS curpages,
+             pg_catalog.pg_stat_get_last_analyze_time(c.oid)
+                 AS last_analyze,
+             pg_catalog.pg_stat_get_last_autoanalyze_time(c.oid)
+                 AS last_autoanalyze,
+             COALESCE(a.attname, ''),
+             n1.nspname AS schemaname_of_atttype,
+             t.typname,
+             a.atttypmod,
+             s.stainherit,
+             s.stanullfrac,
+             s.stawidth,
+             s.stadistinct,
+             s.stakind1,
+             s.stakind2,
+             s.stakind3,
+             s.stakind4,
+             s.stakind5,
+             s.staop1,
+             s.staop2,
+             s.staop3,
+             s.staop4,
+             s.staop5,
+             s.stanumbers1,
+             s.stanumbers2,
+             s.stanumbers3,
+             s.stanumbers4,
+             s.stanumbers5,
+             s.stavalues1,
+             s.stavalues2,
+             s.stavalues3,
+             s.stavalues4,
+             s.stavalues5
+        FROM pg_statistic s
+        JOIN pg_attribute a
+          ON (s.starelid = a.attrelid AND s.staattnum = a.attnum)
+        JOIN pg_type t
+          ON a.atttypid = t.oid
+        JOIN pg_namespace n1
+          ON t.typnamespace = n1.oid
+       RIGHT JOIN pg_catalog.pg_class c
+          ON s.starelid = c.oid
+        JOIN pg_catalog.pg_namespace n2
+          ON c.relnamespace = n2.oid
+       WHERE c.relkind IN ('r', 'i', 'f', 'm')
          AND NOT n2.nspname IN ('pg_catalog',
                                 'pg_toast',
                                 'information_schema',
@@ -851,17 +945,18 @@ SELECT * FROM work_v;
  nspname | relname | relpages | reltuples | relallvisible | curpages | attname | nspname_of_typename | typname | atttypmod | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 |       stavalues1       | stavalues2 | stavalues3 | stavalues4 | stavalues5 
 ---------+---------+----------+-----------+---------------+----------+---------+---------------------+---------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+-------------+-------------+-------------+-------------+-------------+------------------------+------------+------------+------------+------------
  s0      | sft0    |        1 |        10 |             0 |        0 | id      | pg_catalog          | int4    |        -1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2,3,4,5,6,7,8,9,10} | (null)     | (null)     | (null)     | (null)
+ s0      | smv0    |        1 |         2 |             1 |        1 | id      | pg_catalog          | int4    |        -1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2}                  | (null)     | (null)     | (null)     | (null)
  s0      | st0     |        1 |         2 |             1 |        1 | id      | pg_catalog          | int4    |        -1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2}                  | (null)     | (null)     | (null)     | (null)
  s0      | st0     |        1 |         2 |             1 |        1 | id      | pg_catalog          | int4    |        -1 | t          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2,4,5,6}            | (null)     | (null)     | (null)     | (null)
  s0      | st1     |        1 |         3 |             1 |        1 | id      | pg_catalog          | int4    |        -1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)      | {1}         | (null)      | (null)      | (null)      | {4,5,6}                | (null)     | (null)     | (null)     | (null)
  s0      | st2     |        1 |         3 |             1 |        1 | id      | pg_catalog          | int4    |        -1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2,3}                | (null)     | (null)     | (null)     | (null)
-(5 rows)
+(6 rows)
 
 TRUNCATE dbms_stats.work;
-\! rm export_plain_stats-9.2.sql.sample_test
+\! rm export_plain_stats-9.3.sql.sample_test
 -- No.16-1-11
-\! sed '/ORDER/i\\ AND n2.nspname = '"\'s0\'"' AND a.attname IS NULL' export_plain_stats-9.2.sql.sample > export_plain_stats-9.2.sql.sample_test
-\i export_plain_stats-9.2.sql.sample_test
+\! sed '/ORDER/i\\ AND n2.nspname = '"\'s0\'"' AND a.attname IS NULL' export_plain_stats-9.3.sql.sample > export_plain_stats-9.3.sql.sample_test
+\i export_plain_stats-9.3.sql.sample_test
 /*
  * If you want the statistics of per-relation or per-column, please modify
  * nspname, relname, and attname in 'WHERE' clause.
@@ -921,7 +1016,7 @@ COPY (SELECT n2.nspname,
           ON s.starelid = c.oid
         JOIN pg_catalog.pg_namespace n2
           ON c.relnamespace = n2.oid
-       WHERE c.relkind IN ('r', 'i', 'f')
+       WHERE c.relkind IN ('r', 'i', 'f', 'm')
          AND NOT n2.nspname IN ('pg_catalog',
                                 'pg_toast',
                                 'information_schema',
@@ -946,10 +1041,10 @@ SELECT * FROM work_v;
 (4 rows)
 
 TRUNCATE dbms_stats.work;
-\! rm export_plain_stats-9.2.sql.sample_test
+\! rm export_plain_stats-9.3.sql.sample_test
 -- No.16-1-12
-\! sed '/ORDER/i\\ AND n2.nspname = '"\'s1\'"' AND c.relname IS NULL' export_plain_stats-9.2.sql.sample > export_plain_stats-9.2.sql.sample_test
-\i export_plain_stats-9.2.sql.sample_test
+\! sed '/ORDER/i\\ AND n2.nspname = '"\'s1\'"' AND c.relname IS NULL' export_plain_stats-9.3.sql.sample > export_plain_stats-9.3.sql.sample_test
+\i export_plain_stats-9.3.sql.sample_test
 /*
  * If you want the statistics of per-relation or per-column, please modify
  * nspname, relname, and attname in 'WHERE' clause.
@@ -1009,7 +1104,7 @@ COPY (SELECT n2.nspname,
           ON s.starelid = c.oid
         JOIN pg_catalog.pg_namespace n2
           ON c.relnamespace = n2.oid
-       WHERE c.relkind IN ('r', 'i', 'f')
+       WHERE c.relkind IN ('r', 'i', 'f', 'm')
          AND NOT n2.nspname IN ('pg_catalog',
                                 'pg_toast',
                                 'information_schema',
@@ -1030,9 +1125,9 @@ SELECT * FROM work_v;
 (0 rows)
 
 TRUNCATE dbms_stats.work;
-\! rm export_plain_stats-9.2.sql.sample_test
+\! rm export_plain_stats-9.3.sql.sample_test
 /*
- * No.16-2 export_effective_stats-9.2.sql.sample
+ * No.16-2 export_effective_stats-9.3.sql.sample
  */
 -- No.16-2-1
 VACUUM ANALYZE;
@@ -1053,9 +1148,10 @@ SELECT dbms_stats.lock_database_stats();
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
  s0.st3
-(16 rows)
+(17 rows)
 
 UPDATE dbms_stats._relation_stats_locked
    SET (relpages, reltuples, relallvisible, curpages) = (NULL, NULL, NULL, NULL);
@@ -1071,7 +1167,7 @@ UPDATE dbms_stats._column_stats_locked
         NULL, NULL, NULL, NULL, NULL,
         NULL, NULL, NULL, NULL, NULL)
  WHERE starelid = 's0.st0'::regclass;
-\i export_effective_stats-9.2.sql.sample
+\i export_effective_stats-9.3.sql.sample
 /*
  * If you want the statistics of per-relation or per-column, please modify
  * nspname, relname, and attname in 'WHERE' clause.
@@ -1152,6 +1248,9 @@ SELECT * FROM work_v;
  public  | st1_exp |       30 |     10000 |             0 |       30 | lower   | pg_catalog          | text    |        -1 | f          |          -1 |       -1 |          -1 |        2 |        3 |        4 |        1 |        5 |     22 |     23 |     24 |     21 |     25 | {-1,22}     | {-1,23}     | {-1,24}     | {-1,21}     | {-1,25}     | (null)           | (null)     | {1,0,2}                | (null)     | (null)
  public  | st1_idx |       30 |     10000 |             0 |       30 |         | (null)              | (null)  |    (null) | (null)     |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)           | (null)     | (null)                 | (null)     | (null)
  s0      | sft0    |        1 |        10 |             0 |        0 | id      | pg_catalog          | int4    |        -1 | f          |          -1 |       -1 |          -1 |        2 |        3 |        4 |        1 |        5 |     22 |     23 |     24 |     21 |     25 | {-1,22}     | {-1,23}     | {-1,24}     | {-1,21}     | {-1,25}     | (null)           | (null)     | {1,2,3,4,5,6,7,8,9,10} | (null)     | (null)
+ s0      | smv0    |        1 |         2 |             1 |        1 | id      | pg_catalog          | int4    |        -1 | f          |          -1 |       -1 |          -1 |        2 |        3 |        4 |        1 |        5 |     22 |     23 |     24 |     21 |     25 | {-1,22}     | {-1,23}     | {-1,24}     | {-1,21}     | {-1,25}     | (null)           | (null)     | {1,2}                  | (null)     | (null)
+ s0      | smv0    |        1 |         2 |             1 |        1 | num     | pg_catalog          | int4    |        -1 | f          |          -2 |       -2 |          -2 |        2 |        3 |        4 |        1 |        5 |     22 |     23 |     24 |     21 |     25 | {-2,22}     | {-2,23}     | {-2,24}     | {-2,21}     | {-2,25}     | (null)           | (null)     | {10,20}                | (null)     | (null)
+ s0      | smv0    |        1 |         2 |             1 |        1 | txt     | pg_catalog          | text    |        -1 | f          |          -3 |       -3 |          -3 |        2 |        3 |        4 |        1 |        5 |     22 |     23 |     24 |     21 |     25 | {-3,22}     | {-3,23}     | {-3,24}     | {-3,21}     | {-3,25}     | (null)           | (null)     | {1,test}               | (null)     | (null)
  s0      | st0     |        1 |         2 |             1 |        1 | id      | pg_catalog          | int4    |        -1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2}            | (null)     | (null)                 | (null)     | (null)
  s0      | st0     |        1 |         2 |             1 |        1 | id      | pg_catalog          | int4    |        -1 | t          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2,4,5,6}      | (null)     | (null)                 | (null)     | (null)
  s0      | st0     |        1 |         2 |             1 |        1 | num     | pg_catalog          | int4    |        -1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)      | {1}         | (null)      | (null)      | (null)      | {10,20}          | (null)     | (null)                 | (null)     | (null)
@@ -1166,12 +1265,12 @@ SELECT * FROM work_v;
  s0      | st3     |        0 |         0 |             0 |        0 |         | (null)              | (null)  |    (null) | (null)     |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)           | (null)     | (null)                 | (null)     | (null)
  s1      | st0     |        1 |         4 |             1 |        1 | id      | pg_catalog          | int4    |        -1 | f          |          -1 |       -1 |          -1 |        2 |        3 |        4 |        1 |        5 |     22 |     23 |     24 |     21 |     25 | {-1,22}     | {-1,23}     | {-1,24}     | {-1,21}     | {-1,25}     | (null)           | (null)     | {1,2,3,4}              | (null)     | (null)
  s1      | st0     |        1 |         4 |             1 |        1 | num     | pg_catalog          | int4    |        -1 | f          |          -2 |       -2 |          -2 |        2 |        3 |        4 |        1 |        5 |     22 |     23 |     24 |     21 |     25 | {-2,22}     | {-2,23}     | {-2,24}     | {-2,21}     | {-2,25}     | (null)           | (null)     | {15,25,35,45}          | (null)     | (null)
-(24 rows)
+(27 rows)
 
 TRUNCATE dbms_stats.work;
 -- No.16-2-2
-\! sed '/ORDER/i\\ WHERE n2.nspname = '"\'s0\'" export_effective_stats-9.2.sql.sample > export_effective_stats-9.2.sql.sample_test
-\i export_effective_stats-9.2.sql.sample_test
+\! sed '/ORDER/i\\ WHERE n2.nspname = '"\'s0\'" export_effective_stats-9.3.sql.sample > export_effective_stats-9.3.sql.sample_test
+\i export_effective_stats-9.3.sql.sample_test
 /*
  * If you want the statistics of per-relation or per-column, please modify
  * nspname, relname, and attname in 'WHERE' clause.
@@ -1244,6 +1343,9 @@ SELECT * FROM work_v;
  nspname | relname | relpages | reltuples | relallvisible | curpages | attname | nspname_of_typename | typname | atttypmod | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 |    stavalues1    | stavalues2 |       stavalues3       | stavalues4 | stavalues5 
 ---------+---------+----------+-----------+---------------+----------+---------+---------------------+---------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+-------------+-------------+-------------+-------------+-------------+------------------+------------+------------------------+------------+------------
  s0      | sft0    |        1 |        10 |             0 |        0 | id      | pg_catalog          | int4    |        -1 | f          |          -1 |       -1 |          -1 |        2 |        3 |        4 |        1 |        5 |     22 |     23 |     24 |     21 |     25 | {-1,22}     | {-1,23}     | {-1,24}     | {-1,21}     | {-1,25}     | (null)           | (null)     | {1,2,3,4,5,6,7,8,9,10} | (null)     | (null)
+ s0      | smv0    |        1 |         2 |             1 |        1 | id      | pg_catalog          | int4    |        -1 | f          |          -1 |       -1 |          -1 |        2 |        3 |        4 |        1 |        5 |     22 |     23 |     24 |     21 |     25 | {-1,22}     | {-1,23}     | {-1,24}     | {-1,21}     | {-1,25}     | (null)           | (null)     | {1,2}                  | (null)     | (null)
+ s0      | smv0    |        1 |         2 |             1 |        1 | num     | pg_catalog          | int4    |        -1 | f          |          -2 |       -2 |          -2 |        2 |        3 |        4 |        1 |        5 |     22 |     23 |     24 |     21 |     25 | {-2,22}     | {-2,23}     | {-2,24}     | {-2,21}     | {-2,25}     | (null)           | (null)     | {10,20}                | (null)     | (null)
+ s0      | smv0    |        1 |         2 |             1 |        1 | txt     | pg_catalog          | text    |        -1 | f          |          -3 |       -3 |          -3 |        2 |        3 |        4 |        1 |        5 |     22 |     23 |     24 |     21 |     25 | {-3,22}     | {-3,23}     | {-3,24}     | {-3,21}     | {-3,25}     | (null)           | (null)     | {1,test}               | (null)     | (null)
  s0      | st0     |        1 |         2 |             1 |        1 | id      | pg_catalog          | int4    |        -1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2}            | (null)     | (null)                 | (null)     | (null)
  s0      | st0     |        1 |         2 |             1 |        1 | id      | pg_catalog          | int4    |        -1 | t          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2,4,5,6}      | (null)     | (null)                 | (null)     | (null)
  s0      | st0     |        1 |         2 |             1 |        1 | num     | pg_catalog          | int4    |        -1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)      | {1}         | (null)      | (null)      | (null)      | {10,20}          | (null)     | (null)                 | (null)     | (null)
@@ -1256,13 +1358,13 @@ SELECT * FROM work_v;
  s0      | st2     |        1 |         3 |             1 |        1 | txt     | pg_catalog          | text    |        -1 | f          |          -2 |       -2 |          -2 |        2 |        3 |        4 |        1 |        5 |     22 |     23 |     24 |     21 |     25 | {-2,22}     | {-2,23}     | {-2,24}     | {-2,21}     | {-2,25}     | (null)           | (null)     | {1,comment,test}       | (null)     | (null)
  s0      | st2_idx |        2 |         3 |             0 |        2 |         | (null)              | (null)  |    (null) | (null)     |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)           | (null)     | (null)                 | (null)     | (null)
  s0      | st3     |        0 |         0 |             0 |        0 |         | (null)              | (null)  |    (null) | (null)     |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)           | (null)     | (null)                 | (null)     | (null)
-(13 rows)
+(16 rows)
 
-\! rm export_effective_stats-9.2.sql.sample_test
+\! rm export_effective_stats-9.3.sql.sample_test
 TRUNCATE dbms_stats.work;
 -- No.16-2-3
-\! sed '/ORDER/i\\ WHERE cl.relname = '"\'st0\'" export_effective_stats-9.2.sql.sample > export_effective_stats-9.2.sql.sample_test
-\i export_effective_stats-9.2.sql.sample_test
+\! sed '/ORDER/i\\ WHERE cl.relname = '"\'st0\'" export_effective_stats-9.3.sql.sample > export_effective_stats-9.3.sql.sample_test
+\i export_effective_stats-9.3.sql.sample_test
 /*
  * If you want the statistics of per-relation or per-column, please modify
  * nspname, relname, and attname in 'WHERE' clause.
@@ -1344,11 +1446,11 @@ SELECT * FROM work_v;
  s1      | st0     |        1 |         4 |             1 |        1 | num     | pg_catalog          | int4    |        -1 | f          |          -2 |       -2 |          -2 |        2 |        3 |        4 |        1 |        5 |     22 |     23 |     24 |     21 |     25 | {-2,22}     | {-2,23}     | {-2,24}     | {-2,21}     | {-2,25}     | (null)           | (null)     | {15,25,35,45} | (null)     | (null)
 (8 rows)
 
-\! rm export_effective_stats-9.2.sql.sample_test
+\! rm export_effective_stats-9.3.sql.sample_test
 TRUNCATE dbms_stats.work;
 -- No.16-2-4
-\! sed '/ORDER/i\\ WHERE cl.relname = '"\'pg_toast_1262\'" export_effective_stats-9.2.sql.sample > export_effective_stats-9.2.sql.sample_test
-\i export_effective_stats-9.2.sql.sample_test
+\! sed '/ORDER/i\\ WHERE cl.relname = '"\'pg_toast_1262\'" export_effective_stats-9.3.sql.sample > export_effective_stats-9.3.sql.sample_test
+\i export_effective_stats-9.3.sql.sample_test
 /*
  * If you want the statistics of per-relation or per-column, please modify
  * nspname, relname, and attname in 'WHERE' clause.
@@ -1422,11 +1524,11 @@ SELECT * FROM work_v;
 ---------+---------+----------+-----------+---------------+----------+---------+---------------------+---------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+-------------+-------------+-------------+-------------+-------------+------------+------------+------------+------------+------------
 (0 rows)
 
-\! rm export_effective_stats-9.2.sql.sample_test
+\! rm export_effective_stats-9.3.sql.sample_test
 TRUNCATE dbms_stats.work;
 -- No.16-2-5
-\! sed '/ORDER/i\\ WHERE cl.relname = '"\'st0_idx\'" export_effective_stats-9.2.sql.sample > export_effective_stats-9.2.sql.sample_test
-\i export_effective_stats-9.2.sql.sample_test
+\! sed '/ORDER/i\\ WHERE cl.relname = '"\'st0_idx\'" export_effective_stats-9.3.sql.sample > export_effective_stats-9.3.sql.sample_test
+\i export_effective_stats-9.3.sql.sample_test
 /*
  * If you want the statistics of per-relation or per-column, please modify
  * nspname, relname, and attname in 'WHERE' clause.
@@ -1502,11 +1604,11 @@ SELECT * FROM work_v;
  s0      | st0_idx |        2 |         2 |             0 |        2 |         | (null)              | (null)  |    (null) | (null)     |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)     | (null)     | (null)     | (null)     | (null)
 (2 rows)
 
-\! rm export_effective_stats-9.2.sql.sample_test
+\! rm export_effective_stats-9.3.sql.sample_test
 TRUNCATE dbms_stats.work;
 -- No.16-2-6
-\! sed '/ORDER/i\\ WHERE cl.relname = '"\'ss0\'" export_effective_stats-9.2.sql.sample > export_effective_stats-9.2.sql.sample_test
-\i export_effective_stats-9.2.sql.sample_test
+\! sed '/ORDER/i\\ WHERE cl.relname = '"\'ss0\'" export_effective_stats-9.3.sql.sample > export_effective_stats-9.3.sql.sample_test
+\i export_effective_stats-9.3.sql.sample_test
 /*
  * If you want the statistics of per-relation or per-column, please modify
  * nspname, relname, and attname in 'WHERE' clause.
@@ -1580,11 +1682,11 @@ SELECT * FROM work_v;
 ---------+---------+----------+-----------+---------------+----------+---------+---------------------+---------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+-------------+-------------+-------------+-------------+-------------+------------+------------+------------+------------+------------
 (0 rows)
 
-\! rm export_effective_stats-9.2.sql.sample_test
+\! rm export_effective_stats-9.3.sql.sample_test
 TRUNCATE dbms_stats.work;
 -- No.16-2-7
-\! sed '/ORDER/i\\ WHERE cl.relname = '"\'sc0\'" export_effective_stats-9.2.sql.sample > export_effective_stats-9.2.sql.sample_test
-\i export_effective_stats-9.2.sql.sample_test
+\! sed '/ORDER/i\\ WHERE cl.relname = '"\'sc0\'" export_effective_stats-9.3.sql.sample > export_effective_stats-9.3.sql.sample_test
+\i export_effective_stats-9.3.sql.sample_test
 /*
  * If you want the statistics of per-relation or per-column, please modify
  * nspname, relname, and attname in 'WHERE' clause.
@@ -1658,11 +1760,11 @@ SELECT * FROM work_v;
 ---------+---------+----------+-----------+---------------+----------+---------+---------------------+---------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+-------------+-------------+-------------+-------------+-------------+------------+------------+------------+------------+------------
 (0 rows)
 
-\! rm export_effective_stats-9.2.sql.sample_test
+\! rm export_effective_stats-9.3.sql.sample_test
 TRUNCATE dbms_stats.work;
 -- No.16-2-8
-\! sed '/ORDER/i\\ WHERE cl.relname = '"\'sft0\'" export_effective_stats-9.2.sql.sample > export_effective_stats-9.2.sql.sample_test
-\i export_effective_stats-9.2.sql.sample_test
+\! sed '/ORDER/i\\ WHERE cl.relname = '"\'sft0\'" export_effective_stats-9.3.sql.sample > export_effective_stats-9.3.sql.sample_test
+\i export_effective_stats-9.3.sql.sample_test
 /*
  * If you want the statistics of per-relation or per-column, please modify
  * nspname, relname, and attname in 'WHERE' clause.
@@ -1737,11 +1839,92 @@ SELECT * FROM work_v;
  s0      | sft0    |        1 |        10 |             0 |        0 | id      | pg_catalog          | int4    |        -1 | f          |          -1 |       -1 |          -1 |        2 |        3 |        4 |        1 |        5 |     22 |     23 |     24 |     21 |     25 | {-1,22}     | {-1,23}     | {-1,24}     | {-1,21}     | {-1,25}     | (null)     | (null)     | {1,2,3,4,5,6,7,8,9,10} | (null)     | (null)
 (1 row)
 
-\! rm export_effective_stats-9.2.sql.sample_test
+\! rm export_effective_stats-9.3.sql.sample_test
 TRUNCATE dbms_stats.work;
 -- No.16-2-9
-\! sed '/ORDER/i\\ WHERE n2.nspname = '"\'s0\'"' AND a.attname = '"\'id\'" export_effective_stats-9.2.sql.sample > export_effective_stats-9.2.sql.sample_test
-\i export_effective_stats-9.2.sql.sample_test
+\! sed '/ORDER/i\\ WHERE cl.relname = '"\'smv0\'" export_effective_stats-9.3.sql.sample > export_effective_stats-9.3.sql.sample_test
+\i export_effective_stats-9.3.sql.sample_test
+/*
+ * If you want the statistics of per-relation or per-column, please modify
+ * nspname, relname, and attname in 'WHERE' clause.
+ */
+BEGIN TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+/*
+ * If you want to chage the output file name, please modify the following name.
+ */
+\o export_stats.dmp
+COPY (SELECT n2.nspname,
+             cl.relname,
+             r.relpages,
+             r.reltuples,
+             r.relallvisible,
+             r.curpages,
+             r.last_analyze,
+             r.last_autoanalyze,
+             COALESCE(a.attname, ''),
+             n1.nspname AS schemaname_of_atttype,
+             t.typname,
+             a.atttypmod,
+             co.stainherit,
+             co.stanullfrac,
+             co.stawidth,
+             co.stadistinct,
+             co.stakind1,
+             co.stakind2,
+             co.stakind3,
+             co.stakind4,
+             co.stakind5,
+             co.staop1,
+             co.staop2,
+             co.staop3,
+             co.staop4,
+             co.staop5,
+             co.stanumbers1,
+             co.stanumbers2,
+             co.stanumbers3,
+             co.stanumbers4,
+             co.stanumbers5,
+             co.stavalues1,
+             co.stavalues2,
+             co.stavalues3,
+             co.stavalues4,
+             co.stavalues5
+        FROM dbms_stats.column_stats_effective co
+        JOIN pg_attribute a
+          ON (co.starelid = a.attrelid AND co.staattnum = a.attnum)
+        JOIN pg_type t
+          ON a.atttypid = t.oid
+        JOIN pg_namespace n1
+          ON t.typnamespace = n1.oid
+       RIGHT JOIN dbms_stats.relation_stats_effective r
+          ON co.starelid = r.relid
+        JOIN pg_catalog.pg_class cl
+          ON r.relid = cl.oid
+        JOIN pg_catalog.pg_namespace n2
+          ON cl.relnamespace = n2.oid
+       -- WHERE n2.nspname = 'public'
+       -- AND cl.relname = 'test'
+       -- AND a.attname = 'id'
+ WHERE cl.relname = 'smv0'
+       ORDER BY starelid, staattnum)
+TO STDOUT
+(FORMAT 'binary');
+\o
+COMMIT;
+COPY dbms_stats.work FROM '@abs_srcdir@/export_stats.dmp' (FORMAT 'binary');
+SELECT * FROM work_v;
+ nspname | relname | relpages | reltuples | relallvisible | curpages | attname | nspname_of_typename | typname | atttypmod | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 | stavalues1 | stavalues2 | stavalues3 | stavalues4 | stavalues5 
+---------+---------+----------+-----------+---------------+----------+---------+---------------------+---------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+-------------+-------------+-------------+-------------+-------------+------------+------------+------------+------------+------------
+ s0      | smv0    |        1 |         2 |             1 |        1 | id      | pg_catalog          | int4    |        -1 | f          |          -1 |       -1 |          -1 |        2 |        3 |        4 |        1 |        5 |     22 |     23 |     24 |     21 |     25 | {-1,22}     | {-1,23}     | {-1,24}     | {-1,21}     | {-1,25}     | (null)     | (null)     | {1,2}      | (null)     | (null)
+ s0      | smv0    |        1 |         2 |             1 |        1 | num     | pg_catalog          | int4    |        -1 | f          |          -2 |       -2 |          -2 |        2 |        3 |        4 |        1 |        5 |     22 |     23 |     24 |     21 |     25 | {-2,22}     | {-2,23}     | {-2,24}     | {-2,21}     | {-2,25}     | (null)     | (null)     | {10,20}    | (null)     | (null)
+ s0      | smv0    |        1 |         2 |             1 |        1 | txt     | pg_catalog          | text    |        -1 | f          |          -3 |       -3 |          -3 |        2 |        3 |        4 |        1 |        5 |     22 |     23 |     24 |     21 |     25 | {-3,22}     | {-3,23}     | {-3,24}     | {-3,21}     | {-3,25}     | (null)     | (null)     | {1,test}   | (null)     | (null)
+(3 rows)
+
+\! rm export_effective_stats-9.3.sql.sample_test
+TRUNCATE dbms_stats.work;
+-- No.16-2-10
+\! sed '/ORDER/i\\ WHERE n2.nspname = '"\'s0\'"' AND a.attname = '"\'id\'" export_effective_stats-9.3.sql.sample > export_effective_stats-9.3.sql.sample_test
+\i export_effective_stats-9.3.sql.sample_test
 /*
  * If you want the statistics of per-relation or per-column, please modify
  * nspname, relname, and attname in 'WHERE' clause.
@@ -1814,17 +1997,18 @@ SELECT * FROM work_v;
  nspname | relname | relpages | reltuples | relallvisible | curpages | attname | nspname_of_typename | typname | atttypmod | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 | stavalues1  | stavalues2 |       stavalues3       | stavalues4 | stavalues5 
 ---------+---------+----------+-----------+---------------+----------+---------+---------------------+---------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+-------------+-------------+-------------+-------------+-------------+-------------+------------+------------------------+------------+------------
  s0      | sft0    |        1 |        10 |             0 |        0 | id      | pg_catalog          | int4    |        -1 | f          |          -1 |       -1 |          -1 |        2 |        3 |        4 |        1 |        5 |     22 |     23 |     24 |     21 |     25 | {-1,22}     | {-1,23}     | {-1,24}     | {-1,21}     | {-1,25}     | (null)      | (null)     | {1,2,3,4,5,6,7,8,9,10} | (null)     | (null)
+ s0      | smv0    |        1 |         2 |             1 |        1 | id      | pg_catalog          | int4    |        -1 | f          |          -1 |       -1 |          -1 |        2 |        3 |        4 |        1 |        5 |     22 |     23 |     24 |     21 |     25 | {-1,22}     | {-1,23}     | {-1,24}     | {-1,21}     | {-1,25}     | (null)      | (null)     | {1,2}                  | (null)     | (null)
  s0      | st0     |        1 |         2 |             1 |        1 | id      | pg_catalog          | int4    |        -1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2}       | (null)     | (null)                 | (null)     | (null)
  s0      | st0     |        1 |         2 |             1 |        1 | id      | pg_catalog          | int4    |        -1 | t          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2,4,5,6} | (null)     | (null)                 | (null)     | (null)
  s0      | st1     |        1 |         3 |             1 |        1 | id      | pg_catalog          | int4    |        -1 | f          |          -1 |       -1 |          -1 |        2 |        3 |        4 |        1 |        5 |     22 |     23 |     24 |     21 |     25 | {-1,22}     | {-1,23}     | {-1,24}     | {-1,21}     | {-1,25}     | (null)      | (null)     | {4,5,6}                | (null)     | (null)
  s0      | st2     |        1 |         3 |             1 |        1 | id      | pg_catalog          | int4    |        -1 | f          |          -1 |       -1 |          -1 |        2 |        3 |        4 |        1 |        5 |     22 |     23 |     24 |     21 |     25 | {-1,22}     | {-1,23}     | {-1,24}     | {-1,21}     | {-1,25}     | (null)      | (null)     | {1,2,3}                | (null)     | (null)
-(5 rows)
+(6 rows)
 
-\! rm export_effective_stats-9.2.sql.sample_test
+\! rm export_effective_stats-9.3.sql.sample_test
 TRUNCATE dbms_stats.work;
--- No.16-2-10
-\! sed '/ORDER/i\\ WHERE n2.nspname = '"\'s0\'"' AND a.attname IS NULL' export_effective_stats-9.2.sql.sample > export_effective_stats-9.2.sql.sample_test
-\i export_effective_stats-9.2.sql.sample_test
+-- No.16-2-11
+\! sed '/ORDER/i\\ WHERE n2.nspname = '"\'s0\'"' AND a.attname IS NULL' export_effective_stats-9.3.sql.sample > export_effective_stats-9.3.sql.sample_test
+\i export_effective_stats-9.3.sql.sample_test
 /*
  * If you want the statistics of per-relation or per-column, please modify
  * nspname, relname, and attname in 'WHERE' clause.
@@ -1902,11 +2086,11 @@ SELECT * FROM work_v;
  s0      | st3     |        0 |         0 |             0 |        0 |         | (null)              | (null)  |    (null) | (null)     |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)     | (null)     | (null)     | (null)     | (null)
 (4 rows)
 
-\! rm export_effective_stats-9.2.sql.sample_test
+\! rm export_effective_stats-9.3.sql.sample_test
 TRUNCATE dbms_stats.work;
--- No.16-2-11
-\! sed '/ORDER/i\\ WHERE n2.nspname = '"\'s0\'"' AND cl.relname IS NULL' export_effective_stats-9.2.sql.sample > export_effective_stats-9.2.sql.sample_test
-\i export_effective_stats-9.2.sql.sample_test
+-- No.16-2-12
+\! sed '/ORDER/i\\ WHERE n2.nspname = '"\'s0\'"' AND cl.relname IS NULL' export_effective_stats-9.3.sql.sample > export_effective_stats-9.3.sql.sample_test
+\i export_effective_stats-9.3.sql.sample_test
 /*
  * If you want the statistics of per-relation or per-column, please modify
  * nspname, relname, and attname in 'WHERE' clause.
@@ -1980,7 +2164,7 @@ SELECT * FROM work_v;
 ---------+---------+----------+-----------+---------------+----------+---------+---------------------+---------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+-------------+-------------+-------------+-------------+-------------+------------+------------+------------+------------+------------
 (0 rows)
 
-\! rm export_effective_stats-9.2.sql.sample_test
+\! rm export_effective_stats-9.3.sql.sample_test
 TRUNCATE dbms_stats.work;
 /*
  * Stab function dbms_stats.import

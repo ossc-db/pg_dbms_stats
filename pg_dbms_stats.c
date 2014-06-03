@@ -1,8 +1,8 @@
 /*
  * pg_dbms_stats.c
  *
- * Copyright (c) 2009-2012, NIPPON TELEGRAPH AND TELEPHONE CORPORATION
- * Portions Copyright (c) 1996-2011, PostgreSQL Global Development Group
+ * Copyright (c) 2009-2014, NIPPON TELEGRAPH AND TELEPHONE CORPORATION
+ * Portions Copyright (c) 1996-2013, PostgreSQL Global Development Group
  * Portions Copyright (c) 1994, Regents of the University of California
  */
 #include "postgres.h"
@@ -23,6 +23,10 @@
 #include "utils/syscache.h"
 #if PG_VERSION_NUM >= 90200
 #include "utils/rel.h"
+#endif
+#if PG_VERSION_NUM >= 90300
+#include "access/htup_details.h"
+#include "utils/catcache.h"
 #endif
 
 #include "pg_dbms_stats.h"
@@ -269,6 +273,9 @@ dbms_stats_merge(PG_FUNCTION_ARGS)
  * dbms_stats_merge_internal
  *   merge the dummy statistic (lhs) and the true statistic (rhs), on the basis
  *   of given TupleDesc.
+ *
+ *   this function doesn't become an error level of ERROR to meet that the 
+ *   result of the SQL is not affected by the query plan.
  */
 static HeapTuple
 dbms_stats_merge_internal(HeapTuple lhs, HeapTuple rhs, TupleDesc tupdesc)
@@ -277,6 +284,8 @@ dbms_stats_merge_internal(HeapTuple lhs, HeapTuple rhs, TupleDesc tupdesc)
 	bool			nulls[Natts_pg_statistic];
 	int				i;
 	Oid				atttype = InvalidOid;
+	Oid				relid;
+	AttrNumber		attnum;
 
 	/* fast path for both-sides are null */
 	if ((lhs == NULL || lhs->t_data == NULL) &&
@@ -356,27 +365,44 @@ dbms_stats_merge_internal(HeapTuple lhs, HeapTuple rhs, TupleDesc tupdesc)
 		}
 	}
 
-	/* verify types to work around for ALTER COLUMN TYPE */
+	/*
+	 * Verify types to work around for ALTER COLUMN TYPE.
+	 *
+	 * Note: We don't need to retrieve atttype when the attribute doesn't have
+	 * neither Most-Common-Value nor Histogram, but we retrieve it always
+	 * because it's not usual.
+	 */
+	relid = DatumGetObjectId(values[0]);
+	attnum = DatumGetInt16(values[1]);
+	atttype = get_atttype(relid, attnum);
+	if (atttype == InvalidOid)
+	{
+		ereport(WARNING,
+			(errmsg("pg_dbms_stats: not exist column"),
+			 errdetail("relid \"%d\" or it's column number \"%d\" does not exist",
+				relid, attnum),
+			 errhint("need to execute clean_up_stats()")));
+		return NULL;
+	}
 	for (i = 0; i < STATISTIC_NUM_SLOTS; i++)
 	{
 		if ((i + 1 == STATISTIC_KIND_MCV ||
 			 i + 1 == STATISTIC_KIND_HISTOGRAM) &&
 			!nulls[Anum_pg_statistic_stavalues1 + i - 1])
 		{
-			Oid			relid = DatumGetObjectId(values[0]);
-			AttrNumber	attnum = DatumGetInt16(values[1]);
 			ArrayType  *arr;
-
-			if (atttype == InvalidOid)
-				atttype = get_atttype(relid, attnum);
 
 			arr = DatumGetArrayTypeP(
 					values[Anum_pg_statistic_stavalues1 + i - 1]);
 			if (arr == NULL || arr->elemtype != atttype)
 			{
-				char *attname = get_attname(relid,
-									tupdesc->attrs[attnum - 1]->attnum);
+				const char	   *attname = get_attname(relid, attnum);
 
+				/*
+				 * relid and attnum must be valid here because valid atttype
+			 	 * has been gotten already.
+				 */
+				Assert(attname);
 				ereport(ELEVEL_BADSTATS,
 					(errmsg("pg_dbms_stats: bad column type"),
 					 errdetail("type of column \"%s\" has been changed",
@@ -1231,6 +1257,9 @@ dbms_stats_estimate_rel_size(Relation rel, int32 *attr_widths,
 	{
 		case RELKIND_RELATION:
 		case RELKIND_INDEX:
+#if PG_VERSION_NUM >= 90300
+		case RELKIND_MATVIEW:
+#endif
 		case RELKIND_TOASTVALUE:
 			/* it has storage, ok to call the smgr */
 			if (curpages == InvalidBlockNumber)

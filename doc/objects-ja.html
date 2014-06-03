@@ -8,7 +8,7 @@
 </head>
 
 <body>
-<h1 id="pg_dbms_stats">pg_dbms_stats</h1>
+<h1 id="pg_dbms_stats">pg_dbms_stats-1.3.1</h1>
 <div class="navigation">
   <a href="pg_dbms_stats-ja.html">pg_dbms_stats</a> &gt;
   <a href="objects-ja.html">Appendix A. オブジェクト一覧</a>
@@ -48,7 +48,7 @@ pg_dbms_stats は下記の関数を含みます。
 <tr><td nowrap>schemaname、tablename、comment</td></tr>
 <tr><td rowspan="2" nowrap>dbms_stats.backup_column_stats</td>
   <td nowrap>relname、attname、comment</td>
-  <td rowspan="2">カラム</td></tr>
+  <td rowspan="2">列</td></tr>
 <tr><td nowrap>schemaname、tablename、attname、comment</td></tr>
 <tr><td rowspan="7" nowrap>リストア</td>
   <td nowrap>dbms_stats.restore_database_stats</td>
@@ -64,7 +64,7 @@ pg_dbms_stats は下記の関数を含みます。
 <tr><td nowrap>schemaname、tablename、timestamp</td></tr>
 <tr><td rowspan="2" nowrap>dbms_stats.restore_column_stats</td>
   <td nowrap>relname、attname、timestamp</td>
-  <td rowspan="2">カラム</td></tr>
+  <td rowspan="2">列</td></tr>
 <tr><td nowrap>schemaname、tablename、attname、timestamp</td></tr>
 <tr><td nowrap>dbms_stats.restore_stats</td>
   <td nowrap>backup_id</td>
@@ -83,7 +83,7 @@ pg_dbms_stats は下記の関数を含みます。
 <tr><td nowrap>schemaname、tablename</td></tr>
 <tr><td rowspan="2" nowrap>dbms_stats.lock_column_stats</td>
   <td nowrap>relname、attname</td>
-  <td rowspan="2">カラム</td></tr>
+  <td rowspan="2">列</td></tr>
 <tr><td nowrap>schemaname、tablename、attname</td></tr>
 <tr><td rowspan="6" nowrap>ロック解除</td>
   <td nowrap>dbms_stats.unlock_database_stats</td>
@@ -99,7 +99,7 @@ pg_dbms_stats は下記の関数を含みます。
 <tr><td nowrap>schemaname、tablename</td></tr>
 <tr><td rowspan="2" nowrap>dbms_stats.unlock_column_stats</td>
   <td nowrap>relname、attname</td>
-  <td rowspan="2">カラム</td></tr>
+  <td rowspan="2">列</td></tr>
 <tr><td nowrap>schemaname、tablename、attname</td></tr>
 <tr><td rowspan="6" nowrap>インポート</td>
   <td nowrap>dbms_stats.import_database_stats</td>
@@ -115,13 +115,18 @@ pg_dbms_stats は下記の関数を含みます。
 <tr><td nowrap>schemaname、tablename、src</td></tr>
 <tr><td rowspan="2" nowrap>dbms_stats.import_column_stats</td>
   <td nowrap>relname、attname、src</td>
-  <td rowspan="2">カラム</td></tr>
+  <td rowspan="2">列</td></tr>
 <tr><td nowrap>schemaname、tablename、attname、src</td></tr>
 <tr><td nowrap>パージ</td>
   <td nowrap>dbms_stats.purge_stats</td>
   <td nowrap>backup_id、force</td>
   <td>バックアップ</td>
   <td>dbms_stats.backup_history</td></tr>
+<tr><td nowrap>クリーンアップ</td>
+  <td nowrap>dbms_stats.clean_up_stats</td>
+  <td nowrap>(なし)</td>
+  <td nowrap>データベース</td>
+  <td>text</td></tr>
 </tbody>
 </table>
 
@@ -144,7 +149,7 @@ pg_dbms_stats は下記の関数を含みます。
   <td>処理対象のテーブル名です。</td></tr>
 <tr><td nowrap>attname</td>
   <td nowrap>text</td>
-  <td>処理対象のカラム名です。</td></tr>
+  <td>処理対象の列名です。</td></tr>
 <tr><td nowrap>comment</td>
   <td nowrap>text</td>
   <td>バックアップを識別するためのコメントです。</td></tr>
@@ -179,11 +184,11 @@ falseの場合、対象範囲外にデータベース単位のバックアップ
 </tr>
 </thead>
 <tbody>
-<tr><td nowrap>export_effective_stats.sql.sample</td>
+<tr><td nowrap>export_effective_stats.&lt;PGバージョン&gt;.sql.sample</td>
   <td nowrap>プランナが見ている統計情報</td>
   <td>-</td></tr>
 <tr>
-  <td nowrap>export_plain_stats.sql.sample</td>
+  <td nowrap>export_plain_stats-&lt;PGバージョン&gt;.sql.sample</td>
   <td nowrap>真の統計情報のみ</td>
   <td>pg_dbms_stats未インストールでも使用可能です。</td></tr>
 </tbody>
@@ -229,9 +234,9 @@ d:データベース、s:スキーマ、t:テーブル、c:列</td></tr>
 <tr><td nowrap>dbms_stats.relation_stats_effective</td>
   <td>プランナに見せるテーブルごとの統計情報を表示します。PostgreSQLのpg_classカタログに対応します。</td></tr>
 <tr><td nowrap>dbms_stats.column_stats_effective</td>
-  <td>プランナに見せるカラムごとの統計情報を表示します。PostgreSQLのpg_statisticカタログに対応します。</td></tr>
+  <td>プランナに見せる列ごとの統計情報を表示します。PostgreSQLのpg_statisticカタログに対応します。</td></tr>
 <tr><td nowrap>dbms_stats.status</td>
-  <td>プランナに見せるカラムごとの統計情報のうち、ユーザが読み取り可能なものを表示します。PostgreSQLのpg_statsビューに対応します。</td></tr>
+  <td>プランナに見せる列ごとの統計情報のうち、ユーザが読み取り可能なものを表示します。PostgreSQLのpg_statsビューに対応します。</td></tr>
 </tbody>
 </table>
 
@@ -240,7 +245,7 @@ d:データベース、s:スキーマ、t:テーブル、c:列</td></tr>
 <a href="http://www.postgresql.jp/document/current/html/app-vacuumdb.html">vacuumdb</a>
 
 <hr />
-<p class="footer">Copyright (c) 2009-2012, NIPPON TELEGRAPH AND TELEPHONE CORPORATION</p>
+<p class="footer">Copyright (c) 2009-2014, NIPPON TELEGRAPH AND TELEPHONE CORPORATION</p>
 
 </body>
 </html>

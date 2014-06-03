@@ -103,3 +103,4 @@ SELECT nspname, relname, relpages, reltuples, relallvisible,
        stavalues1, stavalues2, stavalues3, stavalues4, stavalues5
   FROM dbms_stats.work
  ORDER BY nspname, relname, attname, stainherit;
+ANALYZE s0.sft0;

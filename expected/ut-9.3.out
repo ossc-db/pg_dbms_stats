@@ -170,11 +170,32 @@ Triggers:
  stavalues4  | dbms_stats.anyarray |           | extended | 
  stavalues5  | dbms_stats.anyarray |           | extended | 
 View definition:
- SELECT m.starelid, m.staattnum, m.stainherit, m.stanullfrac, m.stawidth, 
-    m.stadistinct, m.stakind1, m.stakind2, m.stakind3, m.stakind4, m.stakind5, 
-    m.staop1, m.staop2, m.staop3, m.staop4, m.staop5, m.stanumbers1, 
-    m.stanumbers2, m.stanumbers3, m.stanumbers4, m.stanumbers5, m.stavalues1, 
-    m.stavalues2, m.stavalues3, m.stavalues4, m.stavalues5
+ SELECT m.starelid, 
+    m.staattnum, 
+    m.stainherit, 
+    m.stanullfrac, 
+    m.stawidth, 
+    m.stadistinct, 
+    m.stakind1, 
+    m.stakind2, 
+    m.stakind3, 
+    m.stakind4, 
+    m.stakind5, 
+    m.staop1, 
+    m.staop2, 
+    m.staop3, 
+    m.staop4, 
+    m.staop5, 
+    m.stanumbers1, 
+    m.stanumbers2, 
+    m.stanumbers3, 
+    m.stanumbers4, 
+    m.stanumbers5, 
+    m.stavalues1, 
+    m.stavalues2, 
+    m.stavalues3, 
+    m.stavalues4, 
+    m.stavalues5
    FROM ( SELECT (dbms_stats.merge(v.*, s.*)).starelid AS starelid, 
             (dbms_stats.merge(v.*, s.*)).staattnum AS staattnum, 
             (dbms_stats.merge(v.*, s.*)).stainherit AS stainherit, 
@@ -255,9 +276,13 @@ View definition:
  most_common_elem_freqs | real[]              |           | extended | 
  elem_count_histogram   | real[]              |           | extended | 
 View definition:
- SELECT n.nspname AS schemaname, c.relname AS tablename, a.attname, 
-    s.stainherit AS inherited, s.stanullfrac AS null_frac, 
-    s.stawidth AS avg_width, s.stadistinct AS n_distinct, 
+ SELECT n.nspname AS schemaname, 
+    c.relname AS tablename, 
+    a.attname, 
+    s.stainherit AS inherited, 
+    s.stanullfrac AS null_frac, 
+    s.stawidth AS avg_width, 
+    s.stadistinct AS n_distinct, 
         CASE
             WHEN s.stakind1 = 1 THEN s.stavalues1
             WHEN s.stakind2 = 1 THEN s.stavalues2
@@ -352,19 +377,32 @@ View definition:
  stavalues4  | dbms_stats.anyarray |           | extended | 
  stavalues5  | dbms_stats.anyarray |           | extended | 
 View definition:
- SELECT _column_stats_locked.starelid, _column_stats_locked.staattnum, 
-    _column_stats_locked.stainherit, _column_stats_locked.stanullfrac, 
-    _column_stats_locked.stawidth, _column_stats_locked.stadistinct, 
-    _column_stats_locked.stakind1, _column_stats_locked.stakind2, 
-    _column_stats_locked.stakind3, _column_stats_locked.stakind4, 
-    _column_stats_locked.stakind5, _column_stats_locked.staop1, 
-    _column_stats_locked.staop2, _column_stats_locked.staop3, 
-    _column_stats_locked.staop4, _column_stats_locked.staop5, 
-    _column_stats_locked.stanumbers1, _column_stats_locked.stanumbers2, 
-    _column_stats_locked.stanumbers3, _column_stats_locked.stanumbers4, 
-    _column_stats_locked.stanumbers5, _column_stats_locked.stavalues1, 
-    _column_stats_locked.stavalues2, _column_stats_locked.stavalues3, 
-    _column_stats_locked.stavalues4, _column_stats_locked.stavalues5
+ SELECT _column_stats_locked.starelid, 
+    _column_stats_locked.staattnum, 
+    _column_stats_locked.stainherit, 
+    _column_stats_locked.stanullfrac, 
+    _column_stats_locked.stawidth, 
+    _column_stats_locked.stadistinct, 
+    _column_stats_locked.stakind1, 
+    _column_stats_locked.stakind2, 
+    _column_stats_locked.stakind3, 
+    _column_stats_locked.stakind4, 
+    _column_stats_locked.stakind5, 
+    _column_stats_locked.staop1, 
+    _column_stats_locked.staop2, 
+    _column_stats_locked.staop3, 
+    _column_stats_locked.staop4, 
+    _column_stats_locked.staop5, 
+    _column_stats_locked.stanumbers1, 
+    _column_stats_locked.stanumbers2, 
+    _column_stats_locked.stanumbers3, 
+    _column_stats_locked.stanumbers4, 
+    _column_stats_locked.stanumbers5, 
+    _column_stats_locked.stavalues1, 
+    _column_stats_locked.stavalues2, 
+    _column_stats_locked.stavalues3, 
+    _column_stats_locked.stavalues4, 
+    _column_stats_locked.stavalues5
    FROM dbms_stats._column_stats_locked
   WHERE has_column_privilege(_column_stats_locked.starelid, _column_stats_locked.staattnum, 'SELECT'::text);
 
@@ -382,9 +420,12 @@ View definition:
  last_analyze     | timestamp with time zone |           | plain    | 
  last_autoanalyze | timestamp with time zone |           | plain    | 
 View definition:
- SELECT _relation_stats_locked.relid, _relation_stats_locked.relname, 
-    _relation_stats_locked.relpages, _relation_stats_locked.reltuples, 
-    _relation_stats_locked.relallvisible, _relation_stats_locked.curpages, 
+ SELECT _relation_stats_locked.relid, 
+    _relation_stats_locked.relname, 
+    _relation_stats_locked.relpages, 
+    _relation_stats_locked.reltuples, 
+    _relation_stats_locked.relallvisible, 
+    _relation_stats_locked.curpages, 
     _relation_stats_locked.last_analyze, 
     _relation_stats_locked.last_autoanalyze
    FROM dbms_stats._relation_stats_locked;
@@ -1340,6 +1381,13 @@ SELECT dbms_stats.is_target_relkind('f');
  t
 (1 row)
 
+-- No.6-4-11
+SELECT dbms_stats.is_target_relkind('m');
+ is_target_relkind 
+-------------------
+ t
+(1 row)
+
 /*
  * No.7-1 dbms_stats.backup
  */
@@ -1362,6 +1410,26 @@ SELECT count(*) FROM dbms_stats.column_stats_backup;
  count 
 -------
      1
+(1 row)
+
+-- No.7-1-10
+DELETE FROM dbms_stats.relation_stats_backup;
+SELECT dbms_stats.backup(1, 's0.smv0'::regclass, NULL);
+ backup 
+--------
+      1
+(1 row)
+
+SELECT count(*) FROM dbms_stats.relation_stats_backup;
+ count 
+-------
+     1
+(1 row)
+
+SELECT count(*) FROM dbms_stats.column_stats_backup;
+ count 
+-------
+     3
 (1 row)
 
 -- No.7-1-12
@@ -1392,7 +1460,8 @@ SELECT relid::regclass FROM dbms_stats.relation_stats_backup
  st1_idx
  st1_exp
  s0.sft0
-(15 rows)
+ s0.smv0
+(16 rows)
 
 SELECT starelid::regclass, staattnum FROM dbms_stats.column_stats_backup
  GROUP BY starelid, staattnum
@@ -1407,7 +1476,8 @@ SELECT starelid::regclass, staattnum FROM dbms_stats.column_stats_backup
  s1.st0   |         1
  st1_exp  |         1
  s0.sft0  |         1
-(8 rows)
+ s0.smv0  |         1
+(9 rows)
 
 -- No.7-1-14
 DELETE FROM dbms_stats.relation_stats_backup;
@@ -1437,7 +1507,8 @@ SELECT relid::regclass FROM dbms_stats.relation_stats_backup
  st1_idx
  st1_exp
  s0.sft0
-(15 rows)
+ s0.smv0
+(16 rows)
 
 SELECT starelid::regclass, staattnum FROM dbms_stats.column_stats_backup
  GROUP BY starelid, staattnum
@@ -1458,7 +1529,10 @@ SELECT starelid::regclass, staattnum FROM dbms_stats.column_stats_backup
  s1.st0   |         2
  st1_exp  |         1
  s0.sft0  |         1
-(14 rows)
+ s0.smv0  |         1
+ s0.smv0  |         2
+ s0.smv0  |         3
+(17 rows)
 
 -- No.7-1-18
 DELETE FROM dbms_stats.relation_stats_backup;
@@ -1669,6 +1743,25 @@ SELECT id, unit, comment FROM dbms_stats.backup_history;
   6 | t    | dummy comment
 (1 row)
 
+-- No.8-1-12
+DELETE FROM dbms_stats.backup_history;
+SELECT dbms_stats.backup('s0.smv0'::regclass, NULL, 'dummy comment');
+NOTICE:  arguments are 7, s0.smv0, <NULL>
+CONTEXT:  SQL statement "INSERT INTO dbms_stats.backup_history(time, unit, comment)
+        VALUES (current_timestamp, unit_type, $3)
+        RETURNING dbms_stats.backup(id, $1, set_attnum)"
+PL/pgSQL function dbms_stats.backup(regclass,text,text) line 42 at SQL statement
+ backup 
+--------
+      1
+(1 row)
+
+SELECT id, unit, comment FROM dbms_stats.backup_history;
+ id | unit |    comment    
+----+------+---------------
+  7 | t    | dummy comment
+(1 row)
+
 -- No.8-1-13
 DELETE FROM dbms_stats.backup_history;
 SELECT dbms_stats.backup('pg_catalog.pg_class'::regclass, NULL, 'dummy comment');
@@ -1808,6 +1901,17 @@ CONTEXT:  SQL statement "SELECT dbms_stats.backup(backup_id, cn.oid, NULL)
            ) cn"
 PL/pgSQL function dbms_stats.backup_schema_stats(text,text) line 16 at PERFORM
 NOTICE:  arguments are 9, s0.sft0, <NULL>
+CONTEXT:  SQL statement "SELECT dbms_stats.backup(backup_id, cn.oid, NULL)
+      FROM (SELECT c.oid
+              FROM pg_catalog.pg_class c,
+                   pg_catalog.pg_namespace n
+             WHERE n.nspname = schemaname
+               AND c.relnamespace = n.oid
+               AND dbms_stats.is_target_relkind(c.relkind)
+             ORDER BY c.oid
+           ) cn"
+PL/pgSQL function dbms_stats.backup_schema_stats(text,text) line 16 at PERFORM
+NOTICE:  arguments are 9, s0.smv0, <NULL>
 CONTEXT:  SQL statement "SELECT dbms_stats.backup(backup_id, cn.oid, NULL)
       FROM (SELECT c.oid
               FROM pg_catalog.pg_class c,
@@ -1993,6 +2097,7 @@ SELECT * FROM relations_backup_v;
   2 | st1_idx    | public.st1_idx |       30 |     10000 |             0 |       30
   2 | st1_exp    | public.st1_exp |       30 |     10000 |             0 |       30
   2 | s0.sft0    | s0.sft0        |        1 |        10 |             0 |        0
+  2 | s0.smv0    | s0.smv0        |        1 |         2 |             1 |        1
   3 | s0.st0     | s0.st0         |        1 |         2 |             1 |        1
   5 | s0.st0     | s0.st0         |        1 |         2 |             1 |        1
   6 | s0.st0     | s0.st0         |        1 |         2 |             1 |        1
@@ -2003,7 +2108,7 @@ SELECT * FROM relations_backup_v;
   8 | s0.st1_idx | s0.st1_idx     |        2 |         3 |             0 |        2
   8 | s0.st2     | s0.st2         |        1 |         3 |             1 |        1
   8 | s0.st2_idx | s0.st2_idx     |        2 |         3 |             0 |        2
-(25 rows)
+(26 rows)
 
 SELECT * FROM columns_backup_v;
  id | statypid | starelid | staattnum | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 |      stanumbers1       | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 |       stavalues1       | stavalues2 | stavalues3 | stavalues4 | stavalues5 
@@ -2024,6 +2129,9 @@ SELECT * FROM columns_backup_v;
   2 |       23 | s1.st0   |         2 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {15,25,35,45}          | (null)     | (null)     | (null)     | (null)
   2 |       25 | st1_exp  |         1 | f          |           0 |        5 |           3 |        1 |        3 |        0 |        0 |        0 |     98 |    664 |      0 |      0 |      0 | {0.3334,0.3333,0.3333} | {0.3332}    | (null)      | (null)      | (null)      | {1,0,2}                | (null)     | (null)     | (null)     | (null)
   2 |       23 | s0.sft0  |         1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {1,2,3,4,5,6,7,8,9,10} | (null)     | (null)     | (null)     | (null)
+  2 |       23 | s0.smv0  |         1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {1,2}                  | (null)     | (null)     | (null)     | (null)
+  2 |       23 | s0.smv0  |         2 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {10,20}                | (null)     | (null)     | (null)     | (null)
+  2 |       25 | s0.smv0  |         3 | f          |           0 |        3 |          -1 |        2 |        3 |        0 |        0 |        0 |    664 |    664 |      0 |      0 |      0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {1,test}               | (null)     | (null)     | (null)     | (null)
   3 |       23 | s0.st0   |         1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {1,2}                  | (null)     | (null)     | (null)     | (null)
   3 |       23 | s0.st0   |         1 | t          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {1,2,4,5,6}            | (null)     | (null)     | (null)     | (null)
   3 |       23 | s0.st0   |         2 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {10,20}                | (null)     | (null)     | (null)     | (null)
@@ -2044,7 +2152,7 @@ SELECT * FROM columns_backup_v;
   8 |       23 | s0.st1   |         2 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {40,50,60}             | (null)     | (null)     | (null)     | (null)
   8 |       23 | s0.st2   |         1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {1,2,3}                | (null)     | (null)     | (null)     | (null)
   8 |       25 | s0.st2   |         2 | f          |           0 |        5 |          -1 |        2 |        3 |        0 |        0 |        0 |    664 |    664 |      0 |      0 |      0 | (null)                 | {0.5}       | (null)      | (null)      | (null)      | {1,comment,test}       | (null)     | (null)     | (null)     | (null)
-(36 rows)
+(39 rows)
 
 VACUUM ANALYZE;
 /*
@@ -2231,6 +2339,7 @@ SELECT dbms_stats.restore(2, NULL, NULL);
  pt0
  pt0_idx
  s0.sft0
+ s0.smv0
  s0.st0
  s0.st0_idx
  s0.st1
@@ -2243,7 +2352,7 @@ SELECT dbms_stats.restore(2, NULL, NULL);
  st1
  st1_exp
  st1_idx
-(15 rows)
+(16 rows)
 
 SELECT relid::regclass FROM dbms_stats.relation_stats_locked
  GROUP BY relid
@@ -2265,7 +2374,8 @@ SELECT relid::regclass FROM dbms_stats.relation_stats_locked
  st1_idx
  st1_exp
  s0.sft0
-(15 rows)
+ s0.smv0
+(16 rows)
 
 SELECT starelid, attname, stainherit FROM columns_locked_v c;
  starelid | attname | stainherit 
@@ -2286,7 +2396,10 @@ SELECT starelid, attname, stainherit FROM columns_locked_v c;
  s1.st0   | num     | f
  st1_exp  | lower   | f
  s0.sft0  | id      | f
-(16 rows)
+ s0.smv0  | id      | f
+ s0.smv0  | num     | f
+ s0.smv0  | txt     | f
+(19 rows)
 
 -- No.9-1-9
 DELETE FROM dbms_stats._relation_stats_locked;
@@ -2605,6 +2718,44 @@ SELECT count(*) FROM dbms_stats.relation_stats_locked;
 DELETE FROM dbms_stats.relation_stats_backup
  WHERE id = 3
    AND relname = 's0.sft0';
+-- No.9-1-22
+DELETE FROM dbms_stats._relation_stats_locked;
+INSERT INTO dbms_stats.relation_stats_backup(
+               id, relid, relname, relpages, reltuples,
+               relallvisible,
+               curpages)
+     VALUES (3, 's0.smv0'::regclass, 's0.smv0', 1, 1,
+             1,
+             1);
+SELECT * FROM relations_backup_v
+ WHERE id = 3
+   AND relname = 's0.smv0';
+ id |  relid  | relname | relpages | reltuples | relallvisible | curpages 
+----+---------+---------+----------+-----------+---------------+----------
+  3 | s0.smv0 | s0.smv0 |        1 |         1 |             1 |        1
+(1 row)
+
+SELECT dbms_stats.restore(2, 's0.smv0', NULL);
+ restore 
+---------
+ s0.smv0
+(1 row)
+
+SELECT count(*) FROM dbms_stats.column_stats_locked;
+ count 
+-------
+     3
+(1 row)
+
+SELECT count(*) FROM dbms_stats.relation_stats_locked;
+ count 
+-------
+     1
+(1 row)
+
+DELETE FROM dbms_stats.relation_stats_backup
+ WHERE id = 3
+   AND relname = 's0.smv0';
 -- No.9-1-23
 DELETE FROM dbms_stats._relation_stats_locked;
 INSERT INTO dbms_stats.relation_stats_backup(
@@ -2779,6 +2930,8 @@ NOTICE:  arguments are "2, st1_exp, <NULL>"
 CONTEXT:  SQL function "restore_database_stats" statement 1
 NOTICE:  arguments are "2, s0.sft0, <NULL>"
 CONTEXT:  SQL function "restore_database_stats" statement 1
+NOTICE:  arguments are "2, s0.smv0, <NULL>"
+CONTEXT:  SQL function "restore_database_stats" statement 1
  restore_database_stats 
 ------------------------
  pt0
@@ -2825,6 +2978,8 @@ CONTEXT:  SQL function "restore_database_stats" statement 1
 NOTICE:  arguments are "2, st1_exp, <NULL>"
 CONTEXT:  SQL function "restore_database_stats" statement 1
 NOTICE:  arguments are "2, s0.sft0, <NULL>"
+CONTEXT:  SQL function "restore_database_stats" statement 1
+NOTICE:  arguments are "2, s0.smv0, <NULL>"
 CONTEXT:  SQL function "restore_database_stats" statement 1
  restore_database_stats 
 ------------------------
@@ -2881,6 +3036,8 @@ NOTICE:  arguments are "2, st1_exp, <NULL>"
 CONTEXT:  SQL function "restore_database_stats" statement 1
 NOTICE:  arguments are "2, s0.sft0, <NULL>"
 CONTEXT:  SQL function "restore_database_stats" statement 1
+NOTICE:  arguments are "2, s0.smv0, <NULL>"
+CONTEXT:  SQL function "restore_database_stats" statement 1
  restore_database_stats 
 ------------------------
  pt0
@@ -2917,6 +3074,8 @@ NOTICE:  arguments are "2, s0.st2_idx, <NULL>"
 CONTEXT:  PL/pgSQL function dbms_stats.restore_schema_stats(text,timestamp with time zone) line 10 at RETURN QUERY
 NOTICE:  arguments are "2, s0.sft0, <NULL>"
 CONTEXT:  PL/pgSQL function dbms_stats.restore_schema_stats(text,timestamp with time zone) line 10 at RETURN QUERY
+NOTICE:  arguments are "2, s0.smv0, <NULL>"
+CONTEXT:  PL/pgSQL function dbms_stats.restore_schema_stats(text,timestamp with time zone) line 10 at RETURN QUERY
  restore_schema_stats 
 ----------------------
  s0.st0
@@ -2942,6 +3101,8 @@ CONTEXT:  PL/pgSQL function dbms_stats.restore_schema_stats(text,timestamp with 
 NOTICE:  arguments are "2, s0.st2_idx, <NULL>"
 CONTEXT:  PL/pgSQL function dbms_stats.restore_schema_stats(text,timestamp with time zone) line 10 at RETURN QUERY
 NOTICE:  arguments are "2, s0.sft0, <NULL>"
+CONTEXT:  PL/pgSQL function dbms_stats.restore_schema_stats(text,timestamp with time zone) line 10 at RETURN QUERY
+NOTICE:  arguments are "2, s0.smv0, <NULL>"
 CONTEXT:  PL/pgSQL function dbms_stats.restore_schema_stats(text,timestamp with time zone) line 10 at RETURN QUERY
  restore_schema_stats 
 ----------------------
@@ -2977,6 +3138,8 @@ NOTICE:  arguments are "2, s0.st2_idx, <NULL>"
 CONTEXT:  PL/pgSQL function dbms_stats.restore_schema_stats(text,timestamp with time zone) line 10 at RETURN QUERY
 NOTICE:  arguments are "2, s0.sft0, <NULL>"
 CONTEXT:  PL/pgSQL function dbms_stats.restore_schema_stats(text,timestamp with time zone) line 10 at RETURN QUERY
+NOTICE:  arguments are "2, s0.smv0, <NULL>"
+CONTEXT:  PL/pgSQL function dbms_stats.restore_schema_stats(text,timestamp with time zone) line 10 at RETURN QUERY
  restore_schema_stats 
 ----------------------
  s0.st0
@@ -3002,6 +3165,8 @@ CONTEXT:  PL/pgSQL function dbms_stats.restore_schema_stats(text,timestamp with 
 NOTICE:  arguments are "2, s0.st2_idx, <NULL>"
 CONTEXT:  PL/pgSQL function dbms_stats.restore_schema_stats(text,timestamp with time zone) line 10 at RETURN QUERY
 NOTICE:  arguments are "2, s0.sft0, <NULL>"
+CONTEXT:  PL/pgSQL function dbms_stats.restore_schema_stats(text,timestamp with time zone) line 10 at RETURN QUERY
+NOTICE:  arguments are "2, s0.smv0, <NULL>"
 CONTEXT:  PL/pgSQL function dbms_stats.restore_schema_stats(text,timestamp with time zone) line 10 at RETURN QUERY
  restore_schema_stats 
 ----------------------
@@ -3052,6 +3217,7 @@ SELECT dbms_stats.restore_stats(2);
  pt0
  pt0_idx
  s0.sft0
+ s0.smv0
  s0.st0
  s0.st0_idx
  s0.st1
@@ -3063,7 +3229,7 @@ SELECT dbms_stats.restore_stats(2);
  st1
  st1_exp
  st1_idx
-(14 rows)
+(15 rows)
 
 SELECT relation::regclass, mode
   FROM pg_locks
@@ -3101,7 +3267,8 @@ SELECT relid::regclass FROM dbms_stats.relation_stats_locked
  st1_idx
  st1_exp
  s0.sft0
-(14 rows)
+ s0.smv0
+(15 rows)
 
 SELECT starelid, attname, stainherit FROM columns_locked_v c;
  starelid | attname | stainherit 
@@ -3120,7 +3287,10 @@ SELECT starelid, attname, stainherit FROM columns_locked_v c;
  s0.st2   | txt     | f
  st1_exp  | lower   | f
  s0.sft0  | id      | f
-(14 rows)
+ s0.smv0  | id      | f
+ s0.smv0  | num     | f
+ s0.smv0  | txt     | f
+(17 rows)
 
 -- No.10-7-4
 DELETE FROM dbms_stats._relation_stats_locked;
@@ -3154,9 +3324,12 @@ SELECT * FROM columns_locked_v;
  s0.st2   |         2 | txt     | f          |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)     | (null)     | (null)     | (null)     | (null)
  st1_exp  |         1 | lower   | f          |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)     | (null)     | (null)     | (null)     | (null)
  s0.sft0  |         1 | id      | f          |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)     | (null)     | (null)     | (null)     | (null)
+ s0.smv0  |         1 | id      | f          |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)     | (null)     | (null)     | (null)     | (null)
+ s0.smv0  |         2 | num     | f          |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)     | (null)     | (null)     | (null)     | (null)
+ s0.smv0  |         3 | txt     | f          |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)     | (null)     | (null)     | (null)     | (null)
  s1.st0   |         1 | id      | f          |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)     | (null)     | (null)     | (null)     | (null)
  s1.st0   |         2 | num     | f          |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)     | (null)     | (null)     | (null)     | (null)
-(16 rows)
+(19 rows)
 
 SELECT * FROM relations_locked_v;
    relid    |    relname     | relpages | reltuples | relallvisible | curpages 
@@ -3175,8 +3348,9 @@ SELECT * FROM relations_locked_v;
  st1_idx    | public.st1_idx |   (null) |    (null) |        (null) |   (null)
  st1_exp    | public.st1_exp |   (null) |    (null) |        (null) |   (null)
  s0.sft0    | s0.sft0        |   (null) |    (null) |        (null) |   (null)
+ s0.smv0    | s0.smv0        |   (null) |    (null) |        (null) |   (null)
  s1.st0     | s1.st0         |   (null) |    (null) |        (null) |   (null)
-(15 rows)
+(16 rows)
 
 SELECT dbms_stats.restore_stats(8);
  restore_stats 
@@ -3206,8 +3380,9 @@ SELECT * FROM relations_locked_v;
  st1_idx    | public.st1_idx |   (null) |    (null) |        (null) |   (null)
  st1_exp    | public.st1_exp |   (null) |    (null) |        (null) |   (null)
  s0.sft0    | s0.sft0        |   (null) |    (null) |        (null) |   (null)
+ s0.smv0    | s0.smv0        |   (null) |    (null) |        (null) |   (null)
  s1.st0     | s1.st0         |   (null) |    (null) |        (null) |   (null)
-(15 rows)
+(16 rows)
 
 SELECT * FROM columns_locked_v;
  starelid | staattnum | attname | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 |    stavalues1    | stavalues2 | stavalues3 | stavalues4 | stavalues5 
@@ -3226,9 +3401,12 @@ SELECT * FROM columns_locked_v;
  s0.st2   |         2 | txt     | f          |           0 |        5 |          -1 |        2 |        3 |        0 |        0 |        0 |    664 |    664 |      0 |      0 |      0 | (null)      | {0.5}       | (null)      | (null)      | (null)      | {1,comment,test} | (null)     | (null)     | (null)     | (null)
  st1_exp  |         1 | lower   | f          |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)           | (null)     | (null)     | (null)     | (null)
  s0.sft0  |         1 | id      | f          |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)           | (null)     | (null)     | (null)     | (null)
+ s0.smv0  |         1 | id      | f          |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)           | (null)     | (null)     | (null)     | (null)
+ s0.smv0  |         2 | num     | f          |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)           | (null)     | (null)     | (null)     | (null)
+ s0.smv0  |         3 | txt     | f          |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)           | (null)     | (null)     | (null)     | (null)
  s1.st0   |         1 | id      | f          |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)           | (null)     | (null)     | (null)     | (null)
  s1.st0   |         2 | num     | f          |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)           | (null)     | (null)     | (null)     | (null)
-(16 rows)
+(19 rows)
 
 -- No.10-7-5
 DELETE FROM dbms_stats._relation_stats_locked;
@@ -3410,6 +3588,26 @@ SELECT * FROM columns_locked_v c;
  starelid | staattnum | attname | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 |       stavalues1       | stavalues2 | stavalues3 | stavalues4 | stavalues5 
 ----------+-----------+---------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+-------------+-------------+-------------+-------------+-------------+------------------------+------------+------------+------------+------------
  s0.sft0  |         1 | id      | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2,3,4,5,6,7,8,9,10} | (null)     | (null)     | (null)     | (null)
+(1 row)
+
+-- No.11-1-13
+DELETE FROM dbms_stats._relation_stats_locked;
+SELECT dbms_stats.lock('s0.smv0', 'id');
+  lock   
+---------
+ s0.smv0
+(1 row)
+
+SELECT * FROM relations_locked_v;
+  relid  | relname | relpages | reltuples | relallvisible | curpages 
+---------+---------+----------+-----------+---------------+----------
+ s0.smv0 | s0.smv0 |   (null) |    (null) |        (null) |   (null)
+(1 row)
+
+SELECT * FROM columns_locked_v c;
+ starelid | staattnum | attname | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 | stavalues1 | stavalues2 | stavalues3 | stavalues4 | stavalues5 
+----------+-----------+---------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+-------------+-------------+-------------+-------------+-------------+------------+------------+------------+------------+------------
+ s0.smv0  |         1 | id      | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2}      | (null)     | (null)     | (null)     | (null)
 (1 row)
 
 -- No.11-1-14
@@ -3639,6 +3837,28 @@ SELECT * FROM columns_locked_v c;
  s0.sft0  |         1 | id      | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2,3,4,5,6,7,8,9,10} | (null)     | (null)     | (null)     | (null)
 (1 row)
 
+-- No.11-2-10
+DELETE FROM dbms_stats._relation_stats_locked;
+SELECT dbms_stats.lock('s0.smv0');
+  lock   
+---------
+ s0.smv0
+(1 row)
+
+SELECT * FROM relations_locked_v;
+  relid  | relname | relpages | reltuples | relallvisible | curpages 
+---------+---------+----------+-----------+---------------+----------
+ s0.smv0 | s0.smv0 |        1 |         2 |             1 |        1
+(1 row)
+
+SELECT * FROM columns_locked_v c;
+ starelid | staattnum | attname | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 | stavalues1 | stavalues2 | stavalues3 | stavalues4 | stavalues5 
+----------+-----------+---------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+-------------+-------------+-------------+-------------+-------------+------------+------------+------------+------------+------------
+ s0.smv0  |         1 | id      | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2}      | (null)     | (null)     | (null)     | (null)
+ s0.smv0  |         2 | num     | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)      | {1}         | (null)      | (null)      | (null)      | {10,20}    | (null)     | (null)     | (null)     | (null)
+ s0.smv0  |         3 | txt     | f          |           0 |        3 |          -1 |        2 |        3 |        0 |        0 |        0 |    664 |    664 |      0 |      0 |      0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,test}   | (null)     | (null)     | (null)     | (null)
+(3 rows)
+
 -- No.11-2-11
 DELETE FROM dbms_stats._relation_stats_locked;
 SELECT dbms_stats.lock('pg_catalog.pg_class');
@@ -3763,6 +3983,8 @@ NOTICE:  arguments are st1_exp
 CONTEXT:  SQL function "lock_database_stats" statement 1
 NOTICE:  arguments are s0.sft0
 CONTEXT:  SQL function "lock_database_stats" statement 1
+NOTICE:  arguments are s0.smv0
+CONTEXT:  SQL function "lock_database_stats" statement 1
 NOTICE:  arguments are s1.st0
 CONTEXT:  SQL function "lock_database_stats" statement 1
  lock_database_stats 
@@ -3781,8 +4003,9 @@ CONTEXT:  SQL function "lock_database_stats" statement 1
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 /*
  * No.12-2 dbms_stats.lock_schema_stats
@@ -3803,6 +4026,8 @@ NOTICE:  arguments are s0.st2_idx
 CONTEXT:  PL/pgSQL function dbms_stats.lock_schema_stats(text) line 10 at RETURN QUERY
 NOTICE:  arguments are s0.sft0
 CONTEXT:  PL/pgSQL function dbms_stats.lock_schema_stats(text) line 10 at RETURN QUERY
+NOTICE:  arguments are s0.smv0
+CONTEXT:  PL/pgSQL function dbms_stats.lock_schema_stats(text) line 10 at RETURN QUERY
  lock_schema_stats 
 -------------------
  s0.st0
@@ -3812,7 +4037,8 @@ CONTEXT:  PL/pgSQL function dbms_stats.lock_schema_stats(text) line 10 at RETURN
  s0.st2
  s0.st2_idx
  s0.sft0
-(7 rows)
+ s0.smv0
+(8 rows)
 
 -- No.12-2-2
 SELECT dbms_stats.lock_schema_stats('s00');
@@ -3927,8 +4153,9 @@ SELECT dbms_stats.lock_database_stats();
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT * FROM dbms_stats.backup_history
  ORDER BY id;
@@ -3947,13 +4174,13 @@ SELECT * FROM dbms_stats.backup_history
 SELECT count(*) FROM dbms_stats.relation_stats_backup;
  count 
 -------
-    25
+    26
 (1 row)
 
 SELECT count(*) FROM dbms_stats.column_stats_backup;
  count 
 -------
-    36
+    39
 (1 row)
 
 SELECT dbms_stats.unlock();
@@ -3973,8 +4200,9 @@ SELECT dbms_stats.unlock();
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT count(*) FROM dbms_stats._relation_stats_locked;
  count 
@@ -4005,13 +4233,13 @@ SELECT * FROM dbms_stats.backup_history
 SELECT count(*) FROM dbms_stats.relation_stats_backup;
  count 
 -------
-    25
+    26
 (1 row)
 
 SELECT count(*) FROM dbms_stats.column_stats_backup;
  count 
 -------
-    36
+    39
 (1 row)
 
 -- No.13-1-2
@@ -4033,8 +4261,9 @@ SELECT dbms_stats.lock_database_stats();
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT dbms_stats.unlock();
    unlock   
@@ -4053,8 +4282,9 @@ SELECT dbms_stats.unlock();
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT count(*) FROM dbms_stats._relation_stats_locked;
  count 
@@ -4087,8 +4317,9 @@ SELECT dbms_stats.lock_database_stats();
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 DELETE FROM dbms_stats._column_stats_locked;
 SELECT dbms_stats.unlock();
@@ -4108,8 +4339,9 @@ SELECT dbms_stats.unlock();
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT count(*) FROM dbms_stats._relation_stats_locked;
  count 
@@ -4161,8 +4393,9 @@ SELECT dbms_stats.lock_database_stats();
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  GROUP BY relid
@@ -4183,8 +4416,9 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
  GROUP BY starelid
@@ -4198,8 +4432,9 @@ SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
  s0.st2   |     2
  st1_exp  |     1
  s0.sft0  |     1
+ s0.smv0  |     3
  s1.st0   |     2
-(8 rows)
+(9 rows)
 
 SELECT dbms_stats.unlock('s0.st0');
  unlock 
@@ -4225,8 +4460,9 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(14 rows)
+(15 rows)
 
 SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
  GROUP BY starelid
@@ -4239,8 +4475,9 @@ SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
  s0.st2   |     2
  st1_exp  |     1
  s0.sft0  |     1
+ s0.smv0  |     3
  s1.st0   |     2
-(7 rows)
+(8 rows)
 
 -- No.13-1-6
 DELETE FROM dbms_stats._relation_stats_locked;
@@ -4261,8 +4498,9 @@ SELECT dbms_stats.lock_database_stats();
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  GROUP BY relid
@@ -4283,8 +4521,9 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
  GROUP BY starelid
@@ -4298,8 +4537,9 @@ SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
  s0.st2   |     2
  st1_exp  |     1
  s0.sft0  |     1
+ s0.smv0  |     3
  s1.st0   |     2
-(8 rows)
+(9 rows)
 
 SELECT dbms_stats.unlock('st0');
  unlock 
@@ -4325,8 +4565,9 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(14 rows)
+(15 rows)
 
 SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
  GROUP BY starelid
@@ -4339,8 +4580,9 @@ SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
  s0.st2   |     2
  st1_exp  |     1
  s0.sft0  |     1
+ s0.smv0  |     3
  s1.st0   |     2
-(7 rows)
+(8 rows)
 
 -- No.13-1-7
 DELETE FROM dbms_stats._relation_stats_locked;
@@ -4361,19 +4603,20 @@ SELECT dbms_stats.lock_database_stats();
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT count(*) FROM dbms_stats._relation_stats_locked;
  count 
 -------
-    15
+    16
 (1 row)
 
 SELECT count(*) FROM dbms_stats._column_stats_locked;
  count 
 -------
-    16
+    19
 (1 row)
 
 SELECT dbms_stats.unlock('s00.s0');
@@ -4383,13 +4626,13 @@ LINE 1: SELECT dbms_stats.unlock('s00.s0');
 SELECT count(*) FROM dbms_stats._relation_stats_locked;
  count 
 -------
-    15
+    16
 (1 row)
 
 SELECT count(*) FROM dbms_stats._column_stats_locked;
  count 
 -------
-    16
+    19
 (1 row)
 
 -- No.13-1-8
@@ -4411,8 +4654,9 @@ SELECT dbms_stats.lock_database_stats();
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  GROUP BY relid
@@ -4433,8 +4677,9 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT starelid, attname, stainherit FROM columns_locked_v c;
  starelid | attname | stainherit 
@@ -4453,9 +4698,12 @@ SELECT starelid, attname, stainherit FROM columns_locked_v c;
  s0.st2   | txt     | f
  st1_exp  | lower   | f
  s0.sft0  | id      | f
+ s0.smv0  | id      | f
+ s0.smv0  | num     | f
+ s0.smv0  | txt     | f
  s1.st0   | id      | f
  s1.st0   | num     | f
-(16 rows)
+(19 rows)
 
 SELECT dbms_stats.unlock('s0.st0', 'id');
  unlock 
@@ -4482,8 +4730,9 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT starelid, attname, stainherit FROM columns_locked_v c;
  starelid | attname | stainherit 
@@ -4500,9 +4749,12 @@ SELECT starelid, attname, stainherit FROM columns_locked_v c;
  s0.st2   | txt     | f
  st1_exp  | lower   | f
  s0.sft0  | id      | f
+ s0.smv0  | id      | f
+ s0.smv0  | num     | f
+ s0.smv0  | txt     | f
  s1.st0   | id      | f
  s1.st0   | num     | f
-(14 rows)
+(17 rows)
 
 -- No.13-1-9
 DELETE FROM dbms_stats._relation_stats_locked;
@@ -4523,8 +4775,9 @@ SELECT dbms_stats.lock_database_stats();
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  GROUP BY relid
@@ -4545,8 +4798,9 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT starelid, attname, stainherit FROM columns_locked_v c;
  starelid | attname | stainherit 
@@ -4565,9 +4819,12 @@ SELECT starelid, attname, stainherit FROM columns_locked_v c;
  s0.st2   | txt     | f
  st1_exp  | lower   | f
  s0.sft0  | id      | f
+ s0.smv0  | id      | f
+ s0.smv0  | num     | f
+ s0.smv0  | txt     | f
  s1.st0   | id      | f
  s1.st0   | num     | f
-(16 rows)
+(19 rows)
 
 SELECT dbms_stats.unlock('s0.st0', 'dummy');
 ERROR:  column "dummy" of "s0.st0" does not exist
@@ -4590,8 +4847,9 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT starelid, attname, stainherit FROM columns_locked_v c;
  starelid | attname | stainherit 
@@ -4610,9 +4868,12 @@ SELECT starelid, attname, stainherit FROM columns_locked_v c;
  s0.st2   | txt     | f
  st1_exp  | lower   | f
  s0.sft0  | id      | f
+ s0.smv0  | id      | f
+ s0.smv0  | num     | f
+ s0.smv0  | txt     | f
  s1.st0   | id      | f
  s1.st0   | num     | f
-(16 rows)
+(19 rows)
 
 -- No.13-1-10
 DELETE FROM dbms_stats._relation_stats_locked;
@@ -4633,8 +4894,9 @@ SELECT dbms_stats.lock_database_stats();
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 DELETE FROM dbms_stats._column_stats_locked;
 SELECT relid::regclass FROM dbms_stats._relation_stats_locked
@@ -4656,8 +4918,9 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT dbms_stats.unlock('s0.st0', 'id');
  unlock 
@@ -4684,8 +4947,9 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT starelid::regclass, staattnum FROM dbms_stats._column_stats_locked
  GROUP BY starelid, staattnum
@@ -4713,8 +4977,9 @@ SELECT dbms_stats.lock_database_stats();
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  GROUP BY relid
@@ -4735,8 +5000,9 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT starelid::regclass, staattnum FROM dbms_stats._column_stats_locked
  GROUP BY starelid, staattnum
@@ -4755,9 +5021,12 @@ SELECT starelid::regclass, staattnum FROM dbms_stats._column_stats_locked
  s0.st2   |         2
  st1_exp  |         1
  s0.sft0  |         1
+ s0.smv0  |         1
+ s0.smv0  |         2
+ s0.smv0  |         3
  s1.st0   |         1
  s1.st0   |         2
-(14 rows)
+(17 rows)
 
 SELECT dbms_stats.unlock(NULL, 'id');
 ERROR:  relation is required
@@ -4780,8 +5049,9 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT starelid::regclass, staattnum FROM dbms_stats._column_stats_locked
  GROUP BY starelid, staattnum
@@ -4800,9 +5070,12 @@ SELECT starelid::regclass, staattnum FROM dbms_stats._column_stats_locked
  s0.st2   |         2
  st1_exp  |         1
  s0.sft0  |         1
+ s0.smv0  |         1
+ s0.smv0  |         2
+ s0.smv0  |         3
  s1.st0   |         1
  s1.st0   |         2
-(14 rows)
+(17 rows)
 
 -- No.13-1-12
 DELETE FROM dbms_stats._relation_stats_locked;
@@ -4823,8 +5096,9 @@ SELECT dbms_stats.lock_database_stats();
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  GROUP BY relid
@@ -4845,8 +5119,9 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT starelid::regclass, staattnum FROM dbms_stats._column_stats_locked
  GROUP BY starelid, staattnum
@@ -4865,9 +5140,12 @@ SELECT starelid::regclass, staattnum FROM dbms_stats._column_stats_locked
  s0.st2   |         2
  st1_exp  |         1
  s0.sft0  |         1
+ s0.smv0  |         1
+ s0.smv0  |         2
+ s0.smv0  |         3
  s1.st0   |         1
  s1.st0   |         2
-(14 rows)
+(17 rows)
 
 SELECT dbms_stats.unlock('s0.st0', NULL);
  unlock 
@@ -4893,8 +5171,9 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(14 rows)
+(15 rows)
 
 SELECT starelid::regclass, staattnum FROM dbms_stats._column_stats_locked
  GROUP BY starelid, staattnum
@@ -4911,9 +5190,12 @@ SELECT starelid::regclass, staattnum FROM dbms_stats._column_stats_locked
  s0.st2   |         2
  st1_exp  |         1
  s0.sft0  |         1
+ s0.smv0  |         1
+ s0.smv0  |         2
+ s0.smv0  |         3
  s1.st0   |         1
  s1.st0   |         2
-(12 rows)
+(15 rows)
 
 -- No.13-1-13
 DELETE FROM dbms_stats._relation_stats_locked;
@@ -4934,19 +5216,20 @@ SELECT dbms_stats.lock_database_stats();
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT count(*) FROM dbms_stats._relation_stats_locked;
  count 
 -------
-    15
+    16
 (1 row)
 
 SELECT count(*) FROM dbms_stats._column_stats_locked;
  count 
 -------
-    16
+    19
 (1 row)
 
 BEGIN;
@@ -4976,8 +5259,9 @@ SELECT dbms_stats.unlock();
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT relation::regclass, mode
   FROM pg_locks
@@ -5028,8 +5312,9 @@ SELECT dbms_stats.lock_database_stats();
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT * FROM dbms_stats.backup_history
  ORDER BY id;
@@ -5048,22 +5333,111 @@ SELECT * FROM dbms_stats.backup_history
 SELECT count(*) FROM dbms_stats.relation_stats_backup;
  count 
 -------
-    25
+    26
 (1 row)
 
 SELECT count(*) FROM dbms_stats.column_stats_backup;
  count 
 -------
-    36
+    39
 (1 row)
 
 SELECT count(*) FROM dbms_stats._relation_stats_locked;
  count 
 -------
-    15
+    16
 (1 row)
 
 SELECT count(*) FROM dbms_stats._column_stats_locked;
+ count 
+-------
+    19
+(1 row)
+
+SELECT dbms_stats.unlock_database_stats();
+ unlock_database_stats 
+-----------------------
+ pt0
+ pt0_idx
+ st0
+ st0_idx
+ st1
+ s0.st0
+ s0.st0_idx
+ s0.st1
+ s0.st1_idx
+ s0.st2
+ s0.st2_idx
+ st1_idx
+ st1_exp
+ s0.sft0
+ s0.smv0
+ s1.st0
+(16 rows)
+
+SELECT count(*) FROM dbms_stats._relation_stats_locked;
+ count 
+-------
+     0
+(1 row)
+
+SELECT count(*) FROM dbms_stats._column_stats_locked;
+ count 
+-------
+     0
+(1 row)
+
+SELECT * FROM dbms_stats.backup_history
+ ORDER BY id;
+ id |                time                 | unit | comment 
+----+-------------------------------------+------+---------
+  1 | Wed Feb 29 23:59:56.999999 2012 PST | d    | (null)
+  2 | Wed Feb 29 23:59:57 2012 PST        | d    | (null)
+  3 | Wed Feb 29 23:59:57.000001 2012 PST | t    | (null)
+  4 | Wed Feb 29 23:59:58 2012 PST        | d    | (null)
+  5 | Thu Mar 01 00:00:00 2012 PST        | c    | (null)
+  6 | Thu Mar 01 00:00:02 2012 PST        | t    | (null)
+  7 | Thu Mar 01 00:00:04 2012 PST        | t    | (null)
+  8 | Thu Mar 01 00:00:06 2012 PST        | s    | (null)
+(8 rows)
+
+SELECT count(*) FROM dbms_stats.relation_stats_backup;
+ count 
+-------
+    26
+(1 row)
+
+SELECT count(*) FROM dbms_stats.column_stats_backup;
+ count 
+-------
+    39
+(1 row)
+
+-- No.14-1-2
+DELETE FROM dbms_stats._relation_stats_locked;
+SELECT dbms_stats.lock_database_stats();
+ lock_database_stats 
+---------------------
+ pt0
+ pt0_idx
+ st0
+ st0_idx
+ st1
+ s0.st0
+ s0.st0_idx
+ s0.st1
+ s0.st1_idx
+ s0.st2
+ s0.st2_idx
+ st1_idx
+ st1_exp
+ s0.sft0
+ s0.smv0
+ s1.st0
+(16 rows)
+
+DELETE FROM dbms_stats._column_stats_locked;
+SELECT count(*) FROM dbms_stats._relation_stats_locked;
  count 
 -------
     16
@@ -5086,95 +5460,9 @@ SELECT dbms_stats.unlock_database_stats();
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
-
-SELECT count(*) FROM dbms_stats._relation_stats_locked;
- count 
--------
-     0
-(1 row)
-
-SELECT count(*) FROM dbms_stats._column_stats_locked;
- count 
--------
-     0
-(1 row)
-
-SELECT * FROM dbms_stats.backup_history
- ORDER BY id;
- id |                time                 | unit | comment 
-----+-------------------------------------+------+---------
-  1 | Wed Feb 29 23:59:56.999999 2012 PST | d    | (null)
-  2 | Wed Feb 29 23:59:57 2012 PST        | d    | (null)
-  3 | Wed Feb 29 23:59:57.000001 2012 PST | t    | (null)
-  4 | Wed Feb 29 23:59:58 2012 PST        | d    | (null)
-  5 | Thu Mar 01 00:00:00 2012 PST        | c    | (null)
-  6 | Thu Mar 01 00:00:02 2012 PST        | t    | (null)
-  7 | Thu Mar 01 00:00:04 2012 PST        | t    | (null)
-  8 | Thu Mar 01 00:00:06 2012 PST        | s    | (null)
-(8 rows)
-
-SELECT count(*) FROM dbms_stats.relation_stats_backup;
- count 
--------
-    25
-(1 row)
-
-SELECT count(*) FROM dbms_stats.column_stats_backup;
- count 
--------
-    36
-(1 row)
-
--- No.14-1-2
-DELETE FROM dbms_stats._relation_stats_locked;
-SELECT dbms_stats.lock_database_stats();
- lock_database_stats 
----------------------
- pt0
- pt0_idx
- st0
- st0_idx
- st1
- s0.st0
- s0.st0_idx
- s0.st1
- s0.st1_idx
- s0.st2
- s0.st2_idx
- st1_idx
- st1_exp
- s0.sft0
- s1.st0
-(15 rows)
-
-DELETE FROM dbms_stats._column_stats_locked;
-SELECT count(*) FROM dbms_stats._relation_stats_locked;
- count 
--------
-    15
-(1 row)
-
-SELECT dbms_stats.unlock_database_stats();
- unlock_database_stats 
------------------------
- pt0
- pt0_idx
- st0
- st0_idx
- st1
- s0.st0
- s0.st0_idx
- s0.st1
- s0.st1_idx
- s0.st2
- s0.st2_idx
- st1_idx
- st1_exp
- s0.sft0
- s1.st0
-(15 rows)
+(16 rows)
 
 SELECT count(*) FROM dbms_stats._relation_stats_locked;
  count 
@@ -5226,19 +5514,20 @@ SELECT dbms_stats.lock_database_stats();
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT count(*) FROM dbms_stats._relation_stats_locked;
  count 
 -------
-    15
+    16
 (1 row)
 
 SELECT count(*) FROM dbms_stats._column_stats_locked;
  count 
 -------
-    16
+    19
 (1 row)
 
 BEGIN;
@@ -5268,8 +5557,9 @@ SELECT dbms_stats.unlock_database_stats();
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT relation::regclass, mode
   FROM pg_locks
@@ -5320,8 +5610,9 @@ SELECT dbms_stats.lock_database_stats();
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT * FROM dbms_stats.backup_history
  ORDER BY id;
@@ -5340,13 +5631,13 @@ SELECT * FROM dbms_stats.backup_history
 SELECT count(*) FROM dbms_stats.relation_stats_backup;
  count 
 -------
-    25
+    26
 (1 row)
 
 SELECT count(*) FROM dbms_stats.column_stats_backup;
  count 
 -------
-    36
+    39
 (1 row)
 
 SELECT relid::regclass FROM dbms_stats._relation_stats_locked
@@ -5368,8 +5659,9 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
  GROUP BY starelid
@@ -5383,8 +5675,9 @@ SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
  s0.st2   |     2
  st1_exp  |     1
  s0.sft0  |     1
+ s0.smv0  |     3
  s1.st0   |     2
-(8 rows)
+(9 rows)
 
 SELECT dbms_stats.unlock_schema_stats('s0');
  unlock_schema_stats 
@@ -5396,7 +5689,8 @@ SELECT dbms_stats.unlock_schema_stats('s0');
  s0.st2
  s0.st2_idx
  s0.sft0
-(7 rows)
+ s0.smv0
+(8 rows)
 
 SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  GROUP BY relid
@@ -5441,13 +5735,13 @@ SELECT * FROM dbms_stats.backup_history
 SELECT count(*) FROM dbms_stats.relation_stats_backup;
  count 
 -------
-    25
+    26
 (1 row)
 
 SELECT count(*) FROM dbms_stats.column_stats_backup;
  count 
 -------
-    36
+    39
 (1 row)
 
 -- No.14-2-2
@@ -5469,8 +5763,9 @@ SELECT dbms_stats.lock_database_stats();
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 DELETE FROM dbms_stats._column_stats_locked;
 SELECT relid::regclass FROM dbms_stats._relation_stats_locked
@@ -5492,8 +5787,9 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
  GROUP BY starelid
@@ -5512,7 +5808,8 @@ SELECT dbms_stats.unlock_schema_stats('s0');
  s0.st2
  s0.st2_idx
  s0.sft0
-(7 rows)
+ s0.smv0
+(8 rows)
 
 SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  GROUP BY relid
@@ -5590,8 +5887,9 @@ SELECT dbms_stats.lock_database_stats();
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  GROUP BY relid
@@ -5612,8 +5910,9 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
  GROUP BY starelid
@@ -5627,8 +5926,9 @@ SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
  s0.st2   |     2
  st1_exp  |     1
  s0.sft0  |     1
+ s0.smv0  |     3
  s1.st0   |     2
-(8 rows)
+(9 rows)
 
 SELECT dbms_stats.unlock_schema_stats('s0');
  unlock_schema_stats 
@@ -5640,7 +5940,8 @@ SELECT dbms_stats.unlock_schema_stats('s0');
  s0.st2
  s0.st2_idx
  s0.sft0
-(7 rows)
+ s0.smv0
+(8 rows)
 
 SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  GROUP BY relid
@@ -5687,8 +5988,9 @@ SELECT dbms_stats.lock_database_stats();
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  GROUP BY relid
@@ -5709,8 +6011,9 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
  GROUP BY starelid
@@ -5724,8 +6027,9 @@ SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
  s0.st2   |     2
  st1_exp  |     1
  s0.sft0  |     1
+ s0.smv0  |     3
  s1.st0   |     2
-(8 rows)
+(9 rows)
 
 SELECT dbms_stats.unlock_schema_stats('s00');
 ERROR:  schema "s00" does not exist
@@ -5748,8 +6052,9 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
  GROUP BY starelid
@@ -5763,8 +6068,9 @@ SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
  s0.st2   |     2
  st1_exp  |     1
  s0.sft0  |     1
+ s0.smv0  |     3
  s1.st0   |     2
-(8 rows)
+(9 rows)
 
 -- No.14-2-6
 DELETE FROM dbms_stats._relation_stats_locked;
@@ -5785,8 +6091,9 @@ SELECT dbms_stats.lock_database_stats();
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  GROUP BY relid
@@ -5807,8 +6114,9 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
  GROUP BY starelid
@@ -5822,8 +6130,9 @@ SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
  s0.st2   |     2
  st1_exp  |     1
  s0.sft0  |     1
+ s0.smv0  |     3
  s1.st0   |     2
-(8 rows)
+(9 rows)
 
 SELECT dbms_stats.unlock_schema_stats('pg_catalog');
 ERROR:  can not unlock statistics of relation in system schema "pg_catalog"
@@ -5846,8 +6155,9 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
  GROUP BY starelid
@@ -5861,8 +6171,9 @@ SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
  s0.st2   |     2
  st1_exp  |     1
  s0.sft0  |     1
+ s0.smv0  |     3
  s1.st0   |     2
-(8 rows)
+(9 rows)
 
 -- No.14-2-7
 DELETE FROM dbms_stats._relation_stats_locked;
@@ -5883,8 +6194,9 @@ SELECT dbms_stats.lock_database_stats();
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  GROUP BY relid
@@ -5905,8 +6217,9 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
  GROUP BY starelid
@@ -5920,8 +6233,9 @@ SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
  s0.st2   |     2
  st1_exp  |     1
  s0.sft0  |     1
+ s0.smv0  |     3
  s1.st0   |     2
-(8 rows)
+(9 rows)
 
 SELECT dbms_stats.unlock_schema_stats(NULL);
  unlock_schema_stats 
@@ -5947,8 +6261,9 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
  GROUP BY starelid
@@ -5962,8 +6277,9 @@ SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
  s0.st2   |     2
  st1_exp  |     1
  s0.sft0  |     1
+ s0.smv0  |     3
  s1.st0   |     2
-(8 rows)
+(9 rows)
 
 -- No.14-2-8
 DELETE FROM dbms_stats._relation_stats_locked;
@@ -5984,8 +6300,9 @@ SELECT dbms_stats.lock_database_stats();
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  GROUP BY relid
@@ -6006,8 +6323,9 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
  GROUP BY starelid
@@ -6021,8 +6339,9 @@ SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
  s0.st2   |     2
  st1_exp  |     1
  s0.sft0  |     1
+ s0.smv0  |     3
  s1.st0   |     2
-(8 rows)
+(9 rows)
 
 BEGIN;
 SELECT relation::regclass, mode
@@ -6044,7 +6363,8 @@ SELECT dbms_stats.unlock_schema_stats('s0');
  s0.st2
  s0.st2_idx
  s0.sft0
-(7 rows)
+ s0.smv0
+(8 rows)
 
 SELECT relation::regclass, mode
   FROM pg_locks
@@ -6109,8 +6429,9 @@ SELECT dbms_stats.lock_database_stats();
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT * FROM dbms_stats.backup_history
  ORDER BY id;
@@ -6129,13 +6450,13 @@ SELECT * FROM dbms_stats.backup_history
 SELECT count(*) FROM dbms_stats.relation_stats_backup;
  count 
 -------
-    25
+    26
 (1 row)
 
 SELECT count(*) FROM dbms_stats.column_stats_backup;
  count 
 -------
-    36
+    39
 (1 row)
 
 SELECT relid::regclass FROM dbms_stats._relation_stats_locked
@@ -6157,8 +6478,9 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
  GROUP BY starelid
@@ -6172,8 +6494,9 @@ SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
  s0.st2   |     2
  st1_exp  |     1
  s0.sft0  |     1
+ s0.smv0  |     3
  s1.st0   |     2
-(8 rows)
+(9 rows)
 
 SELECT dbms_stats.unlock_table_stats('s0.st0');
  unlock_table_stats 
@@ -6199,8 +6522,9 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(14 rows)
+(15 rows)
 
 SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
  GROUP BY starelid
@@ -6213,8 +6537,9 @@ SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
  s0.st2   |     2
  st1_exp  |     1
  s0.sft0  |     1
+ s0.smv0  |     3
  s1.st0   |     2
-(7 rows)
+(8 rows)
 
 SELECT * FROM dbms_stats.backup_history
  ORDER BY id;
@@ -6233,13 +6558,13 @@ SELECT * FROM dbms_stats.backup_history
 SELECT count(*) FROM dbms_stats.relation_stats_backup;
  count 
 -------
-    25
+    26
 (1 row)
 
 SELECT count(*) FROM dbms_stats.column_stats_backup;
  count 
 -------
-    36
+    39
 (1 row)
 
 -- No.14-3-2
@@ -6261,8 +6586,9 @@ SELECT dbms_stats.lock_database_stats();
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 DELETE FROM dbms_stats._column_stats_locked;
 SELECT relid::regclass FROM dbms_stats._relation_stats_locked
@@ -6284,8 +6610,9 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
  GROUP BY starelid
@@ -6318,8 +6645,9 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(14 rows)
+(15 rows)
 
 SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
  GROUP BY starelid
@@ -6382,8 +6710,9 @@ SELECT dbms_stats.lock_database_stats();
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  GROUP BY relid
@@ -6404,8 +6733,9 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
  GROUP BY starelid
@@ -6419,8 +6749,9 @@ SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
  s0.st2   |     2
  st1_exp  |     1
  s0.sft0  |     1
+ s0.smv0  |     3
  s1.st0   |     2
-(8 rows)
+(9 rows)
 
 SELECT dbms_stats.unlock_table_stats('s0.st0');
  unlock_table_stats 
@@ -6446,8 +6777,9 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(14 rows)
+(15 rows)
 
 SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
  GROUP BY starelid
@@ -6460,8 +6792,9 @@ SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
  s0.st2   |     2
  st1_exp  |     1
  s0.sft0  |     1
+ s0.smv0  |     3
  s1.st0   |     2
-(7 rows)
+(8 rows)
 
 -- No.14-3-5
 DELETE FROM dbms_stats._relation_stats_locked;
@@ -6482,8 +6815,9 @@ SELECT dbms_stats.lock_database_stats();
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  GROUP BY relid
@@ -6504,8 +6838,9 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
  GROUP BY starelid
@@ -6519,8 +6854,9 @@ SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
  s0.st2   |     2
  st1_exp  |     1
  s0.sft0  |     1
+ s0.smv0  |     3
  s1.st0   |     2
-(8 rows)
+(9 rows)
 
 SELECT dbms_stats.unlock_table_stats('st0');
  unlock_table_stats 
@@ -6546,8 +6882,9 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(14 rows)
+(15 rows)
 
 SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
  GROUP BY starelid
@@ -6560,8 +6897,9 @@ SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
  s0.st2   |     2
  st1_exp  |     1
  s0.sft0  |     1
+ s0.smv0  |     3
  s1.st0   |     2
-(7 rows)
+(8 rows)
 
 -- No.14-3-6
 DELETE FROM dbms_stats._relation_stats_locked;
@@ -6582,8 +6920,9 @@ SELECT dbms_stats.lock_database_stats();
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  GROUP BY relid
@@ -6604,8 +6943,9 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
  GROUP BY starelid
@@ -6619,8 +6959,9 @@ SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
  s0.st2   |     2
  st1_exp  |     1
  s0.sft0  |     1
+ s0.smv0  |     3
  s1.st0   |     2
-(8 rows)
+(9 rows)
 
 SELECT dbms_stats.unlock_table_stats('s00.s0');
 ERROR:  schema "s00" does not exist
@@ -6645,8 +6986,9 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
  GROUP BY starelid
@@ -6660,8 +7002,9 @@ SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
  s0.st2   |     2
  st1_exp  |     1
  s0.sft0  |     1
+ s0.smv0  |     3
  s1.st0   |     2
-(8 rows)
+(9 rows)
 
 -- No.14-3-7
 DELETE FROM dbms_stats._relation_stats_locked;
@@ -6682,8 +7025,9 @@ SELECT dbms_stats.lock_database_stats();
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  GROUP BY relid
@@ -6704,8 +7048,9 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
  GROUP BY starelid
@@ -6719,8 +7064,9 @@ SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
  s0.st2   |     2
  st1_exp  |     1
  s0.sft0  |     1
+ s0.smv0  |     3
  s1.st0   |     2
-(8 rows)
+(9 rows)
 
 SELECT dbms_stats.unlock_table_stats(NULL);
  unlock_table_stats 
@@ -6746,8 +7092,9 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
  GROUP BY starelid
@@ -6761,8 +7108,9 @@ SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
  s0.st2   |     2
  st1_exp  |     1
  s0.sft0  |     1
+ s0.smv0  |     3
  s1.st0   |     2
-(8 rows)
+(9 rows)
 
 -- No.14-3-8
 DELETE FROM dbms_stats._relation_stats_locked;
@@ -6783,8 +7131,9 @@ SELECT dbms_stats.lock_database_stats();
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  GROUP BY relid
@@ -6805,8 +7154,9 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
  GROUP BY starelid
@@ -6820,8 +7170,9 @@ SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
  s0.st2   |     2
  st1_exp  |     1
  s0.sft0  |     1
+ s0.smv0  |     3
  s1.st0   |     2
-(8 rows)
+(9 rows)
 
 BEGIN;
 SELECT relation::regclass, mode
@@ -6873,8 +7224,9 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(14 rows)
+(15 rows)
 
 SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
  GROUP BY starelid
@@ -6887,8 +7239,9 @@ SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
  s0.st2   |     2
  st1_exp  |     1
  s0.sft0  |     1
+ s0.smv0  |     3
  s1.st0   |     2
-(7 rows)
+(8 rows)
 
 /*
  * No.14-4 dbms_stats.unlock_table_stats(schemaname, tablename)
@@ -6912,8 +7265,9 @@ SELECT dbms_stats.lock_database_stats();
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT * FROM dbms_stats.backup_history
  ORDER BY id;
@@ -6932,13 +7286,13 @@ SELECT * FROM dbms_stats.backup_history
 SELECT count(*) FROM dbms_stats.relation_stats_backup;
  count 
 -------
-    25
+    26
 (1 row)
 
 SELECT count(*) FROM dbms_stats.column_stats_backup;
  count 
 -------
-    36
+    39
 (1 row)
 
 SELECT relid::regclass FROM dbms_stats._relation_stats_locked
@@ -6960,8 +7314,9 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
  GROUP BY starelid
@@ -6975,8 +7330,9 @@ SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
  s0.st2   |     2
  st1_exp  |     1
  s0.sft0  |     1
+ s0.smv0  |     3
  s1.st0   |     2
-(8 rows)
+(9 rows)
 
 SELECT dbms_stats.unlock_table_stats('s0','st0');
  unlock_table_stats 
@@ -7002,8 +7358,9 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(14 rows)
+(15 rows)
 
 SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
  GROUP BY starelid
@@ -7016,8 +7373,9 @@ SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
  s0.st2   |     2
  st1_exp  |     1
  s0.sft0  |     1
+ s0.smv0  |     3
  s1.st0   |     2
-(7 rows)
+(8 rows)
 
 SELECT * FROM dbms_stats.backup_history
  ORDER BY id;
@@ -7036,13 +7394,13 @@ SELECT * FROM dbms_stats.backup_history
 SELECT count(*) FROM dbms_stats.relation_stats_backup;
  count 
 -------
-    25
+    26
 (1 row)
 
 SELECT count(*) FROM dbms_stats.column_stats_backup;
  count 
 -------
-    36
+    39
 (1 row)
 
 -- No.14-4-2
@@ -7064,8 +7422,9 @@ SELECT dbms_stats.lock_database_stats();
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 DELETE FROM dbms_stats._column_stats_locked;
 SELECT relid::regclass FROM dbms_stats._relation_stats_locked
@@ -7087,8 +7446,9 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
  GROUP BY starelid
@@ -7121,8 +7481,9 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(14 rows)
+(15 rows)
 
 SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
  GROUP BY starelid
@@ -7185,8 +7546,9 @@ SELECT dbms_stats.lock_database_stats();
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  GROUP BY relid
@@ -7207,8 +7569,9 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
  GROUP BY starelid
@@ -7222,8 +7585,9 @@ SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
  s0.st2   |     2
  st1_exp  |     1
  s0.sft0  |     1
+ s0.smv0  |     3
  s1.st0   |     2
-(8 rows)
+(9 rows)
 
 SELECT dbms_stats.unlock_table_stats('s0', 'st0');
  unlock_table_stats 
@@ -7249,8 +7613,9 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(14 rows)
+(15 rows)
 
 SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
  GROUP BY starelid
@@ -7263,8 +7628,9 @@ SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
  s0.st2   |     2
  st1_exp  |     1
  s0.sft0  |     1
+ s0.smv0  |     3
  s1.st0   |     2
-(7 rows)
+(8 rows)
 
 -- No.14-4-5
 DELETE FROM dbms_stats._relation_stats_locked;
@@ -7285,8 +7651,9 @@ SELECT dbms_stats.lock_database_stats();
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  GROUP BY relid
@@ -7307,8 +7674,9 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
  GROUP BY starelid
@@ -7322,8 +7690,9 @@ SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
  s0.st2   |     2
  st1_exp  |     1
  s0.sft0  |     1
+ s0.smv0  |     3
  s1.st0   |     2
-(8 rows)
+(9 rows)
 
 SELECT dbms_stats.unlock_table_stats('s00', 's0');
 ERROR:  schema "s00" does not exist
@@ -7347,8 +7716,9 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
  GROUP BY starelid
@@ -7362,8 +7732,9 @@ SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
  s0.st2   |     2
  st1_exp  |     1
  s0.sft0  |     1
+ s0.smv0  |     3
  s1.st0   |     2
-(8 rows)
+(9 rows)
 
 -- No.14-4-6
 DELETE FROM dbms_stats._relation_stats_locked;
@@ -7384,8 +7755,9 @@ SELECT dbms_stats.lock_database_stats();
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  GROUP BY relid
@@ -7406,8 +7778,9 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
  GROUP BY starelid
@@ -7421,8 +7794,9 @@ SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
  s0.st2   |     2
  st1_exp  |     1
  s0.sft0  |     1
+ s0.smv0  |     3
  s1.st0   |     2
-(8 rows)
+(9 rows)
 
 SELECT dbms_stats.unlock_table_stats(NULL, 'st0');
  unlock_table_stats 
@@ -7448,8 +7822,9 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
  GROUP BY starelid
@@ -7463,8 +7838,9 @@ SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
  s0.st2   |     2
  st1_exp  |     1
  s0.sft0  |     1
+ s0.smv0  |     3
  s1.st0   |     2
-(8 rows)
+(9 rows)
 
 -- No.14-4-7
 DELETE FROM dbms_stats._relation_stats_locked;
@@ -7485,8 +7861,9 @@ SELECT dbms_stats.lock_database_stats();
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  GROUP BY relid
@@ -7507,8 +7884,9 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
  GROUP BY starelid
@@ -7522,8 +7900,9 @@ SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
  s0.st2   |     2
  st1_exp  |     1
  s0.sft0  |     1
+ s0.smv0  |     3
  s1.st0   |     2
-(8 rows)
+(9 rows)
 
 SELECT dbms_stats.unlock_table_stats('s0', NULL);
  unlock_table_stats 
@@ -7549,8 +7928,9 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
  GROUP BY starelid
@@ -7564,8 +7944,9 @@ SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
  s0.st2   |     2
  st1_exp  |     1
  s0.sft0  |     1
+ s0.smv0  |     3
  s1.st0   |     2
-(8 rows)
+(9 rows)
 
 -- No.14-4-8
 DELETE FROM dbms_stats._relation_stats_locked;
@@ -7586,8 +7967,9 @@ SELECT dbms_stats.lock_database_stats();
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  GROUP BY relid
@@ -7608,8 +7990,9 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
  GROUP BY starelid
@@ -7623,8 +8006,9 @@ SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
  s0.st2   |     2
  st1_exp  |     1
  s0.sft0  |     1
+ s0.smv0  |     3
  s1.st0   |     2
-(8 rows)
+(9 rows)
 
 BEGIN;
 SELECT relation::regclass, mode
@@ -7676,8 +8060,9 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(14 rows)
+(15 rows)
 
 SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
  GROUP BY starelid
@@ -7690,8 +8075,9 @@ SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
  s0.st2   |     2
  st1_exp  |     1
  s0.sft0  |     1
+ s0.smv0  |     3
  s1.st0   |     2
-(7 rows)
+(8 rows)
 
 /*
  * No.14-5 dbms_stats.unlock_column_stats(regclass, attname)
@@ -7715,8 +8101,9 @@ SELECT dbms_stats.lock_database_stats();
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT * FROM dbms_stats.backup_history
  ORDER BY id;
@@ -7735,13 +8122,13 @@ SELECT * FROM dbms_stats.backup_history
 SELECT count(*) FROM dbms_stats.relation_stats_backup;
  count 
 -------
-    25
+    26
 (1 row)
 
 SELECT count(*) FROM dbms_stats.column_stats_backup;
  count 
 -------
-    36
+    39
 (1 row)
 
 SELECT relid::regclass FROM dbms_stats._relation_stats_locked
@@ -7763,8 +8150,9 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT starelid, attname, stainherit FROM columns_locked_v c;
  starelid | attname | stainherit 
@@ -7783,9 +8171,12 @@ SELECT starelid, attname, stainherit FROM columns_locked_v c;
  s0.st2   | txt     | f
  st1_exp  | lower   | f
  s0.sft0  | id      | f
+ s0.smv0  | id      | f
+ s0.smv0  | num     | f
+ s0.smv0  | txt     | f
  s1.st0   | id      | f
  s1.st0   | num     | f
-(16 rows)
+(19 rows)
 
 SELECT dbms_stats.unlock_column_stats('s0.st0', 'id');
  unlock_column_stats 
@@ -7808,9 +8199,12 @@ SELECT starelid, attname, stainherit FROM columns_locked_v c;
  s0.st2   | txt     | f
  st1_exp  | lower   | f
  s0.sft0  | id      | f
+ s0.smv0  | id      | f
+ s0.smv0  | num     | f
+ s0.smv0  | txt     | f
  s1.st0   | id      | f
  s1.st0   | num     | f
-(14 rows)
+(17 rows)
 
 SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  GROUP BY relid
@@ -7831,8 +8225,9 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT * FROM dbms_stats.backup_history
  ORDER BY id;
@@ -7851,13 +8246,13 @@ SELECT * FROM dbms_stats.backup_history
 SELECT count(*) FROM dbms_stats.relation_stats_backup;
  count 
 -------
-    25
+    26
 (1 row)
 
 SELECT count(*) FROM dbms_stats.column_stats_backup;
  count 
 -------
-    36
+    39
 (1 row)
 
 -- No.14-5-2
@@ -7879,8 +8274,9 @@ SELECT dbms_stats.lock_database_stats();
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 DELETE FROM dbms_stats._column_stats_locked;
 SELECT relid::regclass FROM dbms_stats._relation_stats_locked
@@ -7902,8 +8298,9 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT dbms_stats.unlock_column_stats('s0.st0', 'id');
  unlock_column_stats 
@@ -7936,8 +8333,9 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 -- No.14-5-3
 DELETE FROM dbms_stats._relation_stats_locked;
@@ -7958,8 +8356,9 @@ SELECT dbms_stats.lock_database_stats();
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  GROUP BY relid
@@ -7980,8 +8379,9 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT starelid, attname, stainherit FROM columns_locked_v c;
  starelid | attname | stainherit 
@@ -8000,9 +8400,12 @@ SELECT starelid, attname, stainherit FROM columns_locked_v c;
  s0.st2   | txt     | f
  st1_exp  | lower   | f
  s0.sft0  | id      | f
+ s0.smv0  | id      | f
+ s0.smv0  | num     | f
+ s0.smv0  | txt     | f
  s1.st0   | id      | f
  s1.st0   | num     | f
-(16 rows)
+(19 rows)
 
 SELECT dbms_stats.unlock_column_stats('s0.st0', 'id');
  unlock_column_stats 
@@ -8025,9 +8428,12 @@ SELECT starelid, attname, stainherit FROM columns_locked_v c;
  s0.st2   | txt     | f
  st1_exp  | lower   | f
  s0.sft0  | id      | f
+ s0.smv0  | id      | f
+ s0.smv0  | num     | f
+ s0.smv0  | txt     | f
  s1.st0   | id      | f
  s1.st0   | num     | f
-(14 rows)
+(17 rows)
 
 SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  GROUP BY relid
@@ -8048,8 +8454,9 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 -- No.14-5-4
 DELETE FROM dbms_stats._relation_stats_locked;
@@ -8070,8 +8477,9 @@ SELECT dbms_stats.lock_database_stats();
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  GROUP BY relid
@@ -8092,8 +8500,9 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT starelid, attname, stainherit FROM columns_locked_v c;
  starelid | attname | stainherit 
@@ -8112,9 +8521,12 @@ SELECT starelid, attname, stainherit FROM columns_locked_v c;
  s0.st2   | txt     | f
  st1_exp  | lower   | f
  s0.sft0  | id      | f
+ s0.smv0  | id      | f
+ s0.smv0  | num     | f
+ s0.smv0  | txt     | f
  s1.st0   | id      | f
  s1.st0   | num     | f
-(16 rows)
+(19 rows)
 
 SELECT dbms_stats.unlock_column_stats('st0', 'id');
  unlock_column_stats 
@@ -8138,9 +8550,12 @@ SELECT starelid, attname, stainherit FROM columns_locked_v c;
  s0.st2   | txt     | f
  st1_exp  | lower   | f
  s0.sft0  | id      | f
+ s0.smv0  | id      | f
+ s0.smv0  | num     | f
+ s0.smv0  | txt     | f
  s1.st0   | id      | f
  s1.st0   | num     | f
-(15 rows)
+(18 rows)
 
 SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  GROUP BY relid
@@ -8161,8 +8576,9 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 -- No.14-5-5
 DELETE FROM dbms_stats._relation_stats_locked;
@@ -8183,8 +8599,9 @@ SELECT dbms_stats.lock_database_stats();
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  GROUP BY relid
@@ -8205,8 +8622,9 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT starelid, attname, stainherit FROM columns_locked_v c;
  starelid | attname | stainherit 
@@ -8225,9 +8643,12 @@ SELECT starelid, attname, stainherit FROM columns_locked_v c;
  s0.st2   | txt     | f
  st1_exp  | lower   | f
  s0.sft0  | id      | f
+ s0.smv0  | id      | f
+ s0.smv0  | num     | f
+ s0.smv0  | txt     | f
  s1.st0   | id      | f
  s1.st0   | num     | f
-(16 rows)
+(19 rows)
 
 SELECT dbms_stats.unlock_column_stats('s0.st0', 'dummy');
 ERROR:  column "dummy" of "s0.st0" does not exist
@@ -8248,9 +8669,12 @@ SELECT starelid, attname, stainherit FROM columns_locked_v c;
  s0.st2   | txt     | f
  st1_exp  | lower   | f
  s0.sft0  | id      | f
+ s0.smv0  | id      | f
+ s0.smv0  | num     | f
+ s0.smv0  | txt     | f
  s1.st0   | id      | f
  s1.st0   | num     | f
-(16 rows)
+(19 rows)
 
 SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  GROUP BY relid
@@ -8271,8 +8695,9 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 -- No.14-5-6
 DELETE FROM dbms_stats._relation_stats_locked;
@@ -8293,8 +8718,9 @@ SELECT dbms_stats.lock_database_stats();
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  GROUP BY relid
@@ -8315,8 +8741,9 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT starelid, attname, stainherit FROM columns_locked_v c;
  starelid | attname | stainherit 
@@ -8335,9 +8762,12 @@ SELECT starelid, attname, stainherit FROM columns_locked_v c;
  s0.st2   | txt     | f
  st1_exp  | lower   | f
  s0.sft0  | id      | f
+ s0.smv0  | id      | f
+ s0.smv0  | num     | f
+ s0.smv0  | txt     | f
  s1.st0   | id      | f
  s1.st0   | num     | f
-(16 rows)
+(19 rows)
 
 SELECT dbms_stats.unlock_column_stats('s00.s0', 'id');
 ERROR:  schema "s00" does not exist
@@ -8360,9 +8790,12 @@ SELECT starelid, attname, stainherit FROM columns_locked_v c;
  s0.st2   | txt     | f
  st1_exp  | lower   | f
  s0.sft0  | id      | f
+ s0.smv0  | id      | f
+ s0.smv0  | num     | f
+ s0.smv0  | txt     | f
  s1.st0   | id      | f
  s1.st0   | num     | f
-(16 rows)
+(19 rows)
 
 SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  GROUP BY relid
@@ -8383,8 +8816,9 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 -- No.14-5-7
 DELETE FROM dbms_stats._relation_stats_locked;
@@ -8405,8 +8839,9 @@ SELECT dbms_stats.lock_database_stats();
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  GROUP BY relid
@@ -8427,8 +8862,9 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT starelid, attname, stainherit FROM columns_locked_v c;
  starelid | attname | stainherit 
@@ -8447,9 +8883,12 @@ SELECT starelid, attname, stainherit FROM columns_locked_v c;
  s0.st2   | txt     | f
  st1_exp  | lower   | f
  s0.sft0  | id      | f
+ s0.smv0  | id      | f
+ s0.smv0  | num     | f
+ s0.smv0  | txt     | f
  s1.st0   | id      | f
  s1.st0   | num     | f
-(16 rows)
+(19 rows)
 
 SELECT dbms_stats.unlock_column_stats(NULL, 'id');
  unlock_column_stats 
@@ -8473,9 +8912,12 @@ SELECT starelid, attname, stainherit FROM columns_locked_v c;
  s0.st2   | txt     | f
  st1_exp  | lower   | f
  s0.sft0  | id      | f
+ s0.smv0  | id      | f
+ s0.smv0  | num     | f
+ s0.smv0  | txt     | f
  s1.st0   | id      | f
  s1.st0   | num     | f
-(16 rows)
+(19 rows)
 
 SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  GROUP BY relid
@@ -8496,8 +8938,9 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 -- No.14-5-8
 DELETE FROM dbms_stats._relation_stats_locked;
@@ -8518,8 +8961,9 @@ SELECT dbms_stats.lock_database_stats();
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  GROUP BY relid
@@ -8540,8 +8984,9 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT starelid, attname, stainherit FROM columns_locked_v c;
  starelid | attname | stainherit 
@@ -8560,9 +9005,12 @@ SELECT starelid, attname, stainherit FROM columns_locked_v c;
  s0.st2   | txt     | f
  st1_exp  | lower   | f
  s0.sft0  | id      | f
+ s0.smv0  | id      | f
+ s0.smv0  | num     | f
+ s0.smv0  | txt     | f
  s1.st0   | id      | f
  s1.st0   | num     | f
-(16 rows)
+(19 rows)
 
 SELECT dbms_stats.unlock_column_stats('s0.st0', NULL);
  unlock_column_stats 
@@ -8586,9 +9034,12 @@ SELECT starelid, attname, stainherit FROM columns_locked_v c;
  s0.st2   | txt     | f
  st1_exp  | lower   | f
  s0.sft0  | id      | f
+ s0.smv0  | id      | f
+ s0.smv0  | num     | f
+ s0.smv0  | txt     | f
  s1.st0   | id      | f
  s1.st0   | num     | f
-(16 rows)
+(19 rows)
 
 SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  GROUP BY relid
@@ -8609,8 +9060,9 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 -- No.14-5-9
 DELETE FROM dbms_stats._relation_stats_locked;
@@ -8631,8 +9083,9 @@ SELECT dbms_stats.lock_database_stats();
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  GROUP BY relid
@@ -8653,8 +9106,9 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT starelid, attname, stainherit FROM columns_locked_v c;
  starelid | attname | stainherit 
@@ -8673,9 +9127,12 @@ SELECT starelid, attname, stainherit FROM columns_locked_v c;
  s0.st2   | txt     | f
  st1_exp  | lower   | f
  s0.sft0  | id      | f
+ s0.smv0  | id      | f
+ s0.smv0  | num     | f
+ s0.smv0  | txt     | f
  s1.st0   | id      | f
  s1.st0   | num     | f
-(16 rows)
+(19 rows)
 
 BEGIN;
 SELECT relation::regclass, mode
@@ -8723,9 +9180,12 @@ SELECT starelid, attname, stainherit FROM columns_locked_v c;
  s0.st2   | txt     | f
  st1_exp  | lower   | f
  s0.sft0  | id      | f
+ s0.smv0  | id      | f
+ s0.smv0  | num     | f
+ s0.smv0  | txt     | f
  s1.st0   | id      | f
  s1.st0   | num     | f
-(14 rows)
+(17 rows)
 
 SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  GROUP BY relid
@@ -8746,8 +9206,9 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 /*
  * No.14-6 dbms_stats.unlock_column_stats(schemaname, tablename, attname)
@@ -8771,8 +9232,9 @@ SELECT dbms_stats.lock_database_stats();
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT * FROM dbms_stats.backup_history
  ORDER BY id;
@@ -8807,8 +9269,9 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT starelid, attname, stainherit FROM columns_locked_v c;
  starelid | attname | stainherit 
@@ -8827,9 +9290,12 @@ SELECT starelid, attname, stainherit FROM columns_locked_v c;
  s0.st2   | txt     | f
  st1_exp  | lower   | f
  s0.sft0  | id      | f
+ s0.smv0  | id      | f
+ s0.smv0  | num     | f
+ s0.smv0  | txt     | f
  s1.st0   | id      | f
  s1.st0   | num     | f
-(16 rows)
+(19 rows)
 
 SELECT dbms_stats.unlock_column_stats('s0', 'st0', 'id');
  unlock_column_stats 
@@ -8852,9 +9318,12 @@ SELECT starelid, attname, stainherit FROM columns_locked_v c;
  s0.st2   | txt     | f
  st1_exp  | lower   | f
  s0.sft0  | id      | f
+ s0.smv0  | id      | f
+ s0.smv0  | num     | f
+ s0.smv0  | txt     | f
  s1.st0   | id      | f
  s1.st0   | num     | f
-(14 rows)
+(17 rows)
 
 SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  GROUP BY relid
@@ -8875,8 +9344,9 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT * FROM dbms_stats.backup_history
  ORDER BY id;
@@ -8895,13 +9365,13 @@ SELECT * FROM dbms_stats.backup_history
 SELECT count(*) FROM dbms_stats.relation_stats_backup;
  count 
 -------
-    25
+    26
 (1 row)
 
 SELECT count(*) FROM dbms_stats.column_stats_backup;
  count 
 -------
-    36
+    39
 (1 row)
 
 -- No.14-6-2
@@ -8923,8 +9393,9 @@ SELECT dbms_stats.lock_database_stats();
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 DELETE FROM dbms_stats._column_stats_locked;
 SELECT relid::regclass FROM dbms_stats._relation_stats_locked
@@ -8946,8 +9417,9 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT dbms_stats.unlock_column_stats('s0', 'st0', 'id');
  unlock_column_stats 
@@ -8979,8 +9451,9 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 -- No.14-6-3
 DELETE FROM dbms_stats._relation_stats_locked;
@@ -9001,8 +9474,9 @@ SELECT dbms_stats.lock_database_stats();
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  GROUP BY relid
@@ -9023,8 +9497,9 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT starelid, attname, stainherit FROM columns_locked_v c;
  starelid | attname | stainherit 
@@ -9043,9 +9518,12 @@ SELECT starelid, attname, stainherit FROM columns_locked_v c;
  s0.st2   | txt     | f
  st1_exp  | lower   | f
  s0.sft0  | id      | f
+ s0.smv0  | id      | f
+ s0.smv0  | num     | f
+ s0.smv0  | txt     | f
  s1.st0   | id      | f
  s1.st0   | num     | f
-(16 rows)
+(19 rows)
 
 SELECT dbms_stats.unlock_column_stats('s0', 'st0', 'id');
  unlock_column_stats 
@@ -9068,9 +9546,12 @@ SELECT starelid, attname, stainherit FROM columns_locked_v c;
  s0.st2   | txt     | f
  st1_exp  | lower   | f
  s0.sft0  | id      | f
+ s0.smv0  | id      | f
+ s0.smv0  | num     | f
+ s0.smv0  | txt     | f
  s1.st0   | id      | f
  s1.st0   | num     | f
-(14 rows)
+(17 rows)
 
 SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  GROUP BY relid
@@ -9091,8 +9572,9 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 -- No.14-6-4
 DELETE FROM dbms_stats._relation_stats_locked;
@@ -9113,8 +9595,9 @@ SELECT dbms_stats.lock_database_stats();
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  GROUP BY relid
@@ -9135,8 +9618,9 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT starelid, attname, stainherit FROM columns_locked_v c;
  starelid | attname | stainherit 
@@ -9155,9 +9639,12 @@ SELECT starelid, attname, stainherit FROM columns_locked_v c;
  s0.st2   | txt     | f
  st1_exp  | lower   | f
  s0.sft0  | id      | f
+ s0.smv0  | id      | f
+ s0.smv0  | num     | f
+ s0.smv0  | txt     | f
  s1.st0   | id      | f
  s1.st0   | num     | f
-(16 rows)
+(19 rows)
 
 SELECT dbms_stats.unlock_column_stats('s0', 'st0', 'dummy');
 ERROR:  column "dummy" of "s0.st0" does not exist
@@ -9178,9 +9665,12 @@ SELECT starelid, attname, stainherit FROM columns_locked_v c;
  s0.st2   | txt     | f
  st1_exp  | lower   | f
  s0.sft0  | id      | f
+ s0.smv0  | id      | f
+ s0.smv0  | num     | f
+ s0.smv0  | txt     | f
  s1.st0   | id      | f
  s1.st0   | num     | f
-(16 rows)
+(19 rows)
 
 SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  GROUP BY relid
@@ -9201,8 +9691,9 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 -- No.14-6-5
 DELETE FROM dbms_stats._relation_stats_locked;
@@ -9223,8 +9714,9 @@ SELECT dbms_stats.lock_database_stats();
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  GROUP BY relid
@@ -9245,8 +9737,9 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT starelid, attname, stainherit FROM columns_locked_v c;
  starelid | attname | stainherit 
@@ -9265,9 +9758,12 @@ SELECT starelid, attname, stainherit FROM columns_locked_v c;
  s0.st2   | txt     | f
  st1_exp  | lower   | f
  s0.sft0  | id      | f
+ s0.smv0  | id      | f
+ s0.smv0  | num     | f
+ s0.smv0  | txt     | f
  s1.st0   | id      | f
  s1.st0   | num     | f
-(16 rows)
+(19 rows)
 
 SELECT dbms_stats.unlock_column_stats(NULL, 'st0', 'id');
  unlock_column_stats 
@@ -9291,9 +9787,12 @@ SELECT starelid, attname, stainherit FROM columns_locked_v c;
  s0.st2   | txt     | f
  st1_exp  | lower   | f
  s0.sft0  | id      | f
+ s0.smv0  | id      | f
+ s0.smv0  | num     | f
+ s0.smv0  | txt     | f
  s1.st0   | id      | f
  s1.st0   | num     | f
-(16 rows)
+(19 rows)
 
 SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  GROUP BY relid
@@ -9314,8 +9813,9 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 -- No.14-6-6
 DELETE FROM dbms_stats._relation_stats_locked;
@@ -9336,8 +9836,9 @@ SELECT dbms_stats.lock_database_stats();
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  GROUP BY relid
@@ -9358,8 +9859,9 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT starelid, attname, stainherit FROM columns_locked_v c;
  starelid | attname | stainherit 
@@ -9378,9 +9880,12 @@ SELECT starelid, attname, stainherit FROM columns_locked_v c;
  s0.st2   | txt     | f
  st1_exp  | lower   | f
  s0.sft0  | id      | f
+ s0.smv0  | id      | f
+ s0.smv0  | num     | f
+ s0.smv0  | txt     | f
  s1.st0   | id      | f
  s1.st0   | num     | f
-(16 rows)
+(19 rows)
 
 SELECT dbms_stats.unlock_column_stats('s0', NULL, 'id');
  unlock_column_stats 
@@ -9404,9 +9909,12 @@ SELECT starelid, attname, stainherit FROM columns_locked_v c;
  s0.st2   | txt     | f
  st1_exp  | lower   | f
  s0.sft0  | id      | f
+ s0.smv0  | id      | f
+ s0.smv0  | num     | f
+ s0.smv0  | txt     | f
  s1.st0   | id      | f
  s1.st0   | num     | f
-(16 rows)
+(19 rows)
 
 SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  GROUP BY relid
@@ -9427,8 +9935,9 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 -- No.14-6-7
 DELETE FROM dbms_stats._relation_stats_locked;
@@ -9449,8 +9958,9 @@ SELECT dbms_stats.lock_database_stats();
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  GROUP BY relid
@@ -9471,8 +9981,9 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT starelid, attname, stainherit FROM columns_locked_v c;
  starelid | attname | stainherit 
@@ -9491,9 +10002,12 @@ SELECT starelid, attname, stainherit FROM columns_locked_v c;
  s0.st2   | txt     | f
  st1_exp  | lower   | f
  s0.sft0  | id      | f
+ s0.smv0  | id      | f
+ s0.smv0  | num     | f
+ s0.smv0  | txt     | f
  s1.st0   | id      | f
  s1.st0   | num     | f
-(16 rows)
+(19 rows)
 
 SELECT dbms_stats.unlock_column_stats('s0', 'st0', NULL);
  unlock_column_stats 
@@ -9517,9 +10031,12 @@ SELECT starelid, attname, stainherit FROM columns_locked_v c;
  s0.st2   | txt     | f
  st1_exp  | lower   | f
  s0.sft0  | id      | f
+ s0.smv0  | id      | f
+ s0.smv0  | num     | f
+ s0.smv0  | txt     | f
  s1.st0   | id      | f
  s1.st0   | num     | f
-(16 rows)
+(19 rows)
 
 SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  GROUP BY relid
@@ -9540,8 +10057,9 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 -- No.14-6-8
 DELETE FROM dbms_stats._relation_stats_locked;
@@ -9562,8 +10080,9 @@ SELECT dbms_stats.lock_database_stats();
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  GROUP BY relid
@@ -9584,8 +10103,9 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 
 SELECT starelid, attname, stainherit FROM columns_locked_v c;
  starelid | attname | stainherit 
@@ -9604,9 +10124,12 @@ SELECT starelid, attname, stainherit FROM columns_locked_v c;
  s0.st2   | txt     | f
  st1_exp  | lower   | f
  s0.sft0  | id      | f
+ s0.smv0  | id      | f
+ s0.smv0  | num     | f
+ s0.smv0  | txt     | f
  s1.st0   | id      | f
  s1.st0   | num     | f
-(16 rows)
+(19 rows)
 
 BEGIN;
 SELECT relation::regclass, mode
@@ -9654,9 +10177,12 @@ SELECT starelid, attname, stainherit FROM columns_locked_v c;
  s0.st2   | txt     | f
  st1_exp  | lower   | f
  s0.sft0  | id      | f
+ s0.smv0  | id      | f
+ s0.smv0  | num     | f
+ s0.smv0  | txt     | f
  s1.st0   | id      | f
  s1.st0   | num     | f
-(14 rows)
+(17 rows)
 
 SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  GROUP BY relid
@@ -9677,6 +10203,7 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  st1_idx
  st1_exp
  s0.sft0
+ s0.smv0
  s1.st0
-(15 rows)
+(16 rows)
 

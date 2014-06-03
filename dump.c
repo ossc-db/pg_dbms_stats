@@ -1,8 +1,8 @@
 /*
  * dump.c
  *
- * Copyright (c) 2009-2012, NIPPON TELEGRAPH AND TELEPHONE CORPORATION
- * Portions Copyright (c) 1996-2012, PostgreSQL Global Development Group
+ * Copyright (c) 2009-2014, NIPPON TELEGRAPH AND TELEPHONE CORPORATION
+ * Portions Copyright (c) 1996-2013, PostgreSQL Global Development Group
  * Portions Copyright (c) 1994, Regents of the University of California
  */
 #include "postgres.h"
@@ -12,6 +12,11 @@
 #include "utils/builtins.h"
 #include "utils/lsyscache.h"
 #include "utils/memutils.h"
+#if PG_VERSION_NUM >= 90300
+#include "access/tupmacs.h"
+#endif
+
+
 
 PG_FUNCTION_INFO_V1(dbms_stats_array_recv);
 

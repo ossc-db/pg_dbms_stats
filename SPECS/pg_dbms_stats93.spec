@@ -1,15 +1,15 @@
 # SPEC file for pg_dbms_stats
 # Copyright(C) 2012-2014 NIPPON TELEGRAPH AND TELEPHONE CORPORATION
 
-%define _pgdir   /usr/pgsql-9.1
+%define _pgdir   /usr/pgsql-9.3
 %define _bindir  %{_pgdir}/bin
 %define _libdir  %{_pgdir}/lib
 %define _datadir %{_pgdir}/share
 %define _docdir  /usr/share/doc/pgsql
 
 ## Set general information for pg_dbms_stats.
-Summary:    Plan Stabilizer for PostgreSQL 9.1
-Name:       pg_dbms_stats91
+Summary:    Plan Stabilizer for PostgreSQL 9.3
+Name:       pg_dbms_stats93
 Version:    1.3.1
 Release:    1%{?dist}
 License:    BSD
@@ -20,8 +20,8 @@ BuildRoot:  %{_tmppath}/%{name}-%{version}-%{release}-%(%{__id_u} -n)
 Vendor:     NIPPON TELEGRAPH AND TELEPHONE CORPORATION
 
 ## We use postgresql-devel package
-BuildRequires:  postgresql91-devel
-Requires:  postgresql91-libs
+BuildRequires:  postgresql93-devel
+Requires:  postgresql93-libs
 
 ## Description for "pg_dbms_stats"
 %description
@@ -33,7 +33,7 @@ pg_dbms_stats also provides following features:
   - backup multiple generations of planner statistics to reuse plans after
   - import planner statistics from another system for tuning an testing
 
-Note that this package is available for only PostgreSQL 9.1.
+Note that this package is available for only PostgreSQL 9.3.
 
 ## pre work for build pg_dbms_stats
 %prep
@@ -52,8 +52,8 @@ install -d %{buildroot}%{_datadir}/extension
 install -m 644 pg_dbms_stats--1.0.sql %{buildroot}%{_datadir}/extension/pg_dbms_stats--1.0.sql
 install -m 644 pg_dbms_stats.control %{buildroot}%{_datadir}/extension/pg_dbms_stats.control
 install -d %{buildroot}%{_docdir}/extension
-install -m 644 export_effective_stats-9.1.sql.sample %{buildroot}%{_docdir}/extension/export_effective_stats-9.1.sql.sample
-install -m 644 export_plain_stats-9.1.sql.sample %{buildroot}%{_docdir}/extension/export_plain_stats-9.1.sql.sample
+install -m 644 export_effective_stats-9.3.sql.sample %{buildroot}%{_docdir}/extension/export_effective_stats-9.3.sql.sample
+install -m 644 export_plain_stats-9.3.sql.sample %{buildroot}%{_docdir}/extension/export_plain_stats-9.3.sql.sample
 
 %clean
 rm -rf %{buildroot}
@@ -64,8 +64,8 @@ rm -rf %{buildroot}
 %defattr(0644,root,root)
 %{_datadir}/extension/pg_dbms_stats--1.0.sql
 %{_datadir}/extension/pg_dbms_stats.control
-%{_docdir}/extension/export_effective_stats-9.1.sql.sample
-%{_docdir}/extension/export_plain_stats-9.1.sql.sample
+%{_docdir}/extension/export_effective_stats-9.3.sql.sample
+%{_docdir}/extension/export_plain_stats-9.3.sql.sample
 
 # History of pg_dbms_stats.
 %changelog

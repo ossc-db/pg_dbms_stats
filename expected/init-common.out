@@ -30,11 +30,6 @@ CREATE VIEW sv0 AS
       FROM s0.st0 st0, s0.st2 st2
      WHERE st0.id = st2.id;
 CREATE TYPE s0.sc0 AS (num integer, txt text);
-CREATE FOREIGN DATA WRAPPER test_wrapper;
-CREATE SERVER test_server
-       FOREIGN DATA WRAPPER test_wrapper;
-CREATE FOREIGN TABLE s0.sft0(id integer)
-       SERVER test_server;
 CREATE SEQUENCE s0.ss0 START 1;
 CREATE SCHEMA s1;
 CREATE TABLE s1.st0(id integer, num integer);

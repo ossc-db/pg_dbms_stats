@@ -1,3 +1,10 @@
+CREATE MATERIALIZED VIEW s0.smv0 AS
+SELECT st0.id,
+       st0.num,
+       st2.txt
+  FROM s0.st0,s0.st2
+ WHERE st0.id = st2.id
+ ORDER BY id;
 CREATE VIEW plain_relations_statistic_v AS
 SELECT oid::regclass,
        relpages,

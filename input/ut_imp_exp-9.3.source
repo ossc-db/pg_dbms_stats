@@ -1,7 +1,7 @@
 \pset null '(null)'
 CREATE TABLE s0.st3();
 /*
- * No.16-1 export_plain_stats-9.2.sql.sample
+ * No.16-1 export_plain_stats-9.3.sql.sample
  */
 -- No.16-1-1
 ANALYZE;
@@ -34,83 +34,90 @@ UPDATE dbms_stats._column_stats_locked SET
     stavalues3 = stavalues1,
     stavalues4 = stavalues4,
     stavalues5 = stavalues5;
-\i export_plain_stats-9.2.sql.sample
+\i export_plain_stats-9.3.sql.sample
 COPY dbms_stats.work FROM '@abs_srcdir@/export_stats.dmp' (FORMAT 'binary');
 SELECT * FROM work_v;
 TRUNCATE dbms_stats.work;
 -- No.16-1-2
-\! sed '/ORDER/i\\ AND n2.nspname = '"\'s0\'" export_plain_stats-9.2.sql.sample > export_plain_stats-9.2.sql.sample_test
-\i export_plain_stats-9.2.sql.sample_test
+\! sed '/ORDER/i\\ AND n2.nspname = '"\'s0\'" export_plain_stats-9.3.sql.sample > export_plain_stats-9.3.sql.sample_test
+\i export_plain_stats-9.3.sql.sample_test
 COPY dbms_stats.work FROM '@abs_srcdir@/export_stats.dmp' (FORMAT 'binary');
 SELECT * FROM work_v;
 TRUNCATE dbms_stats.work;
-\! rm export_plain_stats-9.2.sql.sample_test
+\! rm export_plain_stats-9.3.sql.sample_test
 -- No.16-1-3
-\! sed '/ORDER/i\\ AND c.relname = '"\'st0\'" export_plain_stats-9.2.sql.sample > export_plain_stats-9.2.sql.sample_test
-\i export_plain_stats-9.2.sql.sample_test
+\! sed '/ORDER/i\\ AND c.relname = '"\'st0\'" export_plain_stats-9.3.sql.sample > export_plain_stats-9.3.sql.sample_test
+\i export_plain_stats-9.3.sql.sample_test
 COPY dbms_stats.work FROM '@abs_srcdir@/export_stats.dmp' (FORMAT 'binary');
 SELECT * FROM work_v;
 TRUNCATE dbms_stats.work;
-\! rm export_plain_stats-9.2.sql.sample_test
+\! rm export_plain_stats-9.3.sql.sample_test
 -- No.16-1-4
-\! sed '/ORDER/i\\ AND c.relname = '"\'pg_toast_1262\'" export_plain_stats-9.2.sql.sample > export_plain_stats-9.2.sql.sample_test
-\i export_plain_stats-9.2.sql.sample_test
+\! sed '/ORDER/i\\ AND c.relname = '"\'pg_toast_1262\'" export_plain_stats-9.3.sql.sample > export_plain_stats-9.3.sql.sample_test
+\i export_plain_stats-9.3.sql.sample_test
 COPY dbms_stats.work FROM '@abs_srcdir@/export_stats.dmp' (FORMAT 'binary');
 SELECT * FROM work_v;
 TRUNCATE dbms_stats.work;
-\! rm export_plain_stats-9.2.sql.sample_test
+\! rm export_plain_stats-9.3.sql.sample_test
 -- No.16-1-5
-\! sed '/ORDER/i\\ AND c.relname = '"\'st0_idx\'" export_plain_stats-9.2.sql.sample > export_plain_stats-9.2.sql.sample_test
-\i export_plain_stats-9.2.sql.sample_test
+\! sed '/ORDER/i\\ AND c.relname = '"\'st0_idx\'" export_plain_stats-9.3.sql.sample > export_plain_stats-9.3.sql.sample_test
+\i export_plain_stats-9.3.sql.sample_test
 COPY dbms_stats.work FROM '@abs_srcdir@/export_stats.dmp' (FORMAT 'binary');
 SELECT * FROM work_v;
 TRUNCATE dbms_stats.work;
-\! rm export_plain_stats-9.2.sql.sample_test
+\! rm export_plain_stats-9.3.sql.sample_test
 -- No.16-1-6
-\! sed '/ORDER/i\\ AND c.relname = '"\'ss0\'" export_plain_stats-9.2.sql.sample > export_plain_stats-9.2.sql.sample_test
-\i export_plain_stats-9.2.sql.sample_test
+\! sed '/ORDER/i\\ AND c.relname = '"\'ss0\'" export_plain_stats-9.3.sql.sample > export_plain_stats-9.3.sql.sample_test
+\i export_plain_stats-9.3.sql.sample_test
 COPY dbms_stats.work FROM '@abs_srcdir@/export_stats.dmp' (FORMAT 'binary');
 SELECT * FROM work_v;
 TRUNCATE dbms_stats.work;
-\! rm export_plain_stats-9.2.sql.sample_test
+\! rm export_plain_stats-9.3.sql.sample_test
 -- No.16-1-7
-\! sed '/ORDER/i\\ AND c.relname = '"\'sc0\'" export_plain_stats-9.2.sql.sample > export_plain_stats-9.2.sql.sample_test
-\i export_plain_stats-9.2.sql.sample_test
+\! sed '/ORDER/i\\ AND c.relname = '"\'sc0\'" export_plain_stats-9.3.sql.sample > export_plain_stats-9.3.sql.sample_test
+\i export_plain_stats-9.3.sql.sample_test
 COPY dbms_stats.work FROM '@abs_srcdir@/export_stats.dmp' (FORMAT 'binary');
 SELECT * FROM work_v;
 TRUNCATE dbms_stats.work;
-\! rm export_plain_stats-9.2.sql.sample_test
+\! rm export_plain_stats-9.3.sql.sample_test
 -- No.16-1-8
-\! sed '/ORDER/i\\ AND c.relname = '"\'sft0\'" export_plain_stats-9.2.sql.sample > export_plain_stats-9.2.sql.sample_test
-\i export_plain_stats-9.2.sql.sample_test
+\! sed '/ORDER/i\\ AND c.relname = '"\'sft0\'" export_plain_stats-9.3.sql.sample > export_plain_stats-9.3.sql.sample_test
+\i export_plain_stats-9.3.sql.sample_test
 COPY dbms_stats.work FROM '@abs_srcdir@/export_stats.dmp' (FORMAT 'binary');
 SELECT * FROM work_v;
 TRUNCATE dbms_stats.work;
-\! rm export_plain_stats-9.2.sql.sample_test
+\! rm export_plain_stats-9.3.sql.sample_test
+-- No.16-1-9
+\! sed '/ORDER/i\\ AND c.relname = '"\'smv0\'" export_plain_stats-9.3.sql.sample > export_plain_stats-9.3.sql.sample_test
+\i export_plain_stats-9.3.sql.sample_test
+COPY dbms_stats.work FROM '@abs_srcdir@/export_stats.dmp' (FORMAT 'binary');
+SELECT * FROM work_v;
+TRUNCATE dbms_stats.work;
+\! rm export_plain_stats-9.3.sql.sample_test
 -- No.16-1-10
-\! sed '/ORDER/i\\ AND n2.nspname = '"\'s0\'"' AND a.attname = '\'id\' export_plain_stats-9.2.sql.sample > export_plain_stats-9.2.sql.sample_test
-\i export_plain_stats-9.2.sql.sample_test
+\! sed '/ORDER/i\\ AND n2.nspname = '"\'s0\'"' AND a.attname = '\'id\' export_plain_stats-9.3.sql.sample > export_plain_stats-9.3.sql.sample_test
+\i export_plain_stats-9.3.sql.sample_test
 COPY dbms_stats.work FROM '@abs_srcdir@/export_stats.dmp' (FORMAT 'binary');
 SELECT * FROM work_v;
 TRUNCATE dbms_stats.work;
-\! rm export_plain_stats-9.2.sql.sample_test
+\! rm export_plain_stats-9.3.sql.sample_test
 -- No.16-1-11
-\! sed '/ORDER/i\\ AND n2.nspname = '"\'s0\'"' AND a.attname IS NULL' export_plain_stats-9.2.sql.sample > export_plain_stats-9.2.sql.sample_test
-\i export_plain_stats-9.2.sql.sample_test
+\! sed '/ORDER/i\\ AND n2.nspname = '"\'s0\'"' AND a.attname IS NULL' export_plain_stats-9.3.sql.sample > export_plain_stats-9.3.sql.sample_test
+\i export_plain_stats-9.3.sql.sample_test
 COPY dbms_stats.work FROM '@abs_srcdir@/export_stats.dmp' (FORMAT 'binary');
 SELECT * FROM work_v;
 TRUNCATE dbms_stats.work;
-\! rm export_plain_stats-9.2.sql.sample_test
+\! rm export_plain_stats-9.3.sql.sample_test
 -- No.16-1-12
-\! sed '/ORDER/i\\ AND n2.nspname = '"\'s1\'"' AND c.relname IS NULL' export_plain_stats-9.2.sql.sample > export_plain_stats-9.2.sql.sample_test
-\i export_plain_stats-9.2.sql.sample_test
+\! sed '/ORDER/i\\ AND n2.nspname = '"\'s1\'"' AND c.relname IS NULL' export_plain_stats-9.3.sql.sample > export_plain_stats-9.3.sql.sample_test
+\i export_plain_stats-9.3.sql.sample_test
 COPY dbms_stats.work FROM '@abs_srcdir@/export_stats.dmp' (FORMAT 'binary');
 SELECT * FROM work_v;
 TRUNCATE dbms_stats.work;
-\! rm export_plain_stats-9.2.sql.sample_test
+\! rm export_plain_stats-9.3.sql.sample_test
 
 /*
- * No.16-2 export_effective_stats-9.2.sql.sample
+ * No.16-2 export_effective_stats-9.3.sql.sample
  */
 -- No.16-2-1
 VACUUM ANALYZE;
@@ -129,79 +136,86 @@ UPDATE dbms_stats._column_stats_locked
         NULL, NULL, NULL, NULL, NULL,
         NULL, NULL, NULL, NULL, NULL)
  WHERE starelid = 's0.st0'::regclass;
-\i export_effective_stats-9.2.sql.sample
+\i export_effective_stats-9.3.sql.sample
 COPY dbms_stats.work FROM '@abs_srcdir@/export_stats.dmp' (FORMAT 'binary');
 SELECT * FROM work_v;
 TRUNCATE dbms_stats.work;
 -- No.16-2-2
-\! sed '/ORDER/i\\ WHERE n2.nspname = '"\'s0\'" export_effective_stats-9.2.sql.sample > export_effective_stats-9.2.sql.sample_test
-\i export_effective_stats-9.2.sql.sample_test
+\! sed '/ORDER/i\\ WHERE n2.nspname = '"\'s0\'" export_effective_stats-9.3.sql.sample > export_effective_stats-9.3.sql.sample_test
+\i export_effective_stats-9.3.sql.sample_test
 COPY dbms_stats.work FROM '@abs_srcdir@/export_stats.dmp' (FORMAT 'binary');
 SELECT * FROM work_v;
-\! rm export_effective_stats-9.2.sql.sample_test
+\! rm export_effective_stats-9.3.sql.sample_test
 TRUNCATE dbms_stats.work;
 -- No.16-2-3
-\! sed '/ORDER/i\\ WHERE cl.relname = '"\'st0\'" export_effective_stats-9.2.sql.sample > export_effective_stats-9.2.sql.sample_test
-\i export_effective_stats-9.2.sql.sample_test
+\! sed '/ORDER/i\\ WHERE cl.relname = '"\'st0\'" export_effective_stats-9.3.sql.sample > export_effective_stats-9.3.sql.sample_test
+\i export_effective_stats-9.3.sql.sample_test
 COPY dbms_stats.work FROM '@abs_srcdir@/export_stats.dmp' (FORMAT 'binary');
 SELECT * FROM work_v;
-\! rm export_effective_stats-9.2.sql.sample_test
+\! rm export_effective_stats-9.3.sql.sample_test
 TRUNCATE dbms_stats.work;
 -- No.16-2-4
-\! sed '/ORDER/i\\ WHERE cl.relname = '"\'pg_toast_1262\'" export_effective_stats-9.2.sql.sample > export_effective_stats-9.2.sql.sample_test
-\i export_effective_stats-9.2.sql.sample_test
+\! sed '/ORDER/i\\ WHERE cl.relname = '"\'pg_toast_1262\'" export_effective_stats-9.3.sql.sample > export_effective_stats-9.3.sql.sample_test
+\i export_effective_stats-9.3.sql.sample_test
 COPY dbms_stats.work FROM '@abs_srcdir@/export_stats.dmp' (FORMAT 'binary');
 SELECT * FROM work_v;
-\! rm export_effective_stats-9.2.sql.sample_test
+\! rm export_effective_stats-9.3.sql.sample_test
 TRUNCATE dbms_stats.work;
 -- No.16-2-5
-\! sed '/ORDER/i\\ WHERE cl.relname = '"\'st0_idx\'" export_effective_stats-9.2.sql.sample > export_effective_stats-9.2.sql.sample_test
-\i export_effective_stats-9.2.sql.sample_test
+\! sed '/ORDER/i\\ WHERE cl.relname = '"\'st0_idx\'" export_effective_stats-9.3.sql.sample > export_effective_stats-9.3.sql.sample_test
+\i export_effective_stats-9.3.sql.sample_test
 COPY dbms_stats.work FROM '@abs_srcdir@/export_stats.dmp' (FORMAT 'binary');
 SELECT * FROM work_v;
-\! rm export_effective_stats-9.2.sql.sample_test
+\! rm export_effective_stats-9.3.sql.sample_test
 TRUNCATE dbms_stats.work;
 -- No.16-2-6
-\! sed '/ORDER/i\\ WHERE cl.relname = '"\'ss0\'" export_effective_stats-9.2.sql.sample > export_effective_stats-9.2.sql.sample_test
-\i export_effective_stats-9.2.sql.sample_test
+\! sed '/ORDER/i\\ WHERE cl.relname = '"\'ss0\'" export_effective_stats-9.3.sql.sample > export_effective_stats-9.3.sql.sample_test
+\i export_effective_stats-9.3.sql.sample_test
 COPY dbms_stats.work FROM '@abs_srcdir@/export_stats.dmp' (FORMAT 'binary');
 SELECT * FROM work_v;
-\! rm export_effective_stats-9.2.sql.sample_test
+\! rm export_effective_stats-9.3.sql.sample_test
 TRUNCATE dbms_stats.work;
 -- No.16-2-7
-\! sed '/ORDER/i\\ WHERE cl.relname = '"\'sc0\'" export_effective_stats-9.2.sql.sample > export_effective_stats-9.2.sql.sample_test
-\i export_effective_stats-9.2.sql.sample_test
+\! sed '/ORDER/i\\ WHERE cl.relname = '"\'sc0\'" export_effective_stats-9.3.sql.sample > export_effective_stats-9.3.sql.sample_test
+\i export_effective_stats-9.3.sql.sample_test
 COPY dbms_stats.work FROM '@abs_srcdir@/export_stats.dmp' (FORMAT 'binary');
 SELECT * FROM work_v;
-\! rm export_effective_stats-9.2.sql.sample_test
+\! rm export_effective_stats-9.3.sql.sample_test
 TRUNCATE dbms_stats.work;
 -- No.16-2-8
-\! sed '/ORDER/i\\ WHERE cl.relname = '"\'sft0\'" export_effective_stats-9.2.sql.sample > export_effective_stats-9.2.sql.sample_test
-\i export_effective_stats-9.2.sql.sample_test
+\! sed '/ORDER/i\\ WHERE cl.relname = '"\'sft0\'" export_effective_stats-9.3.sql.sample > export_effective_stats-9.3.sql.sample_test
+\i export_effective_stats-9.3.sql.sample_test
 COPY dbms_stats.work FROM '@abs_srcdir@/export_stats.dmp' (FORMAT 'binary');
 SELECT * FROM work_v;
-\! rm export_effective_stats-9.2.sql.sample_test
+\! rm export_effective_stats-9.3.sql.sample_test
 TRUNCATE dbms_stats.work;
 -- No.16-2-9
-\! sed '/ORDER/i\\ WHERE n2.nspname = '"\'s0\'"' AND a.attname = '"\'id\'" export_effective_stats-9.2.sql.sample > export_effective_stats-9.2.sql.sample_test
-\i export_effective_stats-9.2.sql.sample_test
+\! sed '/ORDER/i\\ WHERE cl.relname = '"\'smv0\'" export_effective_stats-9.3.sql.sample > export_effective_stats-9.3.sql.sample_test
+\i export_effective_stats-9.3.sql.sample_test
 COPY dbms_stats.work FROM '@abs_srcdir@/export_stats.dmp' (FORMAT 'binary');
 SELECT * FROM work_v;
-\! rm export_effective_stats-9.2.sql.sample_test
+\! rm export_effective_stats-9.3.sql.sample_test
 TRUNCATE dbms_stats.work;
 -- No.16-2-10
-\! sed '/ORDER/i\\ WHERE n2.nspname = '"\'s0\'"' AND a.attname IS NULL' export_effective_stats-9.2.sql.sample > export_effective_stats-9.2.sql.sample_test
-\i export_effective_stats-9.2.sql.sample_test
+\! sed '/ORDER/i\\ WHERE n2.nspname = '"\'s0\'"' AND a.attname = '"\'id\'" export_effective_stats-9.3.sql.sample > export_effective_stats-9.3.sql.sample_test
+\i export_effective_stats-9.3.sql.sample_test
 COPY dbms_stats.work FROM '@abs_srcdir@/export_stats.dmp' (FORMAT 'binary');
 SELECT * FROM work_v;
-\! rm export_effective_stats-9.2.sql.sample_test
+\! rm export_effective_stats-9.3.sql.sample_test
 TRUNCATE dbms_stats.work;
 -- No.16-2-11
-\! sed '/ORDER/i\\ WHERE n2.nspname = '"\'s0\'"' AND cl.relname IS NULL' export_effective_stats-9.2.sql.sample > export_effective_stats-9.2.sql.sample_test
-\i export_effective_stats-9.2.sql.sample_test
+\! sed '/ORDER/i\\ WHERE n2.nspname = '"\'s0\'"' AND a.attname IS NULL' export_effective_stats-9.3.sql.sample > export_effective_stats-9.3.sql.sample_test
+\i export_effective_stats-9.3.sql.sample_test
 COPY dbms_stats.work FROM '@abs_srcdir@/export_stats.dmp' (FORMAT 'binary');
 SELECT * FROM work_v;
-\! rm export_effective_stats-9.2.sql.sample_test
+\! rm export_effective_stats-9.3.sql.sample_test
+TRUNCATE dbms_stats.work;
+-- No.16-2-12
+\! sed '/ORDER/i\\ WHERE n2.nspname = '"\'s0\'"' AND cl.relname IS NULL' export_effective_stats-9.3.sql.sample > export_effective_stats-9.3.sql.sample_test
+\i export_effective_stats-9.3.sql.sample_test
+COPY dbms_stats.work FROM '@abs_srcdir@/export_stats.dmp' (FORMAT 'binary');
+SELECT * FROM work_v;
+\! rm export_effective_stats-9.3.sql.sample_test
 TRUNCATE dbms_stats.work;
 
 /*

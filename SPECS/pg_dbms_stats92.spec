@@ -1,5 +1,5 @@
 # SPEC file for pg_dbms_stats
-# Copyright(C) 2012 NIPPON TELEGRAPH AND TELEPHONE CORPORATION
+# Copyright(C) 2012-2014 NIPPON TELEGRAPH AND TELEPHONE CORPORATION
 
 %define _pgdir   /usr/pgsql-9.2
 %define _bindir  %{_pgdir}/bin
@@ -10,7 +10,7 @@
 ## Set general information for pg_dbms_stats.
 Summary:    Plan Stabilizer for PostgreSQL 9.2
 Name:       pg_dbms_stats92
-Version:    1.3.0
+Version:    1.3.1
 Release:    1%{?dist}
 License:    BSD
 Group:      Applications/Databases
@@ -69,6 +69,8 @@ rm -rf %{buildroot}
 
 # History of pg_dbms_stats.
 %changelog
-* Wed Sep 05 2012 Shigeru Hanada <shigeru.hanada@gmail.com>
+* Wed Nov 06 2013 Takashi Suzuki
+- Update to 1.3.1
+* Wed Sep 05 2012 Shigeru Hanada
 - Initial cut for 1.0.0
 

@@ -21,6 +21,20 @@ SELECT setval('dbms_stats.backup_history_id_seq', 1, false);
 DELETE FROM dbms_stats.backup_history;
 
 /*
+ * No.2-4 dbms_stats.anyarray
+ */
+-- No.2-4-1
+SELECT n.nspname, t.typname, t.typlen, t.typbyval, t.typtype,
+       t.typcategory, t.typispreferred, t.typisdefined, t.typdelim,
+       t.typrelid, t.typelem, t.typinput, t.typoutput, t.typreceive,
+       t.typsend, t.typmodin, t.typmodout, t.typanalyze, t.typalign,
+       t.typstorage, t.typnotnull, t.typbasetype, t.typtypmod, t.typndims,
+       t.typcollation, t.typdefaultbin, t.typdefault, t.typacl
+  FROM pg_type t, pg_namespace n
+ WHERE t.typnamespace = n.oid
+   AND n.nspname = 'dbms_stats'
+   AND t.typname = 'anyarray';
+/*
  * No.3-1 dbms_stats.use_locked_stats
  */
 DELETE FROM dbms_stats._relation_stats_locked;
@@ -516,6 +530,7 @@ SELECT dbms_stats.is_target_relkind('');
 -- No.6-4-9
 SELECT dbms_stats.is_target_relkind(NULL);
 --#No.6-4-10 result varies according to a version
+--#No.6-4-11 result varies according to a version
 
 /*
  * No.7-1 dbms_stats.backup
@@ -590,8 +605,9 @@ SELECT count(*) FROM dbms_stats.relation_stats_backup;
 SELECT count(*) FROM dbms_stats.column_stats_backup;
 
 --#No.7-1-9 ut-<PG Version>
+--#No.7-1-10 ut-<PG Version>
 
--- No.7-1-10
+-- No.7-1-11
 DELETE FROM dbms_stats.relation_stats_backup;
 SELECT dbms_stats.backup(1, 's0.st0'::regclass, 1::int2);
 SELECT relid::regclass FROM dbms_stats.relation_stats_backup
@@ -601,9 +617,9 @@ SELECT starelid::regclass, staattnum FROM dbms_stats.column_stats_backup
  GROUP BY starelid, staattnum
  ORDER BY starelid, staattnum;
 
---#No.7-1-11 ut-<PG Version>
+--#No.7-1-12 ut-<PG Version>
 
--- No.7-1-12
+-- No.7-1-13
 DELETE FROM dbms_stats.relation_stats_backup;
 SELECT dbms_stats.backup(1, 's0.st0'::regclass, NULL);
 SELECT relid::regclass FROM dbms_stats.relation_stats_backup
@@ -613,15 +629,15 @@ SELECT starelid::regclass, staattnum FROM dbms_stats.column_stats_backup
  GROUP BY starelid, staattnum
  ORDER BY starelid, staattnum;
 
---#No.7-1-13 ut-<PG Version>
+--#No.7-1-14 ut-<PG Version>
 
--- No.7-1-14
+-- No.7-1-15
 DELETE FROM dbms_stats.relation_stats_backup;
 SELECT dbms_stats.backup(1, 'pg_catalog.pg_class'::regclass, NULL);
 SELECT count(*) FROM dbms_stats.relation_stats_backup;
 SELECT count(*) FROM dbms_stats.column_stats_backup;
 
--- No.7-1-15
+-- No.7-1-16
 SELECT dbms_stats.backup(1, 's0.st0'::regclass, NULL);
 DELETE FROM dbms_stats.column_stats_backup;
 SELECT starelid::regclass, staattnum FROM dbms_stats.column_stats_backup
@@ -635,7 +651,7 @@ RESET client_min_messages;
 SELECT count(*) FROM dbms_stats.relation_stats_backup;
 SELECT count(*) FROM dbms_stats.column_stats_backup;
 
---#No.7-1-17 ut-<PG Version>
+--#No.7-1-18 ut-<PG Version>
 
 /*
  * Stab function dbms_stats.backup
@@ -837,6 +853,9 @@ SELECT dbms_stats.restore_table_stats('s00.s0', '2012-02-29 23:59:57');
 /*
  * Stab dbms_stats.restore_table_stats(regclass, as_of_timestamp)
  */
+ALTER FUNCTION dbms_stats.restore_table_stats(regclass,
+											  timestamp with time zone)
+      RENAME TO truth_func_restore_table_stats;
 CREATE OR REPLACE FUNCTION dbms_stats.restore_table_stats(
     relid regclass,
     as_of_timestamp timestamp with time zone)
@@ -855,6 +874,11 @@ LANGUAGE plpgsql;
  */
 -- No.10-4-1
 SELECT dbms_stats.restore_table_stats('s0', 'st0', '2012-02-29 23:59:57');
+DROP FUNCTION dbms_stats.restore_table_stats(regclass,
+											 timestamp with time zone);
+ALTER FUNCTION dbms_stats.truth_func_restore_table_stats(regclass,
+											  timestamp with time zone)
+      RENAME TO restore_table_stats;
 
 /*
  * No.10-5 dbms_stats.restore_column_stats(regclass, attname, as_of_timestamp)
@@ -1010,18 +1034,102 @@ ALTER FUNCTION dbms_stats.truth_func_restore(int8, regclass, text)
       RENAME TO restore;
 
 /*
- * No.18-1 dummy statistics view for general users privileges.
+ * No.18-1 dbms_stats.clean_up_stats
+ */
+CREATE TABLE clean_test(id integer, num integer);
+INSERT INTO clean_test SELECT i, i FROM generate_series(1,10) t(i);
+ANALYZE clean_test;
+-- No.18-1-1
+-- No.18-1-5
+SELECT dbms_stats.lock_table_stats('clean_test');
+SELECT count(*) FROM dbms_stats.relation_stats_locked;
+SELECT count(*) FROM dbms_stats.column_stats_locked;
+SELECT dbms_stats.clean_up_stats();
+SELECT count(*) FROM dbms_stats.relation_stats_locked;
+SELECT count(*) FROM dbms_stats.column_stats_locked;
+-- No.18-1-2
+-- No.18-1-7
+DELETE FROM dbms_stats._relation_stats_locked;
+SELECT count(*) FROM dbms_stats.relation_stats_locked;
+SELECT count(*) FROM dbms_stats.column_stats_locked;
+SELECT dbms_stats.clean_up_stats();
+SELECT count(*) FROM dbms_stats.relation_stats_locked;
+SELECT count(*) FROM dbms_stats.column_stats_locked;
+-- No.18-1-3
+SELECT dbms_stats.lock_table_stats('clean_test');
+DROP TABLE clean_test;
+SELECT count(*) FROM dbms_stats.relation_stats_locked;
+SELECT dbms_stats.clean_up_stats();
+SELECT count(*) FROM dbms_stats.relation_stats_locked;
+-- No.18-1-4
+DELETE FROM dbms_stats._relation_stats_locked;
+SELECT count(*) FROM dbms_stats.relation_stats_locked;
+SELECT dbms_stats.clean_up_stats();
+SELECT count(*) FROM dbms_stats.relation_stats_locked;
+-- No.18-1-6
+CREATE TABLE clean_test(id integer, num integer);
+INSERT INTO clean_test SELECT i, i FROM generate_series(1,10) t(i);
+ANALYZE clean_test;
+SELECT dbms_stats.lock_table_stats('clean_test');
+ALTER TABLE clean_test DROP COLUMN num;
+ALTER TABLE clean_test ADD num integer;
+UPDATE dbms_stats._column_stats_locked
+   SET staattnum = 3
+ WHERE starelid = 'clean_test'::regclass
+   AND staattnum = 2;
+UPDATE clean_test SET num = id;
+SELECT count(*) FROM pg_statistic
+ WHERE starelid = 'clean_test'::regclass;
+SELECT count(*) FROM dbms_stats.column_stats_locked
+ WHERE starelid = 'clean_test'::regclass;
+SELECT dbms_stats.clean_up_stats();
+SELECT count(*) FROM dbms_stats.column_stats_locked
+ WHERE starelid = 'clean_test'::regclass;
+-- No.18-1-8
+DELETE FROM dbms_stats._column_stats_locked
+ WHERE starelid = 'clean_test'::regclass
+   AND staattnum = 3;
+SELECT count(*) FROM pg_statistic
+ WHERE starelid = 'clean_test'::regclass;
+SELECT count(*) FROM dbms_stats.column_stats_locked
+ WHERE starelid = 'clean_test'::regclass;
+SELECT dbms_stats.clean_up_stats();
+SELECT count(*) FROM dbms_stats.column_stats_locked
+ WHERE starelid = 'clean_test'::regclass;
+-- No.18-1-9
+ANALYZE clean_test;
+SELECT dbms_stats.lock_table_stats('clean_test');
+ALTER TABLE clean_test DROP COLUMN num;
+SELECT count(*) FROM dbms_stats.column_stats_locked
+ WHERE starelid = 'clean_test'::regclass;
+SELECT dbms_stats.clean_up_stats();
+SELECT count(*) FROM dbms_stats.column_stats_locked
+ WHERE starelid = 'clean_test'::regclass;
+-- No.18-1-10
+DELETE FROM dbms_stats._column_stats_locked
+ WHERE starelid = 'clean_test'::regclass
+   AND staattnum = 3;
+SELECT count(*) FROM dbms_stats.column_stats_locked
+ WHERE starelid = 'clean_test'::regclass;
+SELECT dbms_stats.clean_up_stats();
+SELECT count(*) FROM dbms_stats.column_stats_locked
+ WHERE starelid = 'clean_test'::regclass;
+DELETE FROM dbms_stats._relation_stats_locked;
+DROP TABLE clean_test;
+
+/*
+ * No.19-1 dummy statistics view for general users privileges.
  */
 \c - regular_user
--- No.18-1-1
+-- No.19-1-1
 SELECT count(*) FROM dbms_stats.relation_stats_locked WHERE false;
--- No.18-1-2
+-- No.19-1-2
 SELECT count(*) FROM dbms_stats.column_stats_locked WHERE false;
--- No.18-1-3
+-- No.19-1-3
 SELECT count(*) FROM dbms_stats.stats WHERE false;
--- No.18-1-4
+-- No.19-1-4
 SELECT count(*) FROM dbms_stats._relation_stats_locked WHERE false;
--- No.18-1-5
+-- No.19-1-5
 SELECT count(*) FROM dbms_stats._columnns_user WHERE false;
 \c - postgres
 LOAD 'pg_dbms_stats';

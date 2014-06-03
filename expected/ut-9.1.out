@@ -160,7 +160,9 @@ View definition:
    FROM ( SELECT (dbms_stats.merge(v.*, s.*)).starelid AS starelid, (dbms_stats.merge(v.*, s.*)).staattnum AS staattnum, (dbms_stats.merge(v.*, s.*)).stainherit AS stainherit, (dbms_stats.merge(v.*, s.*)).stanullfrac AS stanullfrac, (dbms_stats.merge(v.*, s.*)).stawidth AS stawidth, (dbms_stats.merge(v.*, s.*)).stadistinct AS stadistinct, (dbms_stats.merge(v.*, s.*)).stakind1 AS stakind1, (dbms_stats.merge(v.*, s.*)).stakind2 AS stakind2, (dbms_stats.merge(v.*, s.*)).stakind3 AS stakind3, (dbms_stats.merge(v.*, s.*)).stakind4 AS stakind4, (dbms_stats.merge(v.*, s.*)).staop1 AS staop1, (dbms_stats.merge(v.*, s.*)).staop2 AS staop2, (dbms_stats.merge(v.*, s.*)).staop3 AS staop3, (dbms_stats.merge(v.*, s.*)).staop4 AS staop4, (dbms_stats.merge(v.*, s.*)).stanumbers1 AS stanumbers1, (dbms_stats.merge(v.*, s.*)).stanumbers2 AS stanumbers2, (dbms_stats.merge(v.*, s.*)).stanumbers3 AS stanumbers3, (dbms_stats.merge(v.*, s.*)).stanumbers4 AS stanumbers4, (dbms_stats.merge(v.*, s.*)).stavalues1 AS stavalues1, (dbms_stats.merge(v.*, s.*)).stavalues2 AS stavalues2, (dbms_stats.merge(v.*, s.*)).stavalues3 AS stavalues3, (dbms_stats.merge(v.*, s.*)).stavalues4 AS stavalues4
            FROM pg_statistic s
       FULL JOIN dbms_stats._column_stats_locked v USING (starelid, staattnum, stainherit)
-     WHERE NOT dbms_stats.is_system_catalog(starelid::regclass)) m
+     WHERE NOT dbms_stats.is_system_catalog(starelid::regclass) AND (EXISTS ( SELECT NULL::unknown
+              FROM pg_attribute a
+             WHERE a.attrelid = starelid AND a.attnum = staattnum AND a.attisdropped = false))) m
   WHERE m.starelid IS NOT NULL;
 
 -- No.2-2-2

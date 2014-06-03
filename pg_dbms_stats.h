@@ -1,8 +1,8 @@
 /*
  * pg_dbms_stats.h
  *
- * Copyright (c) 2009-2012, NIPPON TELEGRAPH AND TELEPHONE CORPORATION
- * Portions Copyright (c) 1996-2011, PostgreSQL Global Development Group
+ * Copyright (c) 2009-2014, NIPPON TELEGRAPH AND TELEPHONE CORPORATION
+ * Portions Copyright (c) 1996-2013, PostgreSQL Global Development Group
  * Portions Copyright (c) 1994, Regents of the University of California
  */
 

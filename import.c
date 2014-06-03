@@ -1,7 +1,7 @@
 /*
  * import.c
  *
- * Copyright (c) 2012, NIPPON TELEGRAPH AND TELEPHONE CORPORATION
+ * Copyright (c) 2012-2014, NIPPON TELEGRAPH AND TELEPHONE CORPORATION
  */
 #include "postgres.h"
 
@@ -18,6 +18,9 @@
 #include "utils/syscache.h"
 #if PG_VERSION_NUM >= 90200
 #include "catalog/pg_class.h"
+#endif
+#if PG_VERSION_NUM >= 90300
+#include "access/htup_details.h"
 #endif
 
 #include "pg_dbms_stats.h"
@@ -578,6 +581,9 @@ get_args(FunctionCallInfo fcinfo, char **nspname, char **relname,
 #if PG_VERSION_NUM >= 90200
 			&& relkind != RELKIND_FOREIGN_TABLE
 #endif
+#if PG_VERSION_NUM >= 90300
+			&& relkind != RELKIND_MATVIEW
+#endif
 		)
 			elog(ERROR, "relkind of \"%s\" is \"%c\", can not import",
 				get_rel_name(relid), relkind);
@@ -666,7 +672,11 @@ import_stats_from_file(char *filename, char *nspname, char *relname,
 
 	/* Execute COPY FROM command. */
 	parsetree_list = pg_parse_query(buf.data);
+#if PG_VERSION_NUM >= 90300
+	DoCopy((CopyStmt *)linitial(parsetree_list), buf.data, &processed);
+#else
 	processed = DoCopy((CopyStmt *)linitial(parsetree_list), buf.data);
+#endif
 
 	if (processed == 0)
 		elog(ERROR, "no data to be imported");
@@ -716,9 +726,7 @@ static void test_spi_exec_utility(int *passed, int *total);
 static void test_appendLiteral(int *passed, int *total);
 
 #define StringEq(actual, expected)	\
-		(strcmp((actual), (expected)) == 0 ? 1 : \
-			(elog(WARNING, "%s-%d failed: [%s]", \
-				__FUNCTION__, caseno, (actual)), 0))
+		(strcmp((actual), (expected)) == 0 ? 1 : 0)
 
 /*
  * Test appendLiteral function
@@ -750,6 +758,10 @@ test_appendLiteral(int *passed, int *total)
 		elog(WARNING, "%s-%d ok", __FUNCTION__, caseno);
 		(*passed)++;
 	}
+	else
+	{
+		elog(WARNING, "%s-%d failed: [%s]", __FUNCTION__, caseno, buf.data);
+	}
 
 	/*
 	 * *-*-2:
@@ -765,6 +777,10 @@ test_appendLiteral(int *passed, int *total)
 	{
 		elog(WARNING, "%s-%d ok", __FUNCTION__, caseno);
 		(*passed)++;
+	}
+	else
+	{
+		elog(WARNING, "%s-%d failed: [%s]", __FUNCTION__, caseno, buf.data);
 	}
 
 	/*
@@ -782,6 +798,10 @@ test_appendLiteral(int *passed, int *total)
 		elog(WARNING, "%s-%d ok", __FUNCTION__, caseno);
 		(*passed)++;
 	}
+	else
+	{
+		elog(WARNING, "%s-%d failed: [%s]", __FUNCTION__, caseno, buf.data);
+	}
 
 	/*
 	 * *-*-4:
@@ -795,6 +815,10 @@ test_appendLiteral(int *passed, int *total)
 	{
 		elog(WARNING, "%s-%d ok", __FUNCTION__, caseno);
 		(*passed)++;
+	}
+	else
+	{
+		elog(WARNING, "%s-%d failed: [%s]", __FUNCTION__, caseno, buf.data);
 	}
 
 	/* report # of tests */

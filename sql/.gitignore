@@ -1,2 +1,3 @@
 /ut_anyarray-*.sql
 /ut_imp_exp-*.sql
+/ut_fdw_init.sql

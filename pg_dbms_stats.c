@@ -1155,8 +1155,7 @@ column_cache_enter(Oid relid, int32 attnum, HeapTuple tuple)
 	StatsRelationEntry *entry;
 	bool			found;
 
-	Assert(tuple != NULL);
-	Assert(!heap_attisnull(tuple, 1));
+	Assert(tuple == NULL || !heap_attisnull(tuple, 1));
 
 	entry = hash_search(rel_stats, &relid, HASH_ENTER, &found);
 	if (!found)

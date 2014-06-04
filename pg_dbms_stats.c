@@ -391,10 +391,10 @@ dbms_stats_merge_internal(HeapTuple lhs, HeapTuple rhs, TupleDesc tupdesc)
 	if (atttype == InvalidOid)
 	{
 		ereport(WARNING,
-		(errmsg("pg_dbms_stats: not exist column"),
-		 errdetail("relid \"%d\" or it's column number \"%d\" does not exist",
+		(errmsg("pg_dbms_stats: no-longer-existent column"),
+		 errdetail("relid \"%d\" or its column whose attnum is \"%d\" might be deleted",
 				relid, attnum),
-			 errhint("need to execute clean_up_stats()")));
+			 errhint("dbms_stats.clean_up_stats() would fix this.")));
 		return NULL;
 	}
 	for (i = 0; i < STATISTIC_NUM_SLOTS; i++)

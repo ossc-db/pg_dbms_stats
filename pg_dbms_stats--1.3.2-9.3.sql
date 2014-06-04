@@ -1,7 +1,7 @@
-/* pg_dbms_stats/pg_dbms_stats--1.0.sql */
+/* pg_dbms_stats/pg_dbms_stats--1.3.2.sql */
 
 -- complain if script is sourced in psql, rather than via CREATE EXTENSION
-\echo Use "CREATE EXTENSION dbms_stats" to load this file. \quit
+\echo Use "CREATE EXTENSION pg_dbms_stats" to load this file. \quit
 
 -- define alias of anyarray type because parser does not allow to use
 -- anyarray in type definitions.
@@ -952,7 +952,7 @@ BEGIN
 
 		/* If we don't have statistic at all, raise error. */
         IF NOT FOUND THEN
-			RAISE EXCEPTION 'statistic for column "%" of "%" does not exist', $2, $1::regclass;
+			RAISE EXCEPTION 'statistics for column "%" of relation "%" does not exist', $2, $1::regclass;
 		END IF;
 
     RETURN $1;

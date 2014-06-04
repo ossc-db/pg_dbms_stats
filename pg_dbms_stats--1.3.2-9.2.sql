@@ -1,7 +1,7 @@
-/* pg_dbms_stats/pg_dbms_stats--1.0.sql */
+/* pg_dbms_stats/pg_dbms_stats--1.3.2.sql */
 
 -- complain if script is sourced in psql, rather than via CREATE EXTENSION
-\echo Use "CREATE EXTENSION dbms_stats" to load this file. \quit
+\echo Use "CREATE EXTENSION pg_dbms_stats" to load this file. \quit
 
 -- define alias of anyarray type because parser does not allow to use
 -- anyarray in type definitions.
@@ -34,6 +34,7 @@ CREATE TABLE dbms_stats._relation_stats_locked (
     relname          text   NOT NULL,
     relpages         int4,
     reltuples        float4,
+    relallvisible    int4,
     curpages         int4,
     last_analyze     timestamp with time zone,
     last_autoanalyze timestamp with time zone,
@@ -51,18 +52,22 @@ CREATE TABLE dbms_stats._column_stats_locked (
     stakind2    int2,
     stakind3    int2,
     stakind4    int2,
+    stakind5    int2,
     staop1      oid,
     staop2      oid,
     staop3      oid,
     staop4      oid,
+    staop5      oid,
     stanumbers1 float4[],
     stanumbers2 float4[],
     stanumbers3 float4[],
     stanumbers4 float4[],
+    stanumbers5 float4[],
     stavalues1  dbms_stats.anyarray,
     stavalues2  dbms_stats.anyarray,
     stavalues3  dbms_stats.anyarray,
     stavalues4  dbms_stats.anyarray,
+    stavalues5  dbms_stats.anyarray,
     PRIMARY KEY (starelid, staattnum, stainherit),
     FOREIGN KEY (starelid) REFERENCES dbms_stats._relation_stats_locked (relid) ON DELETE CASCADE
 );
@@ -84,6 +89,7 @@ CREATE TABLE dbms_stats.relation_stats_backup (
     relname          text   NOT NULL,
     relpages         int4   NOT NULL,
     reltuples        float4 NOT NULL,
+    relallvisible    int4   NOT NULL,
     curpages         int4   NOT NULL,
     last_analyze     timestamp with time zone,
     last_autoanalyze timestamp with time zone,
@@ -104,18 +110,22 @@ CREATE TABLE dbms_stats.column_stats_backup (
     stakind2    int2   NOT NULL,
     stakind3    int2   NOT NULL,
     stakind4    int2   NOT NULL,
+    stakind5    int2   NOT NULL,
     staop1      oid    NOT NULL,
     staop2      oid    NOT NULL,
     staop3      oid    NOT NULL,
     staop4      oid    NOT NULL,
+    staop5      oid    NOT NULL,
     stanumbers1 float4[],
     stanumbers2 float4[],
     stanumbers3 float4[],
     stanumbers4 float4[],
+    stanumbers5 float4[],
     stavalues1  dbms_stats.anyarray,
     stavalues2  dbms_stats.anyarray,
     stavalues3  dbms_stats.anyarray,
     stavalues4  dbms_stats.anyarray,
+    stavalues5  dbms_stats.anyarray,
     PRIMARY KEY (id, starelid, staattnum, stainherit),
     FOREIGN KEY (id) REFERENCES dbms_stats.backup_history (id) ON DELETE CASCADE,
     FOREIGN KEY (id, starelid) REFERENCES dbms_stats.relation_stats_backup (id, relid) ON DELETE CASCADE
@@ -142,7 +152,7 @@ LANGUAGE C STABLE;
 
 CREATE FUNCTION dbms_stats.is_target_relkind(relkind "char")
 RETURNS boolean AS
-$$SELECT $1 IN ('r', 'i')$$
+$$SELECT $1 IN ('r', 'i', 'f')$$
 LANGUAGE sql STABLE;
 
 CREATE FUNCTION dbms_stats.merge(
@@ -164,6 +174,7 @@ CREATE VIEW dbms_stats.relation_stats_effective AS
         dbms_stats.relname(nspname, c.relname) AS relname,
         COALESCE(v.relpages, c.relpages) AS relpages,
         COALESCE(v.reltuples, c.reltuples) AS reltuples,
+        COALESCE(v.relallvisible, c.relallvisible) AS relallvisible,
         COALESCE(v.curpages,
             (pg_relation_size(c.oid) / current_setting('block_size')::int4)::int4)
             AS curpages,
@@ -220,7 +231,7 @@ GRANT SELECT ON dbms_stats.column_stats_locked TO PUBLIC;
 --
 -- Note: This view is copied from pg_stats in
 -- src/backend/catalog/system_views.sql in core source tree of version
--- 9.1, and customized for pg_dbms_stats.  Changes from orignal one are:
+-- 9.2, and customized for pg_dbms_stats.  Changes from orignal one are:
 --   - rename from pg_stats to dbms_stats.stats by a view name.
 --   - changed the table name from pg_statistic to dbms_stats.column_stats_effective.
 --
@@ -234,29 +245,54 @@ CREATE VIEW dbms_stats.stats AS
         stawidth AS avg_width,
         stadistinct AS n_distinct,
         CASE
-            WHEN stakind1 IN (1, 4) THEN stavalues1
-            WHEN stakind2 IN (1, 4) THEN stavalues2
-            WHEN stakind3 IN (1, 4) THEN stavalues3
-            WHEN stakind4 IN (1, 4) THEN stavalues4
+            WHEN stakind1 = 1 THEN stavalues1
+            WHEN stakind2 = 1 THEN stavalues2
+            WHEN stakind3 = 1 THEN stavalues3
+            WHEN stakind4 = 1 THEN stavalues4
+            WHEN stakind5 = 1 THEN stavalues5
         END AS most_common_vals,
         CASE
-            WHEN stakind1 IN (1, 4) THEN stanumbers1
-            WHEN stakind2 IN (1, 4) THEN stanumbers2
-            WHEN stakind3 IN (1, 4) THEN stanumbers3
-            WHEN stakind4 IN (1, 4) THEN stanumbers4
+            WHEN stakind1 = 1 THEN stanumbers1
+            WHEN stakind2 = 1 THEN stanumbers2
+            WHEN stakind3 = 1 THEN stanumbers3
+            WHEN stakind4 = 1 THEN stanumbers4
+            WHEN stakind5 = 1 THEN stanumbers5
         END AS most_common_freqs,
         CASE
             WHEN stakind1 = 2 THEN stavalues1
             WHEN stakind2 = 2 THEN stavalues2
             WHEN stakind3 = 2 THEN stavalues3
             WHEN stakind4 = 2 THEN stavalues4
+            WHEN stakind5 = 2 THEN stavalues5
         END AS histogram_bounds,
         CASE
             WHEN stakind1 = 3 THEN stanumbers1[1]
             WHEN stakind2 = 3 THEN stanumbers2[1]
             WHEN stakind3 = 3 THEN stanumbers3[1]
             WHEN stakind4 = 3 THEN stanumbers4[1]
-        END AS correlation
+            WHEN stakind5 = 3 THEN stanumbers5[1]
+        END AS correlation,
+        CASE
+            WHEN stakind1 = 4 THEN stavalues1
+            WHEN stakind2 = 4 THEN stavalues2
+            WHEN stakind3 = 4 THEN stavalues3
+            WHEN stakind4 = 4 THEN stavalues4
+            WHEN stakind5 = 4 THEN stavalues5
+        END AS most_common_elems,
+        CASE
+            WHEN stakind1 = 4 THEN stanumbers1
+            WHEN stakind2 = 4 THEN stanumbers2
+            WHEN stakind3 = 4 THEN stanumbers3
+            WHEN stakind4 = 4 THEN stanumbers4
+            WHEN stakind5 = 4 THEN stanumbers5
+        END AS most_common_elem_freqs,
+        CASE
+            WHEN stakind1 = 5 THEN stanumbers1
+            WHEN stakind2 = 5 THEN stanumbers2
+            WHEN stakind3 = 5 THEN stanumbers3
+            WHEN stakind4 = 5 THEN stanumbers4
+            WHEN stakind5 = 5 THEN stanumbers5
+        END AS elem_count_histogram
     FROM dbms_stats.column_stats_effective s JOIN pg_class c ON (c.oid = s.starelid)
          JOIN pg_attribute a ON (c.oid = attrelid AND attnum = s.staattnum)
          LEFT JOIN pg_namespace n ON (n.oid = c.relnamespace)
@@ -301,7 +337,7 @@ CREATE FUNCTION dbms_stats.backup(
 ) RETURNS int8 AS
 $$
 INSERT INTO dbms_stats.relation_stats_backup
-    SELECT $1, v.relid, v.relname, v.relpages, v.reltuples,
+    SELECT $1, v.relid, v.relname, v.relpages, v.reltuples, v.relallvisible,
            v.curpages, v.last_analyze, v.last_autoanalyze
       FROM pg_catalog.pg_class c,
            dbms_stats.relation_stats_effective v
@@ -363,7 +399,7 @@ BEGIN
                 RAISE EXCEPTION 'column "%" of "%" does not exist', $2, $1;
             END IF;
             IF NOT EXISTS(SELECT * FROM dbms_stats.column_stats_effective WHERE starelid = $1 AND staattnum = set_attnum) THEN
-                RAISE EXCEPTION 'statistic for column "%" of "%" does not exist', $2, $1;
+                RAISE EXCEPTION 'statistics for column "%" of "%" does not exist', $2, $1;
             END IF;
             unit_type = 'c';
         ELSE
@@ -529,6 +565,7 @@ BEGIN
                relname = b.relname,
                relpages = b.relpages,
                reltuples = b.reltuples,
+               relallvisible = b.relallvisible,
                curpages = b.curpages,
                last_analyze = b.last_analyze,
                last_autoanalyze = b.last_autoanalyze
@@ -542,6 +579,7 @@ BEGIN
                    b.relname,
                    b.relpages,
                    b.reltuples,
+                   b.relallvisible,
                    b.curpages,
                    b.last_analyze,
                    b.last_autoanalyze
@@ -587,10 +625,10 @@ BEGIN
             INSERT INTO dbms_stats._column_stats_locked
                 SELECT starelid, staattnum, stainherit,
                        stanullfrac, stawidth, stadistinct,
-                       stakind1, stakind2, stakind3, stakind4,
-                       staop1, staop2, staop3, staop4,
-                       stanumbers1, stanumbers2, stanumbers3, stanumbers4,
-                       stavalues1, stavalues2, stavalues3, stavalues4
+                       stakind1, stakind2, stakind3, stakind4, stakind5,
+                       staop1, staop2, staop3, staop4, staop5,
+                       stanumbers1, stanumbers2, stanumbers3, stanumbers4, stanumbers5,
+                       stavalues1, stavalues2, stavalues3, stavalues4, stavalues5
                   FROM dbms_stats.column_stats_backup
                  WHERE id = restore_id
                    AND starelid = restore_relid
@@ -722,6 +760,7 @@ BEGIN
                relname = b.relname,
                relpages = b.relpages,
                reltuples = b.reltuples,
+               relallvisible = b.relallvisible,
                curpages = b.curpages,
                last_analyze = b.last_analyze,
                last_autoanalyze = b.last_autoanalyze
@@ -735,6 +774,7 @@ BEGIN
                    b.relname,
                    b.relpages,
                    b.reltuples,
+                   b.relallvisible,
                    b.curpages,
                    b.last_analyze,
                    b.last_autoanalyze
@@ -767,10 +807,10 @@ BEGIN
             INSERT INTO dbms_stats._column_stats_locked
                 SELECT starelid, staattnum, stainherit,
                        stanullfrac, stawidth, stadistinct,
-                       stakind1, stakind2, stakind3, stakind4,
-                       staop1, staop2, staop3, staop4,
-                       stanumbers1, stanumbers2, stanumbers3, stanumbers4,
-                       stavalues1, stavalues2, stavalues3, stavalues4
+                       stakind1, stakind2, stakind3, stakind4, stakind5,
+                       staop1, staop2, staop3, staop4, staop5,
+                       stanumbers1, stanumbers2, stanumbers3, stanumbers4, stanumbers5,
+                       stavalues1, stavalues2, stavalues3, stavalues4, stavalues5
                   FROM dbms_stats.column_stats_backup
                  WHERE id = $1
                    AND starelid = restore_relid
@@ -843,10 +883,10 @@ BEGIN
 	 */
     FOR r IN
         SELECT stainherit, stanullfrac, stawidth, stadistinct,
-               stakind1, stakind2, stakind3, stakind4,
-               staop1, staop2, staop3, staop4,
-               stanumbers1, stanumbers2, stanumbers3, stanumbers4,
-               stavalues1, stavalues2, stavalues3, stavalues4
+               stakind1, stakind2, stakind3, stakind4, stakind5,
+               staop1, staop2, staop3, staop4, staop5,
+               stanumbers1, stanumbers2, stanumbers3, stanumbers4, stanumbers5,
+               stavalues1, stavalues2, stavalues3, stavalues4, stavalues5
           FROM dbms_stats.column_stats_effective
          WHERE starelid = $1
            AND staattnum = set_attnum
@@ -859,18 +899,22 @@ BEGIN
                stakind2 = r.stakind2,
                stakind3 = r.stakind3,
                stakind4 = r.stakind4,
+               stakind5 = r.stakind5,
                staop1 = r.staop1,
                staop2 = r.staop2,
                staop3 = r.staop3,
                staop4 = r.staop4,
+               staop5 = r.staop5,
                stanumbers1 = r.stanumbers1,
                stanumbers2 = r.stanumbers2,
                stanumbers3 = r.stanumbers3,
                stanumbers4 = r.stanumbers4,
+               stanumbers5 = r.stanumbers5,
                stavalues1 = r.stavalues1,
                stavalues2 = r.stavalues2,
                stavalues3 = r.stavalues3,
-               stavalues4 = r.stavalues4
+               stavalues4 = r.stavalues4,
+               stavalues5 = r.stavalues5
          WHERE c.starelid = $1
            AND c.staattnum = set_attnum
            AND c.stainherit = r.stainherit;
@@ -887,18 +931,22 @@ BEGIN
                          r.stakind2,
                          r.stakind3,
                          r.stakind4,
+                         r.stakind5,
                          r.staop1,
                          r.staop2,
                          r.staop3,
                          r.staop4,
+                         r.staop5,
                          r.stanumbers1,
                          r.stanumbers2,
                          r.stanumbers3,
                          r.stanumbers4,
+                         r.stanumbers5,
                          r.stavalues1,
                          r.stavalues2,
                          r.stavalues3,
-                         r.stavalues4);
+                         r.stavalues4,
+                         r.stavalues5);
         END IF;
         END LOOP;
 
@@ -941,6 +989,7 @@ BEGIN
        SET relname = dbms_stats.relname(nspname, c.relname),
            relpages = v.relpages,
            reltuples = v.reltuples,
+           relallvisible = v.relallvisible,
            curpages = v.curpages,
            last_analyze = v.last_analyze,
            last_autoanalyze = v.last_autoanalyze
@@ -954,7 +1003,7 @@ BEGIN
     IF NOT FOUND THEN
         INSERT INTO dbms_stats._relation_stats_locked
         SELECT $1, dbms_stats.relname(nspname, c.relname),
-               v.relpages, v.reltuples, v.curpages,
+               v.relpages, v.reltuples, v.relallvisible, v.curpages,
                v.last_analyze, v.last_autoanalyze
           FROM pg_catalog.pg_class c,
                pg_catalog.pg_namespace n,
@@ -976,10 +1025,10 @@ BEGIN
     FOR i IN
         SELECT staattnum, stainherit, stanullfrac,
                stawidth, stadistinct,
-               stakind1, stakind2, stakind3, stakind4,
-               staop1, staop2, staop3, staop4,
-               stanumbers1, stanumbers2, stanumbers3, stanumbers4,
-               stavalues1, stavalues2, stavalues3, stavalues4
+               stakind1, stakind2, stakind3, stakind4, stakind5,
+               staop1, staop2, staop3, staop4, staop5,
+               stanumbers1, stanumbers2, stanumbers3, stanumbers4, stanumbers5,
+               stavalues1, stavalues2, stavalues3, stavalues4, stavalues5
           FROM dbms_stats.column_stats_effective
          WHERE starelid = $1
     LOOP
@@ -991,18 +1040,22 @@ BEGIN
                stakind2 = i.stakind2,
                stakind3 = i.stakind3,
                stakind4 = i.stakind4,
+               stakind5 = i.stakind5,
                staop1 = i.staop1,
                staop2 = i.staop2,
                staop3 = i.staop3,
                staop4 = i.staop4,
+               staop5 = i.staop5,
                stanumbers1 = i.stanumbers1,
                stanumbers2 = i.stanumbers2,
                stanumbers3 = i.stanumbers3,
                stanumbers4 = i.stanumbers4,
+               stanumbers5 = i.stanumbers5,
                stavalues1 = i.stavalues1,
                stavalues2 = i.stavalues2,
                stavalues3 = i.stavalues3,
-               stavalues4 = i.stavalues4
+               stavalues4 = i.stavalues4,
+               stavalues5 = i.stavalues5
          WHERE c.starelid = $1
            AND c.staattnum = i.staattnum
            AND c.stainherit = i.stainherit;
@@ -1019,18 +1072,22 @@ BEGIN
                          i.stakind2,
                          i.stakind3,
                          i.stakind4,
+                         i.stakind5,
                          i.staop1,
                          i.staop2,
                          i.staop3,
                          i.staop4,
+                         i.staop5,
                          i.stanumbers1,
                          i.stanumbers2,
                          i.stanumbers3,
                          i.stanumbers4,
+                         i.stanumbers5,
                          i.stavalues1,
                          i.stavalues2,
                          i.stavalues3,
-                         i.stavalues4);
+                         i.stavalues4,
+                         i.stavalues5);
             END IF;
         END LOOP;
 

@@ -39,7 +39,7 @@ PG_MODULE_MAGIC;
 
 #define MAX_REL_CACHE		50		/* expected max # of rel stats entries */
 
-/* represents an element of relation statistics which is cached in hash table */
+/* Relation statistics cache entry */
 typedef struct StatsRelationEntry
 {
 	Oid					relid;		/* hash key must be at the head */
@@ -52,9 +52,21 @@ typedef struct StatsRelationEntry
 										 * ANALYZE */
 	BlockNumber			curpages;	/* # of pages as of lock/restore */
 
-	List			   *col_stats;	/* list of HeapTuple, each element is
-									   pg_statistic record of this relation. */
+	List			   *col_stats;	/* list of StatsColumnEntry, each element
+									   of which is pg_statistic record of this
+									   relation. */
 } StatsRelationEntry;
+
+/*
+ * Column statistics cache entry. This is for list item for
+ * StatsRelationEntry.col_stats.
+ */
+typedef struct StatsColumnEntry
+{
+  bool		negative;
+  int32		attnum;
+  HeapTuple tuple;
+} StatsColumnEntry;
 
 /* Saved hook functions */
 get_relation_info_hook_type		prev_get_relation_info = NULL;
@@ -129,8 +141,9 @@ static void get_merged_relation_stats(Oid relid, BlockNumber *pages,
 static int32 get_merged_avgwidth(Oid relid, AttrNumber attnum);
 static HeapTuple get_merged_column_stats(Oid relid, AttrNumber attnum,
 	bool inh);
-static HeapTuple column_cache_search(Oid relid, AttrNumber attnum, bool inh);
-static HeapTuple column_cache_enter(HeapTuple tuple);
+static HeapTuple column_cache_search(Oid relid, AttrNumber attnum,
+									 bool inh, bool*negative);
+static HeapTuple column_cache_enter(Oid relid, int32 attnum, HeapTuple tuple);
 static bool execute_plan(SPIPlanPtr *plan, const char *query, Oid relid,
 	const AttrNumber *attnum, bool inh);
 static void StatsCacheRelCallback(Datum arg, Oid relid);
@@ -378,8 +391,8 @@ dbms_stats_merge_internal(HeapTuple lhs, HeapTuple rhs, TupleDesc tupdesc)
 	if (atttype == InvalidOid)
 	{
 		ereport(WARNING,
-			(errmsg("pg_dbms_stats: not exist column"),
-			 errdetail("relid \"%d\" or it's column number \"%d\" does not exist",
+		(errmsg("pg_dbms_stats: not exist column"),
+		 errdetail("relid \"%d\" or it's column number \"%d\" does not exist",
 				relid, attnum),
 			 errhint("need to execute clean_up_stats()")));
 		return NULL;
@@ -845,13 +858,25 @@ get_merged_relation_stats(Oid relid, BlockNumber *pages, double *tuples,
 	if (!found)
 		init_rel_stats_entry(entry, relid);
 
-	/*
-	 * If we don't have valid cache entry, retrieve stats from catalogs,
-	 * pg_class and dbms_stats.relation_stats_locked, and merge them for planner use.
-	 * We also cache curpages value to make plans stable.
-	 */
+	if (entry->valid)
+	{
+		/*
+		 * Valid entry with invalid relpage is a negative cache, which
+		 * eliminates excessive SPI calls below. Negative caches will be
+		 * invalidated again on invalidation of system relation cache, which
+		 * occur on modification of the dummy stats tables
+		 * dbms_stats._relation_stats_locked and _column_stats_locked.
+		 */
+		if (entry->relpages == InvalidBlockNumber)
+			return;
+	}
 	if (!entry->valid)
 	{
+		/*
+		 * If we don't have valid cache entry, retrieve system stats and dummy
+		 * stats in dbms_stats.relation_stats_locked, then merge them for
+		 * planner use.  We also cache curpages value to make plans stable.
+		 */
 		bool		has_dummy;
 
 		PG_TRY();
@@ -861,22 +886,26 @@ get_merged_relation_stats(Oid relid, BlockNumber *pages, double *tuples,
 			SPI_connect();
 
 			/*
-			 * Retrieve per-tuple dummy statistics from relation_stats_locked table
-			 * via SPI.  If we don't have dummy statistics, we return false to
-			 * tell caller thet we gave up to provide alternative statistics.
+			 * Retrieve per-relation dummy statistics from
+			 * relation_stats_locked table via SPI.
 			 */
 			has_dummy = execute_plan(&rows_plan, rows_query, relid, NULL, true);
-			if (has_dummy)
+			if (!has_dummy)
 			{
+				/* If dummy stats is not found, store negative cache. */
+				entry->relpages = InvalidBlockNumber;
+			}
+			else
+			{
+				/*
+				 * Retrieve per-relation system stats from pg_class.  We use
+				 * syscache to support indexes
+				 */
 				HeapTuple	tuple;
 				Form_pg_class form;
 				bool		isnull;
 				Datum		val;
 
-				/*
-				 * Retrieve per-relation stats from pg_class system catalog.
-				 * We use syscache to support indexes
-				 */
 				tuple = SearchSysCache1(RELOID, ObjectIdGetDatum(relid));
 				if (!HeapTupleIsValid(tuple))
 					elog(ERROR, "cache lookup failed for relation %u", relid);
@@ -885,27 +914,23 @@ get_merged_relation_stats(Oid relid, BlockNumber *pages, double *tuples,
 				/* Choose dummy or authentic */
 				val = get_binary_datum(1, &isnull);
 				entry->relpages = isnull ? form->relpages :
-						(BlockNumber) DatumGetInt32(val);
+					(BlockNumber) DatumGetInt32(val);
 				val = get_binary_datum(2, &isnull);
 				entry->reltuples = isnull ? form->reltuples :
-						(double) DatumGetFloat4(val);
+					(double) DatumGetFloat4(val);
 				val = get_binary_datum(3, &isnull);
 				entry->curpages = isnull ? InvalidBlockNumber :
-						(BlockNumber) DatumGetInt32(val);
+					(BlockNumber) DatumGetInt32(val);
 #if PG_VERSION_NUM >= 90200
 				val = get_binary_datum(4, &isnull);
 				entry->relallvisible = isnull ? form->relallvisible :
-						(BlockNumber) DatumGetInt32(val);
+					(BlockNumber) DatumGetInt32(val);
 #endif
 
 				ReleaseSysCache(tuple);
-
-				/* Mark this entry as valid. */
-				entry->valid = true;
 			}
-
+			entry->valid = true;
 			SPI_finish();
-
 			--nested_level;
 		}
 		PG_CATCH();
@@ -916,13 +941,14 @@ get_merged_relation_stats(Oid relid, BlockNumber *pages, double *tuples,
 		PG_END_TRY();
 
 		/*
-		 * If we don't dummy statistics, tell caller that we didn't change
-		 * stats in Relation, and it's ok to use authentic statistics as-is.
+		 * If no dummy statistics available for this relation, do nothing then
+		 * return immediately.
 		 */
 		if (!has_dummy)
 			return;
 	}
 
+	/* Tweaking statistics using merged statistics */
 	if (!estimate)
 	{
 		*pages = entry->relpages;
@@ -931,8 +957,8 @@ get_merged_relation_stats(Oid relid, BlockNumber *pages, double *tuples,
 	}
 
 	/*
-	 * Get current # of pages to estimate current # of tuples, based on
-	 * tuple density at the last ANALYZE and current # of pages.
+	 * Get current number of pages to estimate current number of tuples, based
+	 * on tuple density at the last ANALYZE and current number of pages.
 	 */
 	rel = relation_open(relid, NoLock);
 	rel->rd_rel->relpages = entry->relpages;
@@ -966,65 +992,96 @@ get_merged_avgwidth(Oid relid, AttrNumber attnum)
 
 /*
  * get_merged_column_stats
- *   get per-column statistic of given column
+ *   returns per-column statistics for given column
  *
- * We cache the result because this function is called for every used column.
+ * This caches the result to avoid excessive SPI calls for repetitive
+ * request for every columns many time.
  */
 static HeapTuple
 get_merged_column_stats(Oid relid, AttrNumber attnum, bool inh)
 {
 	HeapTuple		tuple;
 	HeapTuple		statsTuple;
+	bool			negative = false;
 
 	if (nested_level > 0 || relid < FirstNormalObjectId)
 		return NULL;	/* avoid recursive call and system objects */
 
-	/* If the relation is system catalog, return NULL to use true statistics. */
+	/*
+	 * Return NULL for system catalog, directing the caller to use system
+	 * statistics.
+	 */
 	if (dbms_stats_is_system_catalog_internal(relid))
 		return NULL;
 
 	/* Return cached statistics, if any. */
-	if ((tuple = column_cache_search(relid, attnum, inh)) != NULL)
+	if ((tuple = column_cache_search(relid, attnum, inh, &negative)) != NULL)
 		return tuple;
 
-	/* Obtain statistics from syscache.  This must be released afterward. */
+	/* Obtain system statistics from syscache. */
 	statsTuple = SearchSysCache3(STATRELATTINH,
 								 ObjectIdGetDatum(relid),
 								 Int16GetDatum(attnum),
 								 BoolGetDatum(inh));
-	PG_TRY();
+	if (negative)
 	{
-		++nested_level;
-
-		SPI_connect();
-
-		/* Obtain dummy statistics. */
-		if (execute_plan(&tuple_plan, tuple_query, relid, &attnum, inh))
-		{
-			/* merge the dummy statistics and the true statistics */
-			tuple = dbms_stats_merge_internal(SPI_tuptable->vals[0], statsTuple,
-											  SPI_tuptable->tupdesc);
-		}
-		else
-		{
-			/* if dummy statistics does not exist, use the true statistics */
-			tuple = statsTuple;
-		}
-
-		/* Cache merged result for subsequent calls. */
-		if (tuple != NULL)
-			tuple = column_cache_enter(tuple);
-
-		SPI_finish();
-
-		--nested_level;
+		/*
+		 * Return system statistics whatever it is if negative cache for this
+		 * column is returned
+		 */
+		tuple = heap_copytuple(statsTuple);
 	}
-	PG_CATCH();
+	else
 	{
-		--nested_level;
-		PG_RE_THROW();
+		/*
+		 * Search for dummy statistics and try merge with system stats.
+		 */
+		PG_TRY();
+		{
+			/*
+			 * Save current context in order to use during SPI is
+			 * connected.
+			 */
+			MemoryContext outer_cxt = CurrentMemoryContext;
+			bool		  exec_success;
+
+			++nested_level;
+			SPI_connect();
+
+			/* Obtain dummy statistics for the column using SPI call. */
+			exec_success = 
+				execute_plan(&tuple_plan, tuple_query, relid, &attnum, inh);
+
+			/* Reset to the outer memory context for following steps. */
+			MemoryContextSwitchTo(outer_cxt);
+			
+			if (exec_success)
+			{
+				/* merge the dummy statistics with the system statistics */
+				tuple = dbms_stats_merge_internal(SPI_tuptable->vals[0],
+												  statsTuple,
+												  SPI_tuptable->tupdesc);
+			}
+			else
+				tuple = NULL;
+
+			/* Cache merged result for subsequent calls. */
+			tuple = column_cache_enter(relid, attnum, tuple);
+
+			/* Return system stats if the merging results in failure. */
+			if (!HeapTupleIsValid(tuple))
+				tuple = heap_copytuple(statsTuple);
+
+			SPI_finish();
+			--nested_level;
+		}
+		PG_CATCH();
+		{
+			--nested_level;
+			PG_RE_THROW();
+		}
+		PG_END_TRY();
 	}
-	PG_END_TRY();
 
 	if (HeapTupleIsValid(statsTuple))
 		ReleaseSysCache(statsTuple);
@@ -1037,51 +1094,63 @@ get_merged_column_stats(Oid relid, AttrNumber attnum, bool inh)
  *   Search statistic of the given column from the cache.
  */
 static HeapTuple
-column_cache_search(Oid relid, AttrNumber attnum, bool inh)
+column_cache_search(Oid relid, AttrNumber attnum, bool inh, bool *negative)
 {
 	StatsRelationEntry *entry;
 	bool			found;
 	ListCell	   *lc;
 
+	*negative = false;
 	/*
 	 * First, get cached relation stats.  If we have not cached relation stats,
 	 * we don't have column stats too.
 	 */
 	entry = hash_search(rel_stats, &relid, HASH_FIND, &found);
-	if (!found )
+	if (!found)
 		return NULL;
 
 	/*
-	 * It is assumed that not so many column_stats_effective are defined on a relation, so we
-	 * use simple linear-search here.  Using hash table for each relation would
-	 * be another solution, but it seems overkill so far.
+	 * We assume that not so many column_stats_effective are defined on one
+	 * relation, so we use simple linear-search here.  Hash table would be an
+	 * alternative, but it seems overkill so far.
 	 */
 	foreach(lc, entry->col_stats)
 	{
-		HeapTuple	tuple = (HeapTuple) lfirst(lc);
-		Form_pg_statistic form = get_pg_statistic(tuple);
+		StatsColumnEntry *ent = (StatsColumnEntry*) lfirst (lc);
 
-		/* Find statistic of the given column from the cache. */
-		if (form->staattnum == attnum && form->stainherit == inh)
-			return tuple;
+		if (ent->attnum != attnum) continue;
+
+		if (ent->negative)
+		{
+			/* Retrun NULL for negative cache, with noticing of that.*/
+			*negative = true;
+			return NULL;
+		}
+		else
+		{
+			HeapTuple	tuple = (HeapTuple) ent->tuple;
+			Form_pg_statistic form = get_pg_statistic(tuple);
+
+			/* Find statistic of the given column from the cache. */
+			if (form->stainherit == inh)
+				return tuple;
+		}
 	}
 
-	return NULL;	/* not found */
+	return NULL;	/* Not yet registered. */
 }
 
 /*
- * Cache a per-column statistics. Cached statistics are valid through the
- * current session, unless dummy statistics or table definition have been
- * changed.
- *
- * We store statistics tuple in longer-lifetime context, CacheMemoryContext, to
- * keep them alive during this session.
+ * Cache a per-column statistics. Storing in CacheMemoryContext, the cached
+ * statistics will live through the current session, unless dummy statistics or
+ * table definition have been changed.
  */
 static HeapTuple
-column_cache_enter(HeapTuple tuple)
+column_cache_enter(Oid relid, int32 attnum, HeapTuple tuple)
 {
 	MemoryContext	oldcontext;
 	HeapTuple		newtuple;
+	StatsColumnEntry *newcolent;
 	Form_pg_statistic form;
 	StatsRelationEntry *entry;
 	bool			found;
@@ -1089,22 +1158,33 @@ column_cache_enter(HeapTuple tuple)
 	Assert(tuple != NULL);
 	Assert(!heap_attisnull(tuple, 1));
 
-	form = get_pg_statistic(tuple);
-
-	entry = hash_search(rel_stats, &form->starelid, HASH_ENTER, &found);
+	entry = hash_search(rel_stats, &relid, HASH_ENTER, &found);
 	if (!found)
-		init_rel_stats_entry(entry, form->starelid);
+		init_rel_stats_entry(entry, relid);
 
 	/*
-	 * Link new column statistics entry into the list in relation statsstics
-	 * entry.
+	 * Adding this column stats to the column stats list of the relation stats
+	 * cache just obtained.
 	 */
 	oldcontext = MemoryContextSwitchTo(CacheMemoryContext);
-	newtuple = heap_copytuple(tuple);
-	entry->col_stats = lappend(entry->col_stats, newtuple);
+	newcolent = (StatsColumnEntry*)palloc(sizeof(StatsColumnEntry));
+	newcolent->attnum = attnum;
+	if (HeapTupleIsValid(tuple))
+	{
+		newcolent->negative = false;
+		newcolent->tuple = heap_copytuple(tuple);
+	}
+	else
+	{
+		/* Invalid tuple makes a negative cache. */
+		newcolent->negative = true;
+		newcolent->tuple = NULL;
+	}
+
+	entry->col_stats = lappend(entry->col_stats, newcolent);
 	MemoryContextSwitchTo(oldcontext);
 
-	return newtuple;
+	return newcolent->tuple;
 }
 
 /*
@@ -1171,11 +1251,21 @@ StatsCacheRelCallback(Datum arg, Oid relid)
 	{
 		if (relid == InvalidOid || relid == entry->relid)
 		{
+			ListCell *lc;
+
 			/* Mark the relation entry as INVALID */
 			entry->valid = false;
 
 			/* Discard every column statistics */
-			list_free_deep(entry->col_stats);
+			foreach (lc, entry->col_stats)
+			{
+				StatsColumnEntry *ent = (StatsColumnEntry*) lfirst(lc);
+
+				if (!ent->negative)
+					pfree(ent->tuple);
+				pfree(ent);
+			}
+			list_free(entry->col_stats);
 			entry->col_stats = NIL;
 		}
 	}

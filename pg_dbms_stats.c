@@ -772,9 +772,9 @@ dbms_stats_get_relation_stats(PlannerInfo *root,
 		HeapTuple	tuple;
 
 		tuple = get_merged_column_stats(rte->relid, attnum, rte->inh);
+		vardata->statsTuple = tuple;
 		if (tuple != NULL)
 		{
-			vardata->statsTuple = tuple;
 			vardata->freefunc = FreeHeapTuple;
 			return true;
 		}
@@ -803,9 +803,9 @@ dbms_stats_get_index_stats(PlannerInfo *root,
 		HeapTuple	tuple;
 
 		tuple = get_merged_column_stats(indexOid, indexattnum, false);
+		vardata->statsTuple = tuple;
 		if (tuple != NULL)
 		{
-			vardata->statsTuple = tuple;
 			vardata->freefunc = FreeHeapTuple;
 			return true;
 		}

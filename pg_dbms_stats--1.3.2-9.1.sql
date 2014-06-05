@@ -291,7 +291,7 @@ CREATE TRIGGER invalidate_column_cache
     FOR EACH ROW EXECUTE PROCEDURE dbms_stats.invalidate_column_cache();
 
 --
--- BACKUP_STATS: Statistic backup functions
+-- BACKUP_STATS: Statistics backup functions
 --
 
 CREATE FUNCTION dbms_stats.backup(
@@ -363,7 +363,7 @@ BEGIN
                 RAISE EXCEPTION 'column "%" of "%" does not exist', $2, $1;
             END IF;
             IF NOT EXISTS(SELECT * FROM dbms_stats.column_stats_effective WHERE starelid = $1 AND staattnum = set_attnum) THEN
-                RAISE EXCEPTION 'statistics for column "%" of "%" does not exist', $2, $1;
+                RAISE EXCEPTION 'no statistic for column "%" of "%" exists', $2, $1;
             END IF;
             unit_type = 'c';
         ELSE
@@ -464,7 +464,7 @@ $$
 LANGUAGE sql;
 
 --
--- RESTORE_STATS: Statistic restore functions
+-- RESTORE_STATS: Statistics restore functions
 --
 CREATE FUNCTION dbms_stats.restore(
     backup_id int8,
@@ -783,7 +783,7 @@ $$
 LANGUAGE plpgsql STRICT;
 
 --
--- LOCK_STATS: Statistic lock functions
+-- LOCK_STATS: Statistics lock functions
 --
 
 CREATE FUNCTION dbms_stats.lock(
@@ -828,6 +828,7 @@ BEGIN
 	 * If we don't have per-table statistics, create new one which has NULL for
 	 * every statistic column_stats_effective.
 	 */
+
     IF NOT EXISTS(SELECT * FROM dbms_stats._relation_stats_locked ru
                    WHERE ru.relid = $1) THEN
         INSERT INTO dbms_stats._relation_stats_locked
@@ -904,7 +905,7 @@ BEGIN
 
 		/* If we don't have statistic at all, raise error. */
         IF NOT FOUND THEN
-			RAISE EXCEPTION 'statistic for column "%" of "%" does not exist', $2, $1::regclass;
+			RAISE EXCEPTION 'no statistic for column "%" of "%" exists', $2, $1::regclass;
 		END IF;
 
     RETURN $1;
@@ -1429,7 +1430,7 @@ BEGIN
     LOCK dbms_stats._relation_stats_locked IN SHARE UPDATE EXCLUSIVE MODE;
     LOCK dbms_stats._column_stats_locked IN SHARE UPDATE EXCLUSIVE MODE;
 
-	-- We don't have to check that table-level dummy statistic of the table
+	-- We don't have to check that table-level dummy statistics of the table
 	-- exists here, because the foreign key constraints defined on column-level
 	-- dummy static table eusures that.
 	FOR clean_rel_col, clean_relid, clean_attnum, clean_inherit IN

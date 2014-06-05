@@ -399,7 +399,7 @@ BEGIN
                 RAISE EXCEPTION 'column "%" of "%" does not exist', $2, $1;
             END IF;
             IF NOT EXISTS(SELECT * FROM dbms_stats.column_stats_effective WHERE starelid = $1 AND staattnum = set_attnum) THEN
-                RAISE EXCEPTION 'statistics for column "%" of "%" does not exist', $2, $1;
+                RAISE EXCEPTION 'no statistic for column "%" of "%" exists', $2, $1;
             END IF;
             unit_type = 'c';
         ELSE
@@ -952,7 +952,7 @@ BEGIN
 
 		/* If we don't have statistic at all, raise error. */
         IF NOT FOUND THEN
-			RAISE EXCEPTION 'statistic for column "%" of "%" does not exist', $2, $1::regclass;
+			RAISE EXCEPTION 'no statistic for column "%" of "%" exists', $2, $1::regclass;
 		END IF;
 
     RETURN $1;

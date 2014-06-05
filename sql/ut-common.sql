@@ -1,5 +1,4 @@
 \pset null '(null)'
-LOAD 'pg_dbms_stats';
 /*
  * No.2-3 dbms_stats.backup_history_id_seq
  */
@@ -21,20 +20,6 @@ SELECT setval('dbms_stats.backup_history_id_seq', 1, false);
 DELETE FROM dbms_stats.backup_history;
 
 /*
- * No.2-4 dbms_stats.anyarray
- */
--- No.2-4-1
-SELECT n.nspname, t.typname, t.typlen, t.typbyval, t.typtype,
-       t.typcategory, t.typispreferred, t.typisdefined, t.typdelim,
-       t.typrelid, t.typelem, t.typinput, t.typoutput, t.typreceive,
-       t.typsend, t.typmodin, t.typmodout, t.typanalyze, t.typalign,
-       t.typstorage, t.typnotnull, t.typbasetype, t.typtypmod, t.typndims,
-       t.typcollation, t.typdefaultbin, t.typdefault, t.typacl
-  FROM pg_type t, pg_namespace n
- WHERE t.typnamespace = n.oid
-   AND n.nspname = 'dbms_stats'
-   AND t.typname = 'anyarray';
-/*
  * No.3-1 dbms_stats.use_locked_stats
  */
 DELETE FROM dbms_stats._relation_stats_locked;
@@ -42,14 +27,13 @@ EXPLAIN (costs false) SELECT * FROM s0.st2 WHERE id < 1;
 SELECT dbms_stats.lock_table_stats('s0.st2'::regclass);
 UPDATE dbms_stats._relation_stats_locked SET curpages = 10000;
 -- No.3-1-1
-SET pg_dbms_stats.use_locked_stats TO on;
+SET pg_dbms_stats.use_locked_stats TO ON;
 EXPLAIN (costs false) SELECT * FROM s0.st2 WHERE id < 1;
 -- No.3-1-2
-SET pg_dbms_stats.use_locked_stats TO off;
+SET pg_dbms_stats.use_locked_stats TO OFF;
 EXPLAIN (costs false) SELECT * FROM s0.st2 WHERE id < 1;
 -- No.3-1-3
 \c - regular_user
-LOAD '$libdir/plugins/pg_dbms_stats';
 SHOW pg_dbms_stats.use_locked_stats;
 SET pg_dbms_stats.use_locked_stats TO OFF;
 SHOW pg_dbms_stats.use_locked_stats;
@@ -58,7 +42,6 @@ RESET pg_dbms_stats.use_locked_stats;
 EXPLAIN (costs false) SELECT * FROM s0.st2 WHERE id < 1;
 -- clean up
 \c - postgres
-LOAD 'pg_dbms_stats';
 DELETE FROM dbms_stats._relation_stats_locked;
 
 /*
@@ -346,8 +329,9 @@ UPDATE dbms_stats._relation_stats_locked SET curpages = 1
  WHERE relid = 'st1'::regclass;
 EXPLAIN (costs false) SELECT * FROM st1 WHERE val IS NULL;
 \c
+SET pg_dbms_stats.use_locked_stats to NO;
 EXPLAIN (costs false) SELECT * FROM st1 WHERE val IS NULL;
-LOAD 'pg_dbms_stats';
+SET pg_dbms_stats.use_locked_stats to YES;
 EXPLAIN (costs false) SELECT * FROM st1 WHERE val IS NULL;
 
 SELECT dbms_stats.unlock_database_stats();
@@ -645,10 +629,7 @@ SELECT starelid::regclass, staattnum FROM dbms_stats.column_stats_backup
  GROUP BY starelid, staattnum
  ORDER BY starelid, staattnum;
 SELECT count(*) FROM dbms_stats.relation_stats_backup;
-SET client_min_messages TO FATAL;
 SELECT dbms_stats.backup(1, 's0.st0'::regclass, NULL);
-RESET client_min_messages;
-\! tail ${PGDATA}/pg_log/postgresql.log > results/ut_no2_1_15.out
 SELECT count(*) FROM dbms_stats.relation_stats_backup;
 SELECT count(*) FROM dbms_stats.column_stats_backup;
 
@@ -1133,4 +1114,3 @@ SELECT count(*) FROM dbms_stats._relation_stats_locked WHERE false;
 -- No.19-1-5
 SELECT count(*) FROM dbms_stats._columnns_user WHERE false;
 \c - postgres
-LOAD 'pg_dbms_stats';

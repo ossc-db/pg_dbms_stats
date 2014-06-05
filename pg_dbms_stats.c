@@ -1149,9 +1149,7 @@ static HeapTuple
 column_cache_enter(Oid relid, int32 attnum, HeapTuple tuple)
 {
 	MemoryContext	oldcontext;
-	HeapTuple		newtuple;
 	StatsColumnEntry *newcolent;
-	Form_pg_statistic form;
 	StatsRelationEntry *entry;
 	bool			found;
 

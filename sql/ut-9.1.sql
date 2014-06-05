@@ -28,6 +28,21 @@
 \dS+ dbms_stats.relation_stats_locked
 
 /*
+ * No.2-4 dbms_stats.anyarray
+ */
+-- No.2-4-1
+SELECT n.nspname, t.typname, t.typlen, t.typbyval, t.typtype,
+       t.typcategory, t.typispreferred, t.typisdefined, t.typdelim,
+       t.typrelid, t.typelem, t.typinput, t.typoutput, t.typreceive,
+       t.typsend, t.typmodin, t.typmodout, t.typanalyze, t.typalign,
+       t.typstorage, t.typnotnull, t.typbasetype, t.typtypmod, t.typndims,
+       t.typcollation, t.typdefaultbin, t.typdefault
+  FROM pg_type t, pg_namespace n
+ WHERE t.typnamespace = n.oid
+   AND n.nspname = 'dbms_stats'
+   AND t.typname = 'anyarray';
+
+/*
  * No.5-1 dbms_stats.merge
  */
 UPDATE pg_statistic SET
@@ -1091,10 +1106,7 @@ SELECT starelid, attname, stainherit FROM columns_locked_v c;
 DELETE FROM dbms_stats._relation_stats_locked;
 \set s1_st0_oid `psql contrib_regression -tA -c "SELECT c.oid FROM pg_class c, pg_namespace n WHERE c.relnamespace = n.oid AND n.nspname = 's1' AND c.relname = 'st0';"`
 DROP TABLE s1.st0;
-SET client_min_messages TO FATAL;
 SELECT dbms_stats.restore(2, :s1_st0_oid, NULL);
-RESET client_min_messages;
-\! tail ${PGDATA}/pg_log/postgresql.log > results/ut_no3_1_14.out
 SELECT count(*) FROM dbms_stats.relation_stats_locked;
 SELECT count(*) FROM dbms_stats.column_stats_locked;
 CREATE TABLE s1.st0(id integer, num integer);

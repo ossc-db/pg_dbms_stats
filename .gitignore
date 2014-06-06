@@ -17,3 +17,8 @@ export_stats.dmp
 /log/
 /results/
 /tmp_check/
+
+# others
+/GTAGS
+/GRTAGS
+/GPATH

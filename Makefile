@@ -3,6 +3,8 @@
 MODULE_big = pg_dbms_stats
 OBJS = pg_dbms_stats.o dump.o import.o
 DBMSSTATSVER = 1.3.2
+DOCDIR = doc
+EXTDIR = ext_scripts
 
 ifdef UNIT_TEST
 PG_CPPFLAGS = -DUNIT_TEST
@@ -19,8 +21,8 @@ REGRESS = init-common ut_fdw_init init-$(MAJORVERSION) ut-common \
 
 REGRESS_OPTS = --encoding=UTF8 --temp-config=regress.conf --extra-install=contrib/file_fdw
 
-DOCS = export_effective_stats-$(MAJORVERSION).sql.sample \
-	export_plain_stats-$(MAJORVERSION).sql.sample
+DOCS = $(DOCDIR)/export_effective_stats-$(MAJORVERSION).sql.sample \
+	$(DOCDIR)/export_plain_stats-$(MAJORVERSION).sql.sample
 
 STARBALL = pg_dbms_stats-$(DBMSSTATSVER).tar.gz
 STARBALL94 = pg_dbms_stats94-$(DBMSSTATSVER).tar.gz
@@ -59,11 +61,10 @@ endif
 TARSOURCES = Makefile *.c  *.h \
 	$(EXTDIR)/pg_dbms_stats--*-9.*.sql \
 	pg_dbms_stats.control COPYRIGHT ChangeLog ChangeLog.ja \
-	README.installcheck regress.conf doc/* \
-	expected/init-*.out expected/ut-*.out \
+	README.installcheck regress.conf \
+	doc/* expected/init-*.out expected/ut-*.out \
 	sql/init-*.sql sql/ut-*.sql \
-	input/*.source input/*.csv \
-	output/*.source SPECS/*.spec
+	input/*.source input/*.csv output/*.source SPECS/*.spec
 
 all: $(DATA) $(DOCS)
 
@@ -71,7 +72,7 @@ rpms: rpm93 rpm92 rpm91
 
 sourcetar: $(STARBALL)
 
-$(DATA): %.sql: %-$(MAJORVERSION).sql											
+$(DATA): %.sql: $(EXTDIR)/%-$(MAJORVERSION).sql
 	cp $< $@
 
 $(STARBALLS): $(TARSOURCES)

@@ -65,8 +65,8 @@ install -m 644 pg_dbms_stats--1.3.2.sql %{buildroot}%{_datadir}/extension/pg_dbm
 install -m 644 pg_dbms_stats--1.0--1.3.2.sql %{buildroot}%{_datadir}/extension/pg_dbms_stats--1.0--1.3.2.sql
 install -m 644 pg_dbms_stats.control %{buildroot}%{_datadir}/extension/pg_dbms_stats.control
 install -d %{buildroot}%{_docdir}/extension
-install -m 644 export_effective_stats-9.3.sql.sample %{buildroot}%{_docdir}/extension/export_effective_stats-9.3.sql.sample
-install -m 644 export_plain_stats-9.3.sql.sample %{buildroot}%{_docdir}/extension/export_plain_stats-9.3.sql.sample
+install -m 644 doc/export_effective_stats-9.3.sql.sample %{buildroot}%{_docdir}/extension/export_effective_stats-9.3.sql.sample
+install -m 644 doc/export_plain_stats-9.3.sql.sample %{buildroot}%{_docdir}/extension/export_plain_stats-9.3.sql.sample
 
 %clean
 rm -rf %{buildroot}

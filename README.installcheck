@@ -1,0 +1,32 @@
+Preparation for make installcheck
+
+1. Install pg_dbms_stats into the target binary tree. Make sure to
+   prpare the PATH environment variable properly to execute the right
+   pg_config for the version of target PostgreSQL server.
+
+  postgres$ which pg_config
+  <somewhere bin of the target server resides>/pg_config
+  postgres$ make install
+
+2. Install additionally required contrib module file_fdw. This could
+  be done for RPM installed server by installing postgresql##-contrib
+  using yum after installing additional repository.
+
+  # yum install postgresql93-contrib
+
+3. Edit postgresql.conf so that pg_dbms stats will be automatically
+   loaded.
+
+  postgres$ echo "shared_preload_libraries = 'pg_dbms_stats'" >>  <PGDATA>/postgresql.conf
+
+4. Start the target server
+
+  postgres$ postgres or pg_ctl start
+
+5. Install extension on the server.
+
+  postgres$ psql postgres -c 'CREATE EXTENSION pg_dbms_stats; CREATE EXTENSION file_fdw;'
+
+6. run make installcheck
+
+  postgres$ make installcheck

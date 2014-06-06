@@ -31,9 +31,7 @@ STARBALLS = $(STARBALL) $(STARBALL94s) $(STARBALL93) $(STARBALL92) $(STARBALL91)
 
 EXTRA_CLEAN = sql/ut_anyarray-*.sql expected/ut_anyarray-*.out \
 	sql/ut_imp_exp-*.sql expected/ut_imp_exp-*.out \
-	sql/ut_fdw_init-*.sql expected/ut_fdw_init-*.out \
-	pg_dbms_stats--1.0--1.3.2.sql export_plain_stats.sql.sample \
-	export_effective_stats.sql.sample \
+	sql/ut_fdw_init.sql expected/ut_fdw_init.out \
 	export_stats.dmp ut-fdw.csv $(DATA) $(STARBALLS) RPMS/*/* \
 	*~
 
@@ -58,9 +56,13 @@ ifeq "$(MAJORVERSION)" "9.4"
 MAJORVERSION=9.3
 endif
 
-TARSOURCES = Makefile *.c  *.h pg_dbms_stats--*-9.*.sql pg_dbms_stats.control \
-	export_*_stats-9.*.sql.sample COPYRIGHT \
-	doc/* expected/*.out sql/*.sql input/*.source input/*.csv \
+TARSOURCES = Makefile *.c  *.h \
+	$(EXTDIR)/pg_dbms_stats--*-9.*.sql \
+	pg_dbms_stats.control COPYRIGHT ChangeLog ChangeLog.ja \
+	README.installcheck regress.conf doc/* \
+	expected/init-*.out expected/ut-*.out \
+	sql/init-*.sql sql/ut-*.sql \
+	input/*.source input/*.csv \
 	output/*.source SPECS/*.spec
 
 all: $(DATA) $(DOCS)

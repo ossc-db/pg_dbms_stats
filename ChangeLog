@@ -1,0 +1,26 @@
+2014-06-06 Kyotaro Horiguchi <horiguchi.kyotaro@lab.ntt.co.jp>
+	* pg_dbms_stats.c: pg_dbms_stats no more causes planner to access
+	repeatedly to the tables of pg_dbms_stats for nonexistent saved
+	statistics during considering access paths involving tables or
+	indexes that don't have their statistics 'lock'ed. This change
+	improves the performance especially for light weight (which means
+	taking less than a few milliseconds) queries on no-locked
+	tables/indexes.
+
+	* pg_dbms_stats.c: Fix a bug potentially causes SEGV crash.
+	しました。
+
+	* pg_dbms_stats--*.sql, pg_dbms_stats.control: Now declares the
+	right version to the extension framework. ALTER EXTENSION can be
+	used to upgrade from the older versions.
+
+2013-11-07 Kyotaro Horiguchi <horiguchi.kyotaro@lab.ntt.co.jp>
+	* Fixed a bug potentially cause SEGV after changing column data
+	types on 'lock'ed tables
+
+	* Added clean_up_stats() function, which erases all saved
+	statistics left alone after deleting tables before unlocking
+	staistics.
+
+2013-11-07 Kyotaro Horiguchi <horiguchi.kyotaro@lab.ntt.co.jp>
+	* First published version.

@@ -2,7 +2,7 @@
 
 MODULE_big = pg_dbms_stats
 OBJS = pg_dbms_stats.o dump.o import.o
-DBMSSTATSVER=1.3.2
+DBMSSTATSVER = 1.3.2
 
 ifdef UNIT_TEST
 PG_CPPFLAGS = -DUNIT_TEST
@@ -19,7 +19,8 @@ REGRESS = init-common ut_fdw_init init-$(MAJORVERSION) ut-common \
 
 REGRESS_OPTS = --encoding=UTF8 --temp-config=regress.conf --extra-install=contrib/file_fdw
 
-DOCS = export_effective_stats.sql.sample export_plain_stats.sql.sample
+DOCS = export_effective_stats-$(MAJORVERSION).sql.sample \
+	export_plain_stats-$(MAJORVERSION).sql.sample
 
 STARBALL = pg_dbms_stats-$(DBMSSTATSVER).tar.gz
 STARBALL92 = pg_dbms_stats92-$(DBMSSTATSVER).tar.gz
@@ -66,9 +67,6 @@ rpms: $(RPMS93)  $(RPMS92)
 sourcetar: $(STARBALL)
 
 $(DATA): %.sql: %-$(MAJORVERSION).sql											
-	cp $< $@
-
-$(DOCS): %.sql.sample: %-$(MAJORVERSION).sql.sample
 	cp $< $@
 
 $(STARBALLS): $(TARSOURCES)

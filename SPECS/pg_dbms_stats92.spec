@@ -37,7 +37,7 @@ pg_dbms_stats also provides following features:
   - backup multiple generations of planner statistics to reuse plans afterwards
   - import planner statistics from another system for tuning or testing.
 
-Note that this package is available for only PostgreSQL 9.3.
+Note that this package is available for only PostgreSQL 9.2.
 
 ## pre work for build pg_dbms_stats
 %prep
@@ -47,7 +47,8 @@ if [ ! -d %{_rpmdir} ]; then mkdir -p %{_rpmdir}; fi
 
 ## Set variables for build environment
 %build
-make %{?_smp_mflags}
+PATH=/usr/pgsql-9.2/bin:$PATH
+make USE_PGXS=1 %{?_smp_mflags}
 
 ## Set variables for install
 %install

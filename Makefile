@@ -23,16 +23,18 @@ DOCS = export_effective_stats-$(MAJORVERSION).sql.sample \
 	export_plain_stats-$(MAJORVERSION).sql.sample
 
 STARBALL = pg_dbms_stats-$(DBMSSTATSVER).tar.gz
-STARBALL92 = pg_dbms_stats92-$(DBMSSTATSVER).tar.gz
+STARBALL94 = pg_dbms_stats94-$(DBMSSTATSVER).tar.gz
 STARBALL93 = pg_dbms_stats93-$(DBMSSTATSVER).tar.gz
-STARBALLS = $(STARBALL) $(STARBALL93) $(STARBALL92)
+STARBALL92 = pg_dbms_stats92-$(DBMSSTATSVER).tar.gz
+STARBALL91 = pg_dbms_stats91-$(DBMSSTATSVER).tar.gz
+STARBALLS = $(STARBALL) $(STARBALL94s) $(STARBALL93) $(STARBALL92) $(STARBALL91)
 
 EXTRA_CLEAN = sql/ut_anyarray-*.sql expected/ut_anyarray-*.out \
 	sql/ut_imp_exp-*.sql expected/ut_imp_exp-*.out \
 	sql/ut_fdw_init-*.sql expected/ut_fdw_init-*.out \
 	pg_dbms_stats--1.0--1.3.2.sql export_plain_stats.sql.sample \
 	export_effective_stats.sql.sample \
-	export_stats.dmp ut-fdw.csv $(DATA) $(STARBALLS) RPMS \
+	export_stats.dmp ut-fdw.csv $(DATA) $(STARBALLS) RPMS/*/* \
 	*~
 
 ifdef USE_PGXS
@@ -55,14 +57,9 @@ TARSOURCES = Makefile *.c  *.h pg_dbms_stats--*-9.*.sql pg_dbms_stats.control \
 	doc/* expected/*.out sql/*.sql input/*.source input/*.csv \
 	output/*.source SPECS/*.spec
 
-RPMS93 = RPMS/pg_dbms_stats93-$(DBMSSTATSVER)-1.el6.x86_64.rpm \
-	 RPMS/pg_dbms_stats93-debuginfo-$(DBMSSTATSVER)-1.el6.x86_64.rpm 
-RPMS92 = RPMS/pg_dbms_stats92-$(DBMSSTATSVER)-1.el6.x86_64.rpm \
-	 RPMS/pg_dbms_stats92-debuginfo-$(DBMSSTATSVER)-1.el6.x86_64.rpm 
-
 all: $(DATA) $(DOCS)
 
-rpms: $(RPMS93)  $(RPMS92)
+rpms: rpm93 rpm92 rpm91
 
 sourcetar: $(STARBALL)
 
@@ -79,10 +76,14 @@ $(STARBALLS): $(TARSOURCES)
 	tar -chzf $@ $(addprefix $(subst .tar.gz,,$@)/, $^)
 	rm $(subst .tar.gz,,$@)
 
-$(RPMS93): $(STARBALL93)
-	export MAKE_ROOT=`pwd`
-	rpmbuild -bb SPECS/pg_dbms_stats93.spec
+rpm94: $(STARBALL94)
+	MAKE_ROOT=`pwd` rpmbuild -bb SPECS/pg_dbms_stats94.spec
 
-$(RPMS92): $(STARBALL92)
-	export MAKE_ROOT=`pwd`
-	rpmbuild -bb SPECS/pg_dbms_stats92.spec
+rpm93: $(STARBALL93)
+	MAKE_ROOT=`pwd` rpmbuild -bb SPECS/pg_dbms_stats93.spec
+
+rpm92: $(STARBALL92)
+	MAKE_ROOT=`pwd` rpmbuild -bb SPECS/pg_dbms_stats92.spec
+
+rpm91: $(STARBALL91)
+	MAKE_ROOT=`pwd` rpmbuild -bb SPECS/pg_dbms_stats91.spec

@@ -37,6 +37,12 @@ EXTRA_CLEAN = sql/ut_anyarray-*.sql expected/ut_anyarray-*.out \
 	export_stats.dmp ut-fdw.csv $(DATA) $(STARBALLS) RPMS/*/* \
 	*~
 
+ifndef USE_PGXS
+ifeq ($(wildcard ../../contrib/contrib-global.mk),)
+	USE_PGXS=1
+endif
+endif
+
 ifdef USE_PGXS
 PG_CONFIG = pg_config
 PGXS := $(shell $(PG_CONFIG) --pgxs)

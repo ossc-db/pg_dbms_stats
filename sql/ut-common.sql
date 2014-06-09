@@ -629,7 +629,16 @@ SELECT starelid::regclass, staattnum FROM dbms_stats.column_stats_backup
  GROUP BY starelid, staattnum
  ORDER BY starelid, staattnum;
 SELECT count(*) FROM dbms_stats.relation_stats_backup;
-SELECT dbms_stats.backup(1, 's0.st0'::regclass, NULL);
+-- SELECT dbms_stats.backup(1, 's0.st0'::regclass, NULL);
+-- To avoid test unstability caused by relation id allocation, unique
+-- constraint which used to be checked above is now checked more
+-- directly in the following step.
+SELECT ic.relname idxname, i.indisprimary
+ FROM pg_index i
+ JOIN pg_class c ON (c.oid = i.indrelid)
+ JOIN pg_namespace n ON (n.oid = c.relnamespace)
+ JOIN pg_class ic ON (ic.oid = i.indexrelid)
+ WHERE n.nspname = 'dbms_stats' AND c.relname = 'relation_stats_backup';
 SELECT count(*) FROM dbms_stats.relation_stats_backup;
 SELECT count(*) FROM dbms_stats.column_stats_backup;
 

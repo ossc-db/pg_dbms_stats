@@ -1638,7 +1638,7 @@ SELECT id, unit, comment FROM dbms_stats.backup_history;
 -- No.8-1-3
 DELETE FROM dbms_stats.backup_history;
 SELECT dbms_stats.backup(NULL::regclass, 'id', 'dummy comment');
-ERROR:  relation is required
+ERROR:  relation required
 SELECT id, unit, comment FROM dbms_stats.backup_history;
  id | unit | comment 
 ----+------+---------
@@ -1666,7 +1666,7 @@ SELECT id, unit, comment FROM dbms_stats.backup_history;
 -- No.8-1-5
 DELETE FROM dbms_stats.backup_history;
 SELECT dbms_stats.backup(0, NULL, 'dummy comment');
-ERROR:  relation "-" does not exist
+ERROR:  relation "-" not found
 SELECT id, unit, comment FROM dbms_stats.backup_history;
  id | unit | comment 
 ----+------+---------
@@ -1697,8 +1697,8 @@ SELECT dbms_stats.backup(
     'pg_toast.pg_toast_2618'::regclass,
     NULL,
     'dummy comment');
-ERROR:  can not backup statistics of "pg_toast.pg_toast_2618" with relkind "t"
-HINT:  only tables and indexes are supported
+ERROR:  relation of relkind "t" cannot have statistics to backup: "pg_toast.pg_toast_2618"
+HINT:  Only tables(r), materialized views(m), foreign tables(f) and indexes(i) are allowed.
 SELECT id, unit, comment FROM dbms_stats.backup_history;
  id | unit | comment 
 ----+------+---------
@@ -1726,8 +1726,8 @@ SELECT id, unit, comment FROM dbms_stats.backup_history;
 -- No.8-1-9
 DELETE FROM dbms_stats.backup_history;
 SELECT dbms_stats.backup('s0.ss0'::regclass, NULL, 'dummy comment');
-ERROR:  can not backup statistics of "s0.ss0" with relkind "S"
-HINT:  only tables and indexes are supported
+ERROR:  relation of relkind "S" cannot have statistics to backup: "s0.ss0"
+HINT:  Only tables(r), materialized views(m), foreign tables(f) and indexes(i) are allowed.
 SELECT id, unit, comment FROM dbms_stats.backup_history;
  id | unit | comment 
 ----+------+---------
@@ -1736,8 +1736,8 @@ SELECT id, unit, comment FROM dbms_stats.backup_history;
 -- No.8-1-10
 DELETE FROM dbms_stats.backup_history;
 SELECT dbms_stats.backup('s0.sc0'::regclass, NULL, 'dummy comment');
-ERROR:  can not backup statistics of "s0.sc0" with relkind "c"
-HINT:  only tables and indexes are supported
+ERROR:  relation of relkind "c" cannot have statistics to backup: "s0.sc0"
+HINT:  Only tables(r), materialized views(m), foreign tables(f) and indexes(i) are allowed.
 SELECT id, unit, comment FROM dbms_stats.backup_history;
  id | unit | comment 
 ----+------+---------
@@ -1784,7 +1784,7 @@ SELECT id, unit, comment FROM dbms_stats.backup_history;
 -- No.8-1-13
 DELETE FROM dbms_stats.backup_history;
 SELECT dbms_stats.backup('pg_catalog.pg_class'::regclass, NULL, 'dummy comment');
-ERROR:  can not backup statistics of system catalog "pg_class"
+ERROR:  backing up statistics is inhibited for system catalogs: "pg_class"
 SELECT id, unit, comment FROM dbms_stats.backup_history;
  id | unit | comment 
 ----+------+---------
@@ -1793,7 +1793,7 @@ SELECT id, unit, comment FROM dbms_stats.backup_history;
 -- No.8-1-14
 DELETE FROM dbms_stats.backup_history;
 SELECT dbms_stats.backup('s0.st0'::regclass, 'dummy', 'dummy comment');
-ERROR:  column "dummy" of "s0.st0" does not exist
+ERROR:  column "dummy" not found in relation "s0.st0"
 SELECT id, unit, comment FROM dbms_stats.backup_history;
  id | unit | comment 
 ----+------+---------
@@ -1813,7 +1813,7 @@ SELECT count(*) FROM dbms_stats.column_stats_effective
 (1 row)
 
 SELECT dbms_stats.backup('s0.st0'::regclass, 'id', 'dummy comment');
-ERROR:  no statistic for column "id" of "s0.st0" exists
+ERROR:  no statistics available for column "id" of relation "s0.st0"
 SELECT id, unit, comment FROM dbms_stats.backup_history;
  id | unit | comment 
 ----+------+---------
@@ -1956,7 +1956,7 @@ SELECT id, unit, comment FROM dbms_stats.backup_history
 
 -- No.8-3-2
 SELECT dbms_stats.backup_schema_stats('s00', 'comment');
-ERROR:  schema "s00" does not exist
+ERROR:  schema "s00" not found
 SELECT id, unit, comment FROM dbms_stats.backup_history
  ORDER BY id DESC
  LIMIT 1;
@@ -1967,7 +1967,7 @@ SELECT id, unit, comment FROM dbms_stats.backup_history
 
 -- No.8-3-3
 SELECT dbms_stats.backup_schema_stats('pg_catalog', 'comment');
-ERROR:  can not backup statistics of relation in system schema "pg_catalog"
+ERROR:  backing up statistics is inhibited for system schemas: "pg_catalog"
 SELECT id, unit, comment FROM dbms_stats.backup_history
  ORDER BY id DESC
  LIMIT 1;
@@ -2273,7 +2273,7 @@ SELECT count(*) FROM dbms_stats.relation_stats_locked;
 -- No.9-1-4
 DELETE FROM dbms_stats._relation_stats_locked;
 SELECT dbms_stats.restore(NULL, 's0.st0', NULL);
-ERROR:  backup id is required
+ERROR:  backup id required
 SELECT count(*) FROM dbms_stats.column_stats_locked;
  count 
 -------
@@ -2312,7 +2312,7 @@ SELECT starelid, attname, stainherit FROM columns_locked_v c;
 -- No.9-1-6
 DELETE FROM dbms_stats._relation_stats_locked;
 SELECT dbms_stats.restore(2, NULL, 'id');
-ERROR:  relation is required
+ERROR:  relation required
 SELECT count(*) FROM dbms_stats.column_stats_locked;
  count 
 -------
@@ -2423,7 +2423,7 @@ SELECT starelid, attname, stainherit FROM columns_locked_v c;
 -- No.9-1-9
 DELETE FROM dbms_stats._relation_stats_locked;
 SELECT dbms_stats.restore(0, 's0.st0', NULL);
-ERROR:  backup id 0 does not exist
+ERROR:  backup id 0 not found
 SELECT relid::regclass FROM dbms_stats.relation_stats_locked
  GROUP BY relid
  ORDER BY relid;
@@ -2439,7 +2439,7 @@ SELECT starelid, attname, stainherit FROM columns_locked_v c;
 -- No.9-1-10
 DELETE FROM dbms_stats._relation_stats_locked;
 SELECT dbms_stats.restore(2, 0, 'id');
-ERROR:  relation "-" does not exist
+ERROR:  relation "-" not found
 SELECT count(*) FROM dbms_stats.column_stats_locked;
  count 
 -------
@@ -2455,7 +2455,7 @@ SELECT count(*) FROM dbms_stats.relation_stats_locked;
 -- No.9-1-11
 DELETE FROM dbms_stats._relation_stats_locked;
 SELECT dbms_stats.restore(1, 's0.st0', NULL);
-ERROR:  relation "s0.st0" does not exist in previous backup
+ERROR:  statistics of relation "s0.st0" not found in any backups before backup id = 1
 SELECT count(*) FROM dbms_stats.column_stats_locked;
  count 
 -------
@@ -2471,7 +2471,7 @@ SELECT count(*) FROM dbms_stats.relation_stats_locked;
 -- No.9-1-12
 DELETE FROM dbms_stats._relation_stats_locked;
 SELECT dbms_stats.restore(2, 's0.st0', 'dummy');
-ERROR:  column "dummy" of "s0.st0" does not exist
+ERROR:  column "dummy" not found in relation s0.st0
 SELECT count(*) FROM dbms_stats.column_stats_locked;
  count 
 -------
@@ -2487,7 +2487,7 @@ SELECT count(*) FROM dbms_stats.relation_stats_locked;
 -- No.9-1-13
 DELETE FROM dbms_stats._relation_stats_locked;
 SELECT dbms_stats.restore(1, 's0.st0', 'id');
-ERROR:  relation "s0.st0" does not exist in previous backup
+ERROR:  statistics of relation "s0.st0" not found in any backups before backup id = 1
 SELECT count(*) FROM dbms_stats.column_stats_locked;
  count 
 -------
@@ -2504,7 +2504,7 @@ SELECT count(*) FROM dbms_stats.relation_stats_locked;
 DELETE FROM dbms_stats._relation_stats_locked;
 ALTER TABLE s1.st0 DROP COLUMN id;
 SELECT dbms_stats.restore(2, 's1.st0', 'id');
-ERROR:  column "id" of "s1.st0" does not exist
+ERROR:  column "id" not found in relation s1.st0
 SELECT relid::regclass FROM dbms_stats.relation_stats_locked
  GROUP BY relid
  ORDER BY relid;
@@ -3199,10 +3199,10 @@ CONTEXT:  PL/pgSQL function dbms_stats.restore_schema_stats(text,timestamp with 
 --#No.10-2-8 is skipped after lock tests
 -- No.10-2-9
 SELECT dbms_stats.restore_schema_stats('s00', '2012-02-29 23:59:57');
-ERROR:  schema "s00" does not exist
+ERROR:  schema "s00" not found
 -- No.10-2-10
 SELECT dbms_stats.restore_schema_stats('pg_catalog', '2012-02-29 23:59:57');
-ERROR:  can not restore statistics of relation in system schema "pg_catalog"
+ERROR:  restoring statistics is inhibited for system schemas: "pg_catalog"
 /*
  * No.10-7 dbms_stats.restore_stats
  */
@@ -3216,7 +3216,7 @@ SELECT dbms_stats.restore_stats(NULL);
 -- No.10-7-2
 DELETE FROM dbms_stats._relation_stats_locked;
 SELECT dbms_stats.restore_stats(0);
-ERROR:  backup id 0 does not exist
+ERROR:  backup id 0 not found
 -- No.10-7-3
 DELETE FROM dbms_stats._relation_stats_locked;
 BEGIN;
@@ -3476,7 +3476,7 @@ SELECT * FROM columns_locked_v;
 -- No.11-1-1
 DELETE FROM dbms_stats._relation_stats_locked;
 SELECT dbms_stats.lock(NULL, NULL);
-ERROR:  relation is required
+ERROR:  relation required
 -- No.11-1-2
 ALTER FUNCTION dbms_stats.lock(relid regclass)
     RENAME TO truth_lock;
@@ -3504,7 +3504,7 @@ ALTER FUNCTION dbms_stats.truth_lock(relid regclass)
 -- No.11-1-3
 DELETE FROM dbms_stats._relation_stats_locked;
 SELECT dbms_stats.lock(NULL, 'id');
-ERROR:  relation is required
+ERROR:  relation required
 -- No.11-1-4
 DELETE FROM dbms_stats._relation_stats_locked;
 SELECT dbms_stats.lock('s0.st0', 'id');
@@ -3529,7 +3529,7 @@ SELECT * FROM columns_locked_v c;
 -- No.11-1-5
 DELETE FROM dbms_stats._relation_stats_locked;
 SELECT dbms_stats.lock(0, 'id');
-ERROR:  relation "-" does not exist
+ERROR:  relation "-" not found
 -- No.11-1-6
 DELETE FROM dbms_stats._relation_stats_locked;
 SELECT dbms_stats.lock('s0.st0', 'id');
@@ -3554,11 +3554,11 @@ SELECT * FROM columns_locked_v c;
 -- No.11-1-7
 DELETE FROM dbms_stats._relation_stats_locked;
 SELECT dbms_stats.lock('pg_toast.pg_toast_2618', 'id');
-ERROR:  "pg_toast.pg_toast_2618" is not a table nor an index
+ERROR:  "pg_toast.pg_toast_2618" must be a table or an index
 -- No.11-1-8
 DELETE FROM dbms_stats._relation_stats_locked;
 SELECT dbms_stats.lock('s0.st0_idx', 'id');
-ERROR:  "s0.st0_idx" is not an indexes on expressions
+ERROR:  "s0.st0_idx" must be an expression index
 -- No.11-1-9
 DELETE FROM dbms_stats._relation_stats_locked;
 SELECT dbms_stats.lock('st1_exp', 'lower');
@@ -3583,11 +3583,11 @@ DELETE FROM dbms_stats._relation_stats_locked;
 -- No.11-1-10
 DELETE FROM dbms_stats._relation_stats_locked;
 SELECT dbms_stats.lock('s0.ss0', 'id');
-ERROR:  "s0.ss0" is not a table nor an index
+ERROR:  "s0.ss0" must be a table or an index
 -- No.11-1-11
 DELETE FROM dbms_stats._relation_stats_locked;
 SELECT dbms_stats.lock('s0.sc0', 'id');
-ERROR:  "s0.sc0" is not a table nor an index
+ERROR:  "s0.sc0" must be a table or an index
 -- No.11-1-12
 DELETE FROM dbms_stats._relation_stats_locked;
 SELECT dbms_stats.lock('s0.sft0', 'id');
@@ -3631,17 +3631,17 @@ SELECT * FROM columns_locked_v c;
 -- No.11-1-14
 DELETE FROM dbms_stats._relation_stats_locked;
 SELECT dbms_stats.lock('pg_catalog.pg_class', 'id');
-ERROR:  can not lock statistics of system catalog "pg_class"
+ERROR:  locking statistics is inhibited for system catalogs: "pg_class"
 -- No.11-1-15
 DELETE FROM dbms_stats._relation_stats_locked;
 SELECT dbms_stats.lock('s0.st0', 'dummy');
-ERROR:  column "dummy" of "s0.st0" does not exist
+ERROR:  column "dummy" not found in relation "s0.st0"
 -- No.11-1-16
 DELETE FROM dbms_stats._relation_stats_locked;
 DELETE FROM pg_statistic
  WHERE starelid = 's0.st0'::regclass;
 SELECT dbms_stats.lock('s0.st0', 'id');
-ERROR:  no statistic for column "id" of relation "s0.st0" exists
+ERROR:  no statistics available for column "id" of relation "s0.st0"
 VACUUM ANALYZE;
 -- No.11-1-17
 DELETE FROM dbms_stats._relation_stats_locked;
@@ -3773,11 +3773,11 @@ COMMIT;
 -- No.11-2-2
 DELETE FROM dbms_stats._relation_stats_locked;
 SELECT dbms_stats.lock(NULL);
-ERROR:  relation is required
+ERROR:  relation required
 -- No.11-2-3
 DELETE FROM dbms_stats._relation_stats_locked;
 SELECT dbms_stats.lock('0');
-ERROR:  relation "-" does not exist
+ERROR:  relation "-" not found
 -- No.11-2-4
 DELETE FROM dbms_stats._relation_stats_locked;
 SELECT dbms_stats.lock('s0.st0');
@@ -3804,8 +3804,8 @@ SELECT * FROM columns_locked_v c;
 -- No.11-2-5
 DELETE FROM dbms_stats._relation_stats_locked;
 SELECT dbms_stats.lock('pg_toast.pg_toast_2618');
-ERROR:  can not lock statistics of "pg_toast.pg_toast_2618" with relkind "t"
-HINT:  only tables and indexes are supported
+ERROR:  locking statistics is not allowed for relations with relkind "t": "pg_toast.pg_toast_2618"
+HINT:  Only tables(r, m, f) and indexes(i) are lockable.
 -- No.11-2-6
 DELETE FROM dbms_stats._relation_stats_locked;
 SELECT dbms_stats.lock('s0.st0_idx');
@@ -3828,13 +3828,13 @@ SELECT * FROM columns_locked_v c;
 -- No.11-2-7
 DELETE FROM dbms_stats._relation_stats_locked;
 SELECT dbms_stats.lock('s0.ss0');
-ERROR:  can not lock statistics of "s0.ss0" with relkind "S"
-HINT:  only tables and indexes are supported
+ERROR:  locking statistics is not allowed for relations with relkind "S": "s0.ss0"
+HINT:  Only tables(r, m, f) and indexes(i) are lockable.
 -- No.11-2-8
 DELETE FROM dbms_stats._relation_stats_locked;
 SELECT dbms_stats.lock('s0.sc0');
-ERROR:  can not lock statistics of "s0.sc0" with relkind "c"
-HINT:  only tables and indexes are supported
+ERROR:  locking statistics is not allowed for relations with relkind "c": "s0.sc0"
+HINT:  Only tables(r, m, f) and indexes(i) are lockable.
 -- No.11-2-9
 DELETE FROM dbms_stats._relation_stats_locked;
 SELECT dbms_stats.lock('s0.sft0');
@@ -3880,7 +3880,7 @@ SELECT * FROM columns_locked_v c;
 -- No.11-2-11
 DELETE FROM dbms_stats._relation_stats_locked;
 SELECT dbms_stats.lock('pg_catalog.pg_class');
-ERROR:  can not lock statistics of system catalog "pg_class"
+ERROR:  locking statistics is not allowed for system catalogs: "pg_class"
 -- No.11-2-12
 DELETE FROM dbms_stats._relation_stats_locked;
 SELECT dbms_stats.lock_table_stats('s0.st0');
@@ -4060,10 +4060,10 @@ CONTEXT:  PL/pgSQL function dbms_stats.lock_schema_stats(text) line 10 at RETURN
 
 -- No.12-2-2
 SELECT dbms_stats.lock_schema_stats('s00');
-ERROR:  schema "s00" does not exist
+ERROR:  schema "s00" not found
 -- No.12-2-3
 SELECT dbms_stats.lock_schema_stats('pg_catalog');
-ERROR:  can not lock statistics of relation in system schema "pg_catalog"
+ERROR:  locking statistics is not allowed for system schemas: "pg_catalog"
 /*
  * No.12-3 dbms_stats.lock_table_stats(regclass)
  */
@@ -4845,7 +4845,7 @@ SELECT starelid, attname, stainherit FROM columns_locked_v c;
 (19 rows)
 
 SELECT dbms_stats.unlock('s0.st0', 'dummy');
-ERROR:  column "dummy" of "s0.st0" does not exist
+ERROR:  column "dummy" not found in relation "s0.st0"
 SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  GROUP BY relid
  ORDER BY relid;
@@ -5047,7 +5047,7 @@ SELECT starelid::regclass, staattnum FROM dbms_stats._column_stats_locked
 (17 rows)
 
 SELECT dbms_stats.unlock(NULL, 'id');
-ERROR:  relation is required
+ERROR:  relation required
 SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  GROUP BY relid
  ORDER BY relid;
@@ -6050,7 +6050,7 @@ SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
 (9 rows)
 
 SELECT dbms_stats.unlock_schema_stats('s00');
-ERROR:  schema "s00" does not exist
+ERROR:  schema "s00" not found
 SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  GROUP BY relid
  ORDER BY relid;
@@ -6153,7 +6153,7 @@ SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
 (9 rows)
 
 SELECT dbms_stats.unlock_schema_stats('pg_catalog');
-ERROR:  can not unlock statistics of relation in system schema "pg_catalog"
+ERROR:  unlocking statistics is not allowed for system schemas: "pg_catalog"
 SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  GROUP BY relid
  ORDER BY relid;
@@ -8669,7 +8669,7 @@ SELECT starelid, attname, stainherit FROM columns_locked_v c;
 (19 rows)
 
 SELECT dbms_stats.unlock_column_stats('s0.st0', 'dummy');
-ERROR:  column "dummy" of "s0.st0" does not exist
+ERROR:  column "dummy" not found in relation "s0.st0"
 SELECT starelid, attname, stainherit FROM columns_locked_v c;
  starelid | attname | stainherit 
 ----------+---------+------------
@@ -9665,7 +9665,7 @@ SELECT starelid, attname, stainherit FROM columns_locked_v c;
 (19 rows)
 
 SELECT dbms_stats.unlock_column_stats('s0', 'st0', 'dummy');
-ERROR:  column "dummy" of "s0.st0" does not exist
+ERROR:  column "dummy" not found in relation "s0.st0"
 SELECT starelid, attname, stainherit FROM columns_locked_v c;
  starelid | attname | stainherit 
 ----------+---------+------------

@@ -327,7 +327,7 @@ CREATE TRIGGER invalidate_column_cache
     FOR EACH ROW EXECUTE PROCEDURE dbms_stats.invalidate_column_cache();
 
 --
--- BACKUP_STATS: Statistic backup functions
+-- BACKUP_STATS: Statistics backup functions
 --
 
 CREATE FUNCTION dbms_stats.backup(
@@ -376,30 +376,30 @@ DECLARE
     unit_type       char;
 BEGIN
     IF $1 IS NULL AND $2 IS NOT NULL THEN
-        RAISE EXCEPTION 'relation is required';
+        RAISE EXCEPTION 'relation required';
     END IF;
     IF $1 IS NOT NULL THEN
         SELECT relkind INTO backup_relkind
           FROM pg_catalog.pg_class WHERE oid = $1;
         IF NOT FOUND THEN
-            RAISE EXCEPTION 'relation "%" does not exist', $1;
+            RAISE EXCEPTION 'relation "%" not found', $1;
         END IF;
         IF NOT dbms_stats.is_target_relkind(backup_relkind) THEN
-            RAISE EXCEPTION 'can not backup statistics of "%" with relkind "%"',
-				$1, backup_relkind
-				USING HINT = 'only tables and indexes are supported';
+            RAISE EXCEPTION 'relation of relkind "%" cannot have statistics to backup: "%"',
+				backup_relkind, $1
+				USING HINT = 'Only tables(r), foreign tables(f) and indexes(i) are allowed.';
         END IF;
         IF dbms_stats.is_system_catalog($1) THEN
-            RAISE EXCEPTION 'can not backup statistics of system catalog "%"', $1;
+            RAISE EXCEPTION 'backing up statistics is inhibited for system catalogs: "%"', $1;
         END IF;
         IF $2 IS NOT NULL THEN
             SELECT a.attnum INTO set_attnum FROM pg_catalog.pg_attribute a
              WHERE a.attrelid = $1 AND a.attname = $2;
             IF set_attnum IS NULL THEN
-                RAISE EXCEPTION 'column "%" of "%" does not exist', $2, $1;
+                RAISE EXCEPTION 'column "%" not found in relation "%"', $2, $1;
             END IF;
             IF NOT EXISTS(SELECT * FROM dbms_stats.column_stats_effective WHERE starelid = $1 AND staattnum = set_attnum) THEN
-                RAISE EXCEPTION 'no statistic for column "%" of "%" exists', $2, $1;
+                RAISE EXCEPTION 'no statistics available for column "%" of relation "%"', $2, $1;
             END IF;
             unit_type = 'c';
         ELSE
@@ -434,10 +434,10 @@ DECLARE
     backup_id       int8;
 BEGIN
     IF NOT EXISTS(SELECT * FROM pg_namespace WHERE nspname = $1) THEN
-        RAISE EXCEPTION 'schema "%" does not exist', $1;
+        RAISE EXCEPTION 'schema "%" not found', $1;
     END IF;
     IF dbms_stats.is_system_schema($1) THEN
-        RAISE EXCEPTION 'can not backup statistics of relation in system schema "%"', $1;
+        RAISE EXCEPTION 'backing up statistics is inhibited for system schemas: "%"', $1;
     END IF;
 
     INSERT INTO dbms_stats.backup_history(time, unit, comment)
@@ -500,7 +500,7 @@ $$
 LANGUAGE sql;
 
 --
--- RESTORE_STATS: Statistic restore functions
+-- RESTORE_STATS: Statistics restore functions
 --
 CREATE FUNCTION dbms_stats.restore(
     backup_id int8,
@@ -518,30 +518,30 @@ DECLARE
     cur_type        regtype;
 BEGIN
     IF $1 IS NULL THEN
-        RAISE EXCEPTION 'backup id is required';
+        RAISE EXCEPTION 'backup id required';
     END IF;
     IF $2 IS NULL AND $3 IS NOT NULL THEN
-        RAISE EXCEPTION 'relation is required';
+        RAISE EXCEPTION 'relation required';
     END IF;
     IF NOT EXISTS(SELECT * FROM dbms_stats.backup_history WHERE id <= $1) THEN
-        RAISE EXCEPTION 'backup id % does not exist', $1;
+        RAISE EXCEPTION 'backup id % not found', $1;
     END IF;
     IF $2 IS NOT NULL THEN
         IF NOT EXISTS(SELECT * FROM pg_catalog.pg_class WHERE oid = $2) THEN
-            RAISE EXCEPTION 'relation "%" does not exist', $2;
+            RAISE EXCEPTION 'relation "%" not found', $2;
         END IF;
         IF NOT EXISTS(SELECT * FROM dbms_stats.relation_stats_backup b
                        WHERE b.id <= $1 AND b.relid = $2) THEN
-            RAISE EXCEPTION 'relation "%" does not exist in previous backup', $2;
+            RAISE EXCEPTION 'statistics of relation "%" not found in any backups before backup id = %', $2, $1;
         END IF;
         IF $3 IS NOT NULL THEN
             SELECT a.attnum INTO set_attnum FROM pg_catalog.pg_attribute a
              WHERE a.attrelid = $2 AND a.attname = $3;
             IF set_attnum IS NULL THEN
-				RAISE EXCEPTION 'column "%" of "%" does not exist', $3, $2;
+				RAISE EXCEPTION 'column "%" not found in relation %', $3, $2;
             END IF;
             IF NOT EXISTS(SELECT * FROM dbms_stats.column_stats_backup WHERE id <= $1 AND starelid = $2 AND staattnum = set_attnum) THEN
-                RAISE EXCEPTION 'column "%" of "%" does not exist in previous backup',$3, $2;
+                RAISE EXCEPTION 'statistics of column "%" of relation "%" are not found in any backups before',$3, $2, $1;
             END IF;
         END IF;
     END IF;
@@ -616,8 +616,8 @@ BEGIN
               FROM pg_catalog.pg_attribute a
              WHERE a.attrelid = restore_relid
                AND a.attnum = restore_attnum;
-            RAISE WARNING 'skip "%.%" because of type mismatch: "%" in backup and "%" in database',
-                restore_relid, restore_attname, restore_type, cur_type;
+            RAISE WARNING 'data type of column "%.%" is inconsistent between database(%) and backup (%). Skip.',
+                restore_relid, restore_attname, cur_type, restore_type;
         ELSE
             DELETE FROM dbms_stats._column_stats_locked
              WHERE starelid = restore_relid
@@ -663,10 +663,10 @@ CREATE FUNCTION dbms_stats.restore_schema_stats(
 $$
 BEGIN
     IF NOT EXISTS(SELECT * FROM pg_namespace WHERE nspname = $1) THEN
-        RAISE EXCEPTION 'schema "%" does not exist', $1;
+        RAISE EXCEPTION 'schema "%" not found', $1;
     END IF;
     IF dbms_stats.is_system_schema($1) THEN
-		RAISE EXCEPTION 'can not restore statistics of relation in system schema "%"', $1;
+        RAISE EXCEPTION 'restoring statistics is inhibited for system schemas: "%"', $1;
     END IF;
 
     RETURN QUERY
@@ -742,7 +742,7 @@ DECLARE
     cur_type        regtype;
 BEGIN
     IF NOT EXISTS(SELECT * FROM dbms_stats.backup_history WHERE id = $1) THEN
-        RAISE EXCEPTION 'backup id % does not exist', $1;
+        RAISE EXCEPTION 'backup id % not found', $1;
     END IF;
 
     LOCK dbms_stats._relation_stats_locked IN SHARE UPDATE EXCLUSIVE MODE;
@@ -798,8 +798,8 @@ BEGIN
               FROM pg_catalog.pg_attribute
              WHERE attrelid = restore_relid
                AND attnum = restore_attnum;
-            RAISE WARNING 'skip "%.%" because of type mismatch: "%" in backup and "%" in database',
-                restore_relid, restore_attname, restore_type, cur_type;
+            RAISE WARNING 'data type of column "%.%" is inconsistent between database(%) and backup (%). Skip.',
+                restore_relid, restore_attname, cur_type, restore_type;
         ELSE
             DELETE FROM dbms_stats._column_stats_locked
              WHERE starelid = restore_relid
@@ -823,7 +823,7 @@ $$
 LANGUAGE plpgsql STRICT;
 
 --
--- LOCK_STATS: Statistic lock functions
+-- LOCK_STATS: Statistics lock functions
 --
 
 CREATE FUNCTION dbms_stats.lock(
@@ -837,28 +837,28 @@ DECLARE
     r            record;
 BEGIN
     IF $1 IS NULL THEN
-        RAISE EXCEPTION 'relation is required';
+        RAISE EXCEPTION 'relation required';
     END IF;
     IF $2 IS NULL THEN
         RETURN dbms_stats.lock($1);
     END IF;
     SELECT relkind INTO lock_relkind FROM pg_catalog.pg_class WHERE oid = $1;
     IF NOT FOUND THEN
-        RAISE EXCEPTION 'relation "%" does not exist', $1;
+        RAISE EXCEPTION 'relation "%" not found', $1;
     END IF;
     IF NOT dbms_stats.is_target_relkind(lock_relkind) THEN
-        RAISE EXCEPTION '"%" is not a table nor an index', $1;
+        RAISE EXCEPTION '"%" must be a table or an index', $1;
     END IF;
     IF EXISTS(SELECT * FROM pg_catalog.pg_index WHERE lock_relkind = 'i' AND indexrelid = $1 AND indexprs IS NULL) THEN
-        RAISE EXCEPTION '"%" is not an indexes on expressions', $1;
+        RAISE EXCEPTION '"%" must be an expression index', $1;
     END IF;
     IF dbms_stats.is_system_catalog($1) THEN
-		RAISE EXCEPTION 'can not lock statistics of system catalog "%"', $1;
+		RAISE EXCEPTION 'locking statistics is inhibited for system catalogs: "%"', $1;
     END IF;
     SELECT a.attnum INTO set_attnum FROM pg_catalog.pg_attribute a
      WHERE a.attrelid = $1 AND a.attname = $2;
     IF set_attnum IS NULL THEN
-        RAISE EXCEPTION 'column "%" of "%" does not exist', $2, $1;
+        RAISE EXCEPTION 'column "%" not found in relation "%"', $2, $1;
     END IF;
 
     LOCK dbms_stats._relation_stats_locked IN SHARE UPDATE EXCLUSIVE MODE;
@@ -952,7 +952,7 @@ BEGIN
 
 		/* If we don't have statistic at all, raise error. */
         IF NOT FOUND THEN
-			RAISE EXCEPTION 'no statistic for column "%" of "%" exists', $2, $1::regclass;
+			RAISE EXCEPTION 'no statistics available for column "%" of relation "%"', $2, $1::regclass;
 		END IF;
 
     RETURN $1;
@@ -968,18 +968,18 @@ DECLARE
     i            record;
 BEGIN
     IF $1 IS NULL THEN
-        RAISE EXCEPTION 'relation is required';
+        RAISE EXCEPTION 'relation required';
     END IF;
     SELECT relkind INTO lock_relkind FROM pg_catalog.pg_class WHERE oid = $1;
     IF NOT FOUND THEN
-        RAISE EXCEPTION 'relation "%" does not exist', $1;
+        RAISE EXCEPTION 'relation "%" not found', $1;
     END IF;
     IF NOT dbms_stats.is_target_relkind(lock_relkind) THEN
-        RAISE EXCEPTION 'can not lock statistics of "%" with relkind "%"', $1, lock_relkind
-			USING HINT = 'only tables and indexes are supported';
+        RAISE EXCEPTION 'locking statistics is not allowed for relations with relkind "%": "%"', lock_relkind, $1
+			USING HINT = 'Only tables(r, f) and indexes(i) are lockable.';
     END IF;
     IF dbms_stats.is_system_catalog($1) THEN
-		RAISE EXCEPTION 'can not lock statistics of system catalog "%"', $1;
+		RAISE EXCEPTION 'locking statistics is not allowed for system catalogs: "%"', $1;
     END IF;
 
     LOCK dbms_stats._relation_stats_locked IN SHARE UPDATE EXCLUSIVE MODE;
@@ -1115,10 +1115,10 @@ CREATE FUNCTION dbms_stats.lock_schema_stats(
 $$
 BEGIN
     IF NOT EXISTS(SELECT * FROM pg_namespace WHERE nspname = $1) THEN
-        RAISE EXCEPTION 'schema "%" does not exist', $1;
+        RAISE EXCEPTION 'schema "%" not found', $1;
     END IF;
     IF dbms_stats.is_system_schema($1) THEN
-        RAISE EXCEPTION 'can not lock statistics of relation in system schema "%"', $1;
+        RAISE EXCEPTION 'locking statistics is not allowed for system schemas: "%"', $1;
     END IF;
 
     RETURN QUERY
@@ -1183,12 +1183,12 @@ DECLARE
     unlock_id  int8;
 BEGIN
     IF $1 IS NULL AND $2 IS NOT NULL THEN
-        RAISE EXCEPTION 'relation is required';
+        RAISE EXCEPTION 'relation required';
     END IF;
     SELECT a.attnum INTO set_attnum FROM pg_catalog.pg_attribute a
      WHERE a.attrelid = $1 AND a.attname = $2;
     IF $2 IS NOT NULL AND set_attnum IS NULL THEN
-        RAISE EXCEPTION 'column "%" of "%" does not exist', $2, $1;
+        RAISE EXCEPTION 'column "%" not found in relation "%"', $2, $1;
     END IF;
 
     LOCK dbms_stats._relation_stats_locked IN SHARE UPDATE EXCLUSIVE MODE;
@@ -1246,10 +1246,10 @@ DECLARE
     unlock_id int8;
 BEGIN
     IF NOT EXISTS(SELECT * FROM pg_namespace WHERE nspname = $1) THEN
-        RAISE EXCEPTION 'schema "%" does not exist', $1;
+        RAISE EXCEPTION 'schema "%" not found', $1;
     END IF;
     IF dbms_stats.is_system_schema($1) THEN
-        RAISE EXCEPTION 'can not unlock statistics of relation in system schema "%"', $1;
+        RAISE EXCEPTION 'unlocking statistics is not allowed for system schemas: "%"', $1;
     END IF;
 
     LOCK dbms_stats._relation_stats_locked IN SHARE UPDATE EXCLUSIVE MODE;
@@ -1310,7 +1310,7 @@ BEGIN
     SELECT a.attnum INTO set_attnum FROM pg_catalog.pg_attribute a
      WHERE a.attrelid = $1 AND a.attname = $2;
     IF $2 IS NOT NULL AND set_attnum IS NULL THEN
-        RAISE EXCEPTION 'column "%" of "%" does not exist', $2, $1;
+        RAISE EXCEPTION 'column "%" not found in relation "%"', $2, $1;
     END IF;
 
     LOCK dbms_stats._relation_stats_locked IN SHARE UPDATE EXCLUSIVE MODE;
@@ -1338,7 +1338,7 @@ BEGIN
      WHERE a.attrelid = dbms_stats.relname($1, $2)::regclass
        AND a.attname = $3;
     IF $3 IS NOT NULL AND set_attnum IS NULL THEN
-		RAISE EXCEPTION 'column "%" of "%.%" does not exist', $3, $1, $2;
+		RAISE EXCEPTION 'column "%" not found in relation "%.%"', $3, $1, $2;
     END IF;
 
     LOCK dbms_stats._relation_stats_locked IN SHARE UPDATE EXCLUSIVE MODE;
@@ -1436,10 +1436,10 @@ DECLARE
     deleted   dbms_stats.backup_history;
 BEGIN
     IF $1 IS NULL THEN
-        RAISE EXCEPTION 'backup id is required';
+        RAISE EXCEPTION 'backup id required';
     END IF;
     IF $2 IS NULL THEN
-        RAISE EXCEPTION 'force is not null';
+        RAISE EXCEPTION 'NULL is not allowed as the second parameter';
     END IF;
 
     LOCK dbms_stats.backup_history IN SHARE UPDATE EXCLUSIVE MODE;
@@ -1447,14 +1447,14 @@ BEGIN
     LOCK dbms_stats.column_stats_backup IN SHARE UPDATE EXCLUSIVE MODE;
 
     IF NOT EXISTS(SELECT * FROM dbms_stats.backup_history WHERE id = $1) THEN
-        RAISE EXCEPTION 'backup id % does not exist', $1;
+        RAISE EXCEPTION 'backup id % not found', $1;
     END IF;
     IF NOT $2 AND NOT EXISTS(SELECT *
                                FROM dbms_stats.backup_history
                               WHERE unit = 'd'
                                 AND id > $1) THEN
-        RAISE WARNING 'at least one database-wise backup must be remain'
-			USING HINT = 'use true as 2nd parameter, if you want to purge forcibly';
+        RAISE WARNING 'no database-wide backup will remain after purge'
+			USING HINT = 'Give true for second parameter to purge forcibly.';
         RETURN;
     END IF;
 
@@ -1488,7 +1488,7 @@ BEGIN
 
 	-- We don't have to check that table-level dummy statistic of the table
 	-- exists here, because the foreign key constraints defined on column-level
-	-- dummy static table eusures that.
+	-- dummy static table ensures that.
 	FOR clean_rel_col, clean_relid, clean_attnum, clean_inherit IN
 		SELECT r.relname || ', ' || v.staattnum::text,
 			   v.starelid, v.staattnum, v.stainherit

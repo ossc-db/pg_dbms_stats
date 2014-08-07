@@ -2068,13 +2068,13 @@ SELECT * FROM dbms_stats.backup_history;
 
 -- No.15-1-6
 SELECT id, unit, comment FROM dbms_stats.purge_stats(NULL);
-ERROR:  backup id is required
+ERROR:  backup id required
 -- No.15-1-7
 SELECT id, unit, comment FROM dbms_stats.purge_stats(-1);
-ERROR:  backup id -1 does not exist
+ERROR:  backup id -1 not found
 -- No.15-1-8
 SELECT id, unit, comment FROM dbms_stats.purge_stats(2, NULL);
-ERROR:  force is not null
+ERROR:  NULL is not allowed as the second parameter
 -- No.15-1-4
 SELECT * FROM dbms_stats.backup_history;
  id |                time                 | unit | comment 
@@ -2115,8 +2115,8 @@ SELECT * FROM dbms_stats.backup_history;
 (5 rows)
 
 SELECT id, unit, comment FROM dbms_stats.purge_stats(6);
-WARNING:  at least one database-wise backup must be remain
-HINT:  use true as 2nd parameter, if you want to purge forcibly
+WARNING:  no database-wide backup will remain after purge
+HINT:  Give true for second parameter to purge forcibly.
  id | unit | comment 
 ----+------+---------
 (0 rows)
@@ -2143,8 +2143,8 @@ SELECT * FROM dbms_stats.backup_history;
 (5 rows)
 
 SELECT id, unit, comment FROM dbms_stats.purge_stats(8);
-WARNING:  at least one database-wise backup must be remain
-HINT:  use true as 2nd parameter, if you want to purge forcibly
+WARNING:  no database-wide backup will remain after purge
+HINT:  Give true for second parameter to purge forcibly.
  id | unit | comment 
 ----+------+---------
 (0 rows)

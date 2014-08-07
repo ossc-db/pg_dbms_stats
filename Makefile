@@ -2,7 +2,7 @@
 
 MODULE_big = pg_dbms_stats
 OBJS = pg_dbms_stats.o dump.o import.o
-DBMSSTATSVER = 1.3.2
+DBMSSTATSVER = 1.3.3
 DOCDIR = doc
 EXTDIR = ext_scripts
 
@@ -14,7 +14,7 @@ LAST_LIBPATH=$(shell echo $(LD_LIBRARY_PATH) | sed -e "s/^.*;//")
 CHECKING=$(shell echo $(LAST_LIBPATH)| grep './tmp_check/install/' | wc -l)
 
 EXTENSION = pg_dbms_stats
-DATA = pg_dbms_stats--1.3.2.sql pg_dbms_stats--1.0--1.3.2.sql
+DATA = pg_dbms_stats--1.3.3.sql pg_dbms_stats--1.0--1.3.2.sql pg_dbms_stats--1.3.2--1.3.3.sql
 
 REGRESS = init-common ut_fdw_init init-$(MAJORVERSION) ut-common \
 		  ut-$(MAJORVERSION)  ut_imp_exp-$(MAJORVERSION)
@@ -55,6 +55,9 @@ include $(top_srcdir)/contrib/contrib-global.mk
 endif
 
 ifeq "$(MAJORVERSION)" "9.4"
+MAJORVERSION=9.3
+endif
+ifeq "$(MAJORVERSION)" "9.5"
 MAJORVERSION=9.3
 endif
 

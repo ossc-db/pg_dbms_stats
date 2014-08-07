@@ -1425,8 +1425,7 @@ LANGUAGE sql;
 --
 -- PURGE_STATS: Statistic purge function
 --
-
-CREATE OR REPLACE FUNCTION dbms_stats.purge_stats(
+CREATE FUNCTION dbms_stats.purge_stats(
     backup_id int8,
     force bool DEFAULT false
 ) RETURNS SETOF dbms_stats.backup_history AS
@@ -1474,8 +1473,7 @@ LANGUAGE plpgsql;
 --
 -- CLEAN_STATS: Clean orphan dummy statistic
 --
-
-CREATE OR REPLACE FUNCTION dbms_stats.clean_up_stats() RETURNS SETOF text AS
+CREATE FUNCTION dbms_stats.clean_up_stats() RETURNS SETOF text AS
 $$
 DECLARE
 	clean_relid		Oid;

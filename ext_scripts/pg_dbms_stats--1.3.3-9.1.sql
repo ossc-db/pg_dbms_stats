@@ -1375,7 +1375,7 @@ CREATE FUNCTION dbms_stats.purge_stats(
 $$
 DECLARE
     delete_id int8;
-    deleted   dbms_stats.backup_history;
+    todelete   dbms_stats.backup_history;
 BEGIN
     IF $1 IS NULL THEN
         RAISE EXCEPTION 'backup id required';
@@ -1400,14 +1400,14 @@ BEGIN
         RETURN;
     END IF;
 
-    FOR deleted IN
+    FOR todelete IN
         SELECT * FROM dbms_stats.backup_history
          WHERE id <= $1
          ORDER BY id
     LOOP
         DELETE FROM dbms_stats.backup_history
-         WHERE id = deleted.id;
-        RETURN NEXT deleted;
+         WHERE id = todelete.id;
+        RETURN NEXT todelete;
     END LOOP;
 END;
 $$

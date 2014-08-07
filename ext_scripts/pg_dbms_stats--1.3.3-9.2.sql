@@ -866,7 +866,7 @@ BEGIN
 
 	/*
 	 * If we don't have per-table statistics, create new one which has NULL for
-	 * every statistic column_stats_effective.
+	 * every statistic value for column_stats_effective.
 	 */
     IF NOT EXISTS(SELECT * FROM dbms_stats._relation_stats_locked ru
                    WHERE ru.relid = $1) THEN
@@ -950,7 +950,7 @@ BEGIN
         END IF;
         END LOOP;
 
-		/* If we don't have statistic at all, raise error. */
+		/* If we don't have statistics at all, raise error. */
         IF NOT FOUND THEN
 			RAISE EXCEPTION 'no statistics available for column "%" of relation "%"', $2, $1::regclass;
 		END IF;
@@ -1170,7 +1170,7 @@ $$
 LANGUAGE sql STRICT;
 
 --
--- UNLOCK_STATS: Statistic unlock functions
+-- UNLOCK_STATS: Statistics unlock functions
 --
 
 CREATE FUNCTION dbms_stats.unlock(
@@ -1354,7 +1354,7 @@ $$
 LANGUAGE plpgsql STRICT;
 
 --
--- IMPORT_STATS: Statistic import functions
+-- IMPORT_STATS: Statistics import functions
 --
 
 CREATE FUNCTION dbms_stats.import(
@@ -1423,7 +1423,7 @@ $$
 LANGUAGE sql;
 
 --
--- PURGE_STATS: Statistic purge function
+-- PURGE_STATS: Statistics purge function
 --
 
 CREATE FUNCTION dbms_stats.purge_stats(
@@ -1472,7 +1472,7 @@ $$
 LANGUAGE plpgsql;
 
 --
--- CLEAN_STATS: Clean orphan dummy statistic
+-- CLEAN_STATS: Clean orphan dummy statistics
 --
 
 CREATE FUNCTION dbms_stats.clean_up_stats() RETURNS SETOF text AS
@@ -1486,7 +1486,7 @@ BEGIN
     LOCK dbms_stats._relation_stats_locked IN SHARE UPDATE EXCLUSIVE MODE;
     LOCK dbms_stats._column_stats_locked IN SHARE UPDATE EXCLUSIVE MODE;
 
-	-- We don't have to check that table-level dummy statistic of the table
+	-- We don't have to check that table-level dummy statistics of the table
 	-- exists here, because the foreign key constraints defined on column-level
 	-- dummy static table ensures that.
 	FOR clean_rel_col, clean_relid, clean_attnum, clean_inherit IN

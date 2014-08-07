@@ -1790,7 +1790,7 @@ CONTEXT:  SQL statement "SELECT dbms_stats.backup(backup_id, cn.oid, NULL)
                AND dbms_stats.is_target_relkind(c.relkind)
              ORDER BY c.oid
            ) cn"
-PL/pgSQL function dbms_stats.backup_schema_stats(text,text) line 16 at PERFORM
+PL/pgSQL function dbms_stats.backup_schema_stats(text,text) line 17 at PERFORM
 NOTICE:  arguments are 9, s0.st0_idx, <NULL>
 CONTEXT:  SQL statement "SELECT dbms_stats.backup(backup_id, cn.oid, NULL)
       FROM (SELECT c.oid
@@ -1801,7 +1801,7 @@ CONTEXT:  SQL statement "SELECT dbms_stats.backup(backup_id, cn.oid, NULL)
                AND dbms_stats.is_target_relkind(c.relkind)
              ORDER BY c.oid
            ) cn"
-PL/pgSQL function dbms_stats.backup_schema_stats(text,text) line 16 at PERFORM
+PL/pgSQL function dbms_stats.backup_schema_stats(text,text) line 17 at PERFORM
 NOTICE:  arguments are 9, s0.st1, <NULL>
 CONTEXT:  SQL statement "SELECT dbms_stats.backup(backup_id, cn.oid, NULL)
       FROM (SELECT c.oid
@@ -1812,7 +1812,7 @@ CONTEXT:  SQL statement "SELECT dbms_stats.backup(backup_id, cn.oid, NULL)
                AND dbms_stats.is_target_relkind(c.relkind)
              ORDER BY c.oid
            ) cn"
-PL/pgSQL function dbms_stats.backup_schema_stats(text,text) line 16 at PERFORM
+PL/pgSQL function dbms_stats.backup_schema_stats(text,text) line 17 at PERFORM
 NOTICE:  arguments are 9, s0.st1_idx, <NULL>
 CONTEXT:  SQL statement "SELECT dbms_stats.backup(backup_id, cn.oid, NULL)
       FROM (SELECT c.oid
@@ -1823,7 +1823,7 @@ CONTEXT:  SQL statement "SELECT dbms_stats.backup(backup_id, cn.oid, NULL)
                AND dbms_stats.is_target_relkind(c.relkind)
              ORDER BY c.oid
            ) cn"
-PL/pgSQL function dbms_stats.backup_schema_stats(text,text) line 16 at PERFORM
+PL/pgSQL function dbms_stats.backup_schema_stats(text,text) line 17 at PERFORM
 NOTICE:  arguments are 9, s0.st2, <NULL>
 CONTEXT:  SQL statement "SELECT dbms_stats.backup(backup_id, cn.oid, NULL)
       FROM (SELECT c.oid
@@ -1834,7 +1834,7 @@ CONTEXT:  SQL statement "SELECT dbms_stats.backup(backup_id, cn.oid, NULL)
                AND dbms_stats.is_target_relkind(c.relkind)
              ORDER BY c.oid
            ) cn"
-PL/pgSQL function dbms_stats.backup_schema_stats(text,text) line 16 at PERFORM
+PL/pgSQL function dbms_stats.backup_schema_stats(text,text) line 17 at PERFORM
 NOTICE:  arguments are 9, s0.st2_idx, <NULL>
 CONTEXT:  SQL statement "SELECT dbms_stats.backup(backup_id, cn.oid, NULL)
       FROM (SELECT c.oid
@@ -1845,7 +1845,7 @@ CONTEXT:  SQL statement "SELECT dbms_stats.backup(backup_id, cn.oid, NULL)
                AND dbms_stats.is_target_relkind(c.relkind)
              ORDER BY c.oid
            ) cn"
-PL/pgSQL function dbms_stats.backup_schema_stats(text,text) line 16 at PERFORM
+PL/pgSQL function dbms_stats.backup_schema_stats(text,text) line 17 at PERFORM
 NOTICE:  arguments are 9, s0.sft0, <NULL>
 CONTEXT:  SQL statement "SELECT dbms_stats.backup(backup_id, cn.oid, NULL)
       FROM (SELECT c.oid
@@ -1856,7 +1856,7 @@ CONTEXT:  SQL statement "SELECT dbms_stats.backup(backup_id, cn.oid, NULL)
                AND dbms_stats.is_target_relkind(c.relkind)
              ORDER BY c.oid
            ) cn"
-PL/pgSQL function dbms_stats.backup_schema_stats(text,text) line 16 at PERFORM
+PL/pgSQL function dbms_stats.backup_schema_stats(text,text) line 17 at PERFORM
  backup_schema_stats 
 ---------------------
                    9
@@ -2105,17 +2105,16 @@ SELECT dbms_stats.restore(2, 's0.st0', NULL);
 (1 row)
 
 SELECT * FROM internal_locks;
-             relation              |           mode           
------------------------------------+--------------------------
- dbms_stats.backup_history         | AccessShareLock
+             relation              |       mode       
+-----------------------------------+------------------
+ dbms_stats.backup_history         | RowShareLock
  dbms_stats.column_stats_backup    | AccessShareLock
  dbms_stats._column_stats_locked   | RowExclusiveLock
- dbms_stats._column_stats_locked   | ShareUpdateExclusiveLock
  dbms_stats.relation_stats_backup  | AccessShareLock
+ dbms_stats.relation_stats_backup  | RowShareLock
  dbms_stats._relation_stats_locked | RowExclusiveLock
  dbms_stats._relation_stats_locked | RowShareLock
- dbms_stats._relation_stats_locked | ShareUpdateExclusiveLock
-(8 rows)
+(7 rows)
 
 COMMIT;
 SELECT relid::regclass FROM dbms_stats.relation_stats_locked
@@ -3114,16 +3113,16 @@ SELECT dbms_stats.restore_stats(2);
 (14 rows)
 
 SELECT * FROM internal_locks;
-             relation              |           mode           
------------------------------------+--------------------------
+             relation              |       mode       
+-----------------------------------+------------------
  dbms_stats.backup_history         | AccessShareLock
  dbms_stats.column_stats_backup    | AccessShareLock
  dbms_stats._column_stats_locked   | RowExclusiveLock
- dbms_stats._column_stats_locked   | ShareUpdateExclusiveLock
  dbms_stats.relation_stats_backup  | AccessShareLock
+ dbms_stats.relation_stats_backup  | RowShareLock
+ dbms_stats._relation_stats_locked | ExclusiveLock
  dbms_stats._relation_stats_locked | RowExclusiveLock
  dbms_stats._relation_stats_locked | RowShareLock
- dbms_stats._relation_stats_locked | ShareUpdateExclusiveLock
 (8 rows)
 
 COMMIT;
@@ -3586,16 +3585,14 @@ SELECT * FROM columns_locked_v c;
 (4 rows)
 
 SELECT * FROM internal_locks;
-             relation              |           mode           
------------------------------------+--------------------------
+             relation              |       mode       
+-----------------------------------+------------------
  dbms_stats._column_stats_locked   | AccessShareLock
  dbms_stats._column_stats_locked   | RowExclusiveLock
- dbms_stats._column_stats_locked   | ShareUpdateExclusiveLock
  dbms_stats._relation_stats_locked | AccessShareLock
  dbms_stats._relation_stats_locked | RowExclusiveLock
  dbms_stats._relation_stats_locked | RowShareLock
- dbms_stats._relation_stats_locked | ShareUpdateExclusiveLock
-(7 rows)
+(5 rows)
 
 COMMIT;
 -- No.11-2-2
@@ -5027,14 +5024,13 @@ SELECT dbms_stats.unlock();
 (15 rows)
 
 SELECT * FROM internal_locks;
-             relation              |           mode           
------------------------------------+--------------------------
+             relation              |       mode       
+-----------------------------------+------------------
  dbms_stats._column_stats_locked   | RowExclusiveLock
- dbms_stats._column_stats_locked   | ShareUpdateExclusiveLock
  dbms_stats._relation_stats_locked | AccessShareLock
  dbms_stats._relation_stats_locked | RowExclusiveLock
- dbms_stats._relation_stats_locked | ShareUpdateExclusiveLock
-(5 rows)
+ dbms_stats._relation_stats_locked | RowShareLock
+(4 rows)
 
 COMMIT;
 SELECT count(*) FROM dbms_stats._relation_stats_locked;
@@ -5312,14 +5308,13 @@ SELECT dbms_stats.unlock_database_stats();
 (15 rows)
 
 SELECT * FROM internal_locks;
-             relation              |           mode           
------------------------------------+--------------------------
+             relation              |       mode       
+-----------------------------------+------------------
  dbms_stats._column_stats_locked   | RowExclusiveLock
- dbms_stats._column_stats_locked   | ShareUpdateExclusiveLock
  dbms_stats._relation_stats_locked | AccessShareLock
+ dbms_stats._relation_stats_locked | ExclusiveLock
  dbms_stats._relation_stats_locked | RowExclusiveLock
- dbms_stats._relation_stats_locked | ShareUpdateExclusiveLock
-(5 rows)
+(4 rows)
 
 COMMIT;
 SELECT count(*) FROM dbms_stats._relation_stats_locked;
@@ -6080,14 +6075,12 @@ SELECT dbms_stats.unlock_schema_stats('s0');
 (7 rows)
 
 SELECT * FROM internal_locks;
-             relation              |           mode           
------------------------------------+--------------------------
+             relation              |       mode       
+-----------------------------------+------------------
  dbms_stats._column_stats_locked   | RowExclusiveLock
- dbms_stats._column_stats_locked   | ShareUpdateExclusiveLock
- dbms_stats._relation_stats_locked | AccessShareLock
  dbms_stats._relation_stats_locked | RowExclusiveLock
- dbms_stats._relation_stats_locked | ShareUpdateExclusiveLock
-(5 rows)
+ dbms_stats._relation_stats_locked | RowShareLock
+(3 rows)
 
 COMMIT;
 SELECT relid::regclass FROM dbms_stats._relation_stats_locked
@@ -6866,13 +6859,11 @@ SELECT dbms_stats.unlock_table_stats('s0.st0');
 (1 row)
 
 SELECT * FROM internal_locks;
-             relation              |           mode           
------------------------------------+--------------------------
+             relation              |       mode       
+-----------------------------------+------------------
  dbms_stats._column_stats_locked   | RowExclusiveLock
- dbms_stats._column_stats_locked   | ShareUpdateExclusiveLock
  dbms_stats._relation_stats_locked | RowExclusiveLock
- dbms_stats._relation_stats_locked | ShareUpdateExclusiveLock
-(4 rows)
+(2 rows)
 
 COMMIT;
 SELECT relid::regclass FROM dbms_stats._relation_stats_locked
@@ -7347,7 +7338,7 @@ SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
 
 SELECT dbms_stats.unlock_table_stats('s00', 's0');
 ERROR:  schema "s00" does not exist
-CONTEXT:  SQL function "unlock_table_stats" statement 3
+CONTEXT:  SQL function "unlock_table_stats" statement 1
 SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  GROUP BY relid
  ORDER BY relid;
@@ -7660,13 +7651,11 @@ SELECT dbms_stats.unlock_table_stats('s0', 'st0');
 (1 row)
 
 SELECT * FROM internal_locks;
-             relation              |           mode           
------------------------------------+--------------------------
+             relation              |       mode       
+-----------------------------------+------------------
  dbms_stats._column_stats_locked   | RowExclusiveLock
- dbms_stats._column_stats_locked   | ShareUpdateExclusiveLock
  dbms_stats._relation_stats_locked | RowExclusiveLock
- dbms_stats._relation_stats_locked | ShareUpdateExclusiveLock
-(4 rows)
+(2 rows)
 
 COMMIT;
 SELECT relid::regclass FROM dbms_stats._relation_stats_locked
@@ -8702,12 +8691,11 @@ SELECT dbms_stats.unlock_column_stats('s0.st0', 'id');
 (1 row)
 
 SELECT * FROM internal_locks;
-             relation              |           mode           
------------------------------------+--------------------------
+             relation              |       mode       
+-----------------------------------+------------------
  dbms_stats._column_stats_locked   | RowExclusiveLock
- dbms_stats._column_stats_locked   | ShareUpdateExclusiveLock
- dbms_stats._relation_stats_locked | ShareUpdateExclusiveLock
-(3 rows)
+ dbms_stats._relation_stats_locked | RowShareLock
+(2 rows)
 
 COMMIT;
 SELECT starelid, attname, stainherit FROM columns_locked_v c;
@@ -9624,12 +9612,11 @@ SELECT dbms_stats.unlock_column_stats('s0', 'st0', 'id');
 (1 row)
 
 SELECT * FROM internal_locks;
-             relation              |           mode           
------------------------------------+--------------------------
+             relation              |       mode       
+-----------------------------------+------------------
  dbms_stats._column_stats_locked   | RowExclusiveLock
- dbms_stats._column_stats_locked   | ShareUpdateExclusiveLock
- dbms_stats._relation_stats_locked | ShareUpdateExclusiveLock
-(3 rows)
+ dbms_stats._relation_stats_locked | RowShareLock
+(2 rows)
 
 COMMIT;
 SELECT starelid, attname, stainherit FROM columns_locked_v c;

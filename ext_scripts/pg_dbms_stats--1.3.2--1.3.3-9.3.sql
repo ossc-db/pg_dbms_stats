@@ -4,6 +4,43 @@
 \echo Use "ALTER EXTENSION pg_dbms_stats UPDATE TO '1.3.3'" to load this file. \quit
 
 CREATE OR REPLACE FUNCTION dbms_stats.backup(
+    backup_id int8,
+    relid regclass,
+    attnum int2
+) RETURNS int8 AS
+$$
+/* Lock the backup id */
+SELECT * from dbms_stats.backup_history
+    WHERE  id = $1 FOR UPDATE;
+
+INSERT INTO dbms_stats.relation_stats_backup
+    SELECT $1, v.relid, v.relname, v.relpages, v.reltuples, v.relallvisible,
+           v.curpages, v.last_analyze, v.last_autoanalyze
+      FROM pg_catalog.pg_class c,
+           dbms_stats.relation_stats_effective v
+     WHERE c.oid = v.relid
+       AND dbms_stats.is_target_relkind(relkind)
+       AND NOT dbms_stats.is_system_catalog(v.relid)
+       AND (v.relid = $2 OR $2 IS NULL);
+
+INSERT INTO dbms_stats.column_stats_backup
+    SELECT $1, atttypid, s.*
+      FROM pg_catalog.pg_class c,
+           dbms_stats.column_stats_effective s,
+           pg_catalog.pg_attribute a
+     WHERE c.oid = starelid
+       AND starelid = attrelid
+       AND staattnum = attnum
+       AND dbms_stats.is_target_relkind(relkind)
+       AND NOT dbms_stats.is_system_catalog(c.oid)
+       AND ($2 IS NULL OR starelid = $2)
+       AND ($3 IS NULL OR staattnum = $3);
+
+SELECT $1;
+$$
+LANGUAGE sql;
+
+CREATE OR REPLACE FUNCTION dbms_stats.backup(
     relid regclass DEFAULT NULL,
     attname text DEFAULT NULL,
     comment text DEFAULT NULL
@@ -20,7 +57,7 @@ BEGIN
     END IF;
     IF $1 IS NOT NULL THEN
         SELECT relkind INTO backup_relkind
-          FROM pg_catalog.pg_class WHERE oid = $1;
+          FROM pg_catalog.pg_class WHERE oid = $1 FOR SHARE;
         IF NOT FOUND THEN
             RAISE EXCEPTION 'relation "%" not found', $1;
         END IF;
@@ -34,7 +71,7 @@ BEGIN
         END IF;
         IF $2 IS NOT NULL THEN
             SELECT a.attnum INTO set_attnum FROM pg_catalog.pg_attribute a
-             WHERE a.attrelid = $1 AND a.attname = $2;
+             WHERE a.attrelid = $1 AND a.attname = $2 FOR SHARE;
             IF set_attnum IS NULL THEN
                 RAISE EXCEPTION 'column "%" not found in relation "%"', $2, $1;
             END IF;
@@ -65,7 +102,8 @@ $$
 DECLARE
     backup_id       int8;
 BEGIN
-    IF NOT EXISTS(SELECT * FROM pg_namespace WHERE nspname = $1) THEN
+    IF NOT EXISTS(SELECT * FROM pg_namespace WHERE nspname = $1 FOR SHARE)
+    THEN
         RAISE EXCEPTION 'schema "%" not found', $1;
     END IF;
     IF dbms_stats.is_system_schema($1) THEN
@@ -112,15 +150,18 @@ BEGIN
     IF $2 IS NULL AND $3 IS NOT NULL THEN
         RAISE EXCEPTION 'relation required';
     END IF;
-    IF NOT EXISTS(SELECT * FROM dbms_stats.backup_history WHERE id <= $1) THEN
+    IF NOT EXISTS(SELECT * FROM dbms_stats.backup_history
+                           WHERE id <= $1 FOR SHARE) THEN
         RAISE EXCEPTION 'backup id % not found', $1;
     END IF;
     IF $2 IS NOT NULL THEN
-        IF NOT EXISTS(SELECT * FROM pg_catalog.pg_class WHERE oid = $2) THEN
+        IF NOT EXISTS(SELECT * FROM pg_catalog.pg_class
+                               WHERE oid = $2 FOR SHARE) THEN
             RAISE EXCEPTION 'relation "%" not found', $2;
         END IF;
+		-- Grabbing all backups for the relation which is not used in restore.
         IF NOT EXISTS(SELECT * FROM dbms_stats.relation_stats_backup b
-                       WHERE b.id <= $1 AND b.relid = $2) THEN
+                       WHERE b.id <= $1 AND b.relid = $2 FOR SHARE) THEN
             RAISE EXCEPTION 'statistics of relation "%" not found in any backups before backup id = %', $2, $1;
         END IF;
         IF $3 IS NOT NULL THEN
@@ -133,21 +174,25 @@ BEGIN
                 RAISE EXCEPTION 'statistics of column "%" of relation "%" are not found in any backups before',$3, $2, $1;
             END IF;
         END IF;
+		PERFORM * FROM dbms_stats._relation_stats_locked r
+                  WHERE r.relid = $2 FOR UPDATE;
+    ELSE
+		/* Lock the whole relation stats if relation is not specified.*/
+	    LOCK dbms_stats._relation_stats_locked IN EXCLUSIVE MODE;
     END IF;
 
-    LOCK dbms_stats._relation_stats_locked IN SHARE UPDATE EXCLUSIVE MODE;
-    LOCK dbms_stats._column_stats_locked IN SHARE UPDATE EXCLUSIVE MODE;
-
     FOR restore_id, restore_relid IN
-        SELECT max(b.id), c.oid
-          FROM pg_class c, dbms_stats.relation_stats_backup b
-         WHERE (c.oid = $2 OR $2 IS NULL)
-           AND c.oid = b.relid
-           AND dbms_stats.is_target_relkind(c.relkind)
-           AND NOT dbms_stats.is_system_catalog(c.oid)
-           AND b.id <= $1
-         GROUP BY c.oid
-         ORDER BY c.oid::regclass::text
+	  SELECT max(id), coid FROM
+        (SELECT b.id as id, c.oid as coid
+           FROM pg_class c, dbms_stats.relation_stats_backup b
+          WHERE (c.oid = $2 OR $2 IS NULL)
+            AND c.oid = b.relid
+            AND dbms_stats.is_target_relkind(c.relkind)
+            AND NOT dbms_stats.is_system_catalog(c.oid)
+            AND b.id <= $1
+         FOR SHARE) t
+      GROUP BY coid
+      ORDER BY coid::regclass::text
     LOOP
         UPDATE dbms_stats._relation_stats_locked r
            SET relid = b.relid,
@@ -224,9 +269,30 @@ BEGIN
                    AND staattnum = restore_attnum;
         END IF;
     END LOOP;
+EXCEPTION
+  WHEN unique_violation THEN
+    RAISE EXCEPTION 'This operation is canceled by simultaneous lock or restore operation on the same relation.';
 END;
 $$
 LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION dbms_stats.restore_database_stats(
+    as_of_timestamp timestamp with time zone
+) RETURNS SETOF regclass AS
+$$
+SELECT dbms_stats.restore(m.id, m.relid)
+  FROM (SELECT max(id) AS id, relid
+        FROM (SELECT r.id, r.relid
+              FROM pg_class c, dbms_stats.relation_stats_backup r,
+                   dbms_stats.backup_history b
+              WHERE c.oid = r.relid
+                AND r.id = b.id
+                AND b.time <= $1
+              FOR SHARE) t1
+        GROUP BY t1.relid
+        ORDER BY t1.relid) m;
+$$
+LANGUAGE sql STRICT;
 
 CREATE OR REPLACE FUNCTION dbms_stats.restore_schema_stats(
     schemaname text,
@@ -243,18 +309,19 @@ BEGIN
 
     RETURN QUERY
         SELECT dbms_stats.restore(m.id, m.relid)
-          FROM (SELECT max(r.id) AS id, r.relid
-                  FROM pg_class c, pg_namespace n,
-                       dbms_stats.relation_stats_backup r,
-                       dbms_stats.backup_history b
-                 WHERE c.oid = r.relid
-                   AND c.relnamespace = n.oid
-                   AND n.nspname = $1
-                   AND r.id = b.id
-                   AND b.time <= $2
-                 GROUP BY r.relid
-                 ORDER BY r.relid
-               ) m;
+          FROM (SELECT max(id) AS id, relid
+                FROM (SELECT r.id, r.relid
+                      FROM pg_class c, pg_namespace n,
+                           dbms_stats.relation_stats_backup r,
+                           dbms_stats.backup_history b
+                      WHERE c.oid = r.relid
+                        AND c.relnamespace = n.oid
+                        AND n.nspname = $1
+                        AND r.id = b.id
+                        AND b.time <= $2
+    					FOR SHARE) t1
+                GROUP BY t1.relid
+                ORDER BY t1.relid) m;
 END;
 $$
 LANGUAGE plpgsql STRICT;
@@ -274,8 +341,12 @@ BEGIN
         RAISE EXCEPTION 'backup id % not found', $1;
     END IF;
 
-    LOCK dbms_stats._relation_stats_locked IN SHARE UPDATE EXCLUSIVE MODE;
-    LOCK dbms_stats._column_stats_locked IN SHARE UPDATE EXCLUSIVE MODE;
+    /* Lock the backup */
+    PERFORM * from dbms_stats.relation_stats_backup b
+        WHERE  id = $1 FOR SHARE;
+
+	/* Locking only _relation_stats_locked is sufficient */
+    LOCK dbms_stats._relation_stats_locked IN EXCLUSIVE MODE;
 
     FOR restore_relid IN
         SELECT b.relid
@@ -386,15 +457,12 @@ BEGIN
         RAISE EXCEPTION 'column "%" not found in relation "%"', $2, $1;
     END IF;
 
-    LOCK dbms_stats._relation_stats_locked IN SHARE UPDATE EXCLUSIVE MODE;
-    LOCK dbms_stats._column_stats_locked IN SHARE UPDATE EXCLUSIVE MODE;
-
 	/*
 	 * If we don't have per-table statistics, create new one which has NULL for
-	 * every statistic column_stats_effective.
+	 * every statistic value for column_stats_effective.
 	 */
     IF NOT EXISTS(SELECT * FROM dbms_stats._relation_stats_locked ru
-                   WHERE ru.relid = $1) THEN
+                   WHERE ru.relid = $1 FOR SHARE) THEN
         INSERT INTO dbms_stats._relation_stats_locked
             SELECT $1, dbms_stats.relname(nspname, relname),
                    NULL, NULL, NULL, NULL, NULL
@@ -475,12 +543,15 @@ BEGIN
         END IF;
         END LOOP;
 
-		/* If we don't have statistic at all, raise error. */
+		/* If we don't have statistics at all, raise error. */
         IF NOT FOUND THEN
 			RAISE EXCEPTION 'no statistics available for column "%" of relation "%"', $2, $1::regclass;
 		END IF;
 
     RETURN $1;
+EXCEPTION
+  WHEN unique_violation THEN
+    RAISE EXCEPTION 'This operation is canceled by simultaneous lock or restore operation on the same relation.';
 END;
 $$
 LANGUAGE plpgsql;
@@ -506,9 +577,6 @@ BEGIN
     IF dbms_stats.is_system_catalog($1) THEN
 		RAISE EXCEPTION 'locking statistics is not allowed for system catalogs: "%"', $1;
     END IF;
-
-    LOCK dbms_stats._relation_stats_locked IN SHARE UPDATE EXCLUSIVE MODE;
-    LOCK dbms_stats._column_stats_locked IN SHARE UPDATE EXCLUSIVE MODE;
 
     UPDATE dbms_stats._relation_stats_locked r
        SET relname = dbms_stats.relname(nspname, c.relname),
@@ -617,6 +685,9 @@ BEGIN
         END LOOP;
 
     RETURN $1;
+EXCEPTION
+  WHEN unique_violation THEN
+    RAISE EXCEPTION 'This operation is canceled by simultaneous lock operation on the same relation.';
 END;
 $$
 LANGUAGE plpgsql;
@@ -658,14 +729,18 @@ BEGIN
     IF $1 IS NULL AND $2 IS NOT NULL THEN
         RAISE EXCEPTION 'relation required';
     END IF;
+
+	/*
+	 * Lock the target relation to prevent conflicting with stats lock/restore
+     */
+	PERFORM * FROM dbms_stats._relation_stats_locked ru
+         WHERE (ru.relid = $1 OR $1 IS NULL) FOR UPDATE;
+
     SELECT a.attnum INTO set_attnum FROM pg_catalog.pg_attribute a
      WHERE a.attrelid = $1 AND a.attname = $2;
     IF $2 IS NOT NULL AND set_attnum IS NULL THEN
         RAISE EXCEPTION 'column "%" not found in relation "%"', $2, $1;
     END IF;
-
-    LOCK dbms_stats._relation_stats_locked IN SHARE UPDATE EXCLUSIVE MODE;
-    LOCK dbms_stats._column_stats_locked IN SHARE UPDATE EXCLUSIVE MODE;
 
     DELETE FROM dbms_stats._column_stats_locked
      WHERE (starelid = $1 OR $1 IS NULL)
@@ -689,6 +764,105 @@ END;
 $$
 LANGUAGE plpgsql;
 
+CREATE OR REPLACE FUNCTION dbms_stats.unlock_database_stats()
+  RETURNS SETOF regclass AS
+$$
+DECLARE
+    unlock_id int8;
+BEGIN
+    LOCK dbms_stats._relation_stats_locked IN EXCLUSIVE MODE;
+
+    FOR unlock_id IN
+        SELECT relid
+          FROM dbms_stats._relation_stats_locked
+         ORDER BY relid
+    LOOP
+        DELETE FROM dbms_stats._relation_stats_locked
+         WHERE relid = unlock_id;
+        RETURN NEXT unlock_id;
+    END LOOP;
+END;
+$$
+LANGUAGE plpgsql STRICT;
+
+CREATE OR REPLACE FUNCTION dbms_stats.unlock_table_stats(relid regclass)
+  RETURNS SETOF regclass AS
+$$
+DELETE FROM dbms_stats._relation_stats_locked
+ WHERE relid = $1
+ RETURNING relid::regclass
+$$
+LANGUAGE sql STRICT;
+
+CREATE OR REPLACE FUNCTION dbms_stats.unlock_table_stats(
+    schemaname text,
+    tablename text
+) RETURNS SETOF regclass AS
+$$
+DELETE FROM dbms_stats._relation_stats_locked
+ WHERE relid = dbms_stats.relname($1, $2)::regclass
+ RETURNING relid::regclass
+$$
+LANGUAGE sql STRICT;
+
+CREATE OR REPLACE FUNCTION dbms_stats.unlock_column_stats(
+    relid regclass,
+    attname text
+) RETURNS SETOF regclass AS
+$$
+DECLARE
+    set_attnum int2;
+BEGIN
+    SELECT a.attnum INTO set_attnum FROM pg_catalog.pg_attribute a
+     WHERE a.attrelid = $1 AND a.attname = $2;
+    IF $2 IS NOT NULL AND set_attnum IS NULL THEN
+        RAISE EXCEPTION 'column "%" not found in relation "%"', $2, $1;
+    END IF;
+
+	/* Lock the locked table stats */
+    PERFORM * from dbms_stats.relation_stats_locked r
+        WHERE r.relid = $1 FOR SHARE;
+
+    DELETE FROM dbms_stats._column_stats_locked
+      WHERE starelid = $1
+        AND staattnum = set_attnum;
+
+    RETURN QUERY
+        SELECT $1;
+END;
+$$
+LANGUAGE plpgsql STRICT;
+
+CREATE OR REPLACE FUNCTION dbms_stats.unlock_column_stats(
+    schemaname text,
+    tablename text,
+    attname text
+) RETURNS SETOF regclass AS
+$$
+DECLARE
+    set_attnum int2;
+BEGIN
+    SELECT a.attnum INTO set_attnum FROM pg_catalog.pg_attribute a
+     WHERE a.attrelid = dbms_stats.relname($1, $2)::regclass
+       AND a.attname = $3;
+    IF $3 IS NOT NULL AND set_attnum IS NULL THEN
+		RAISE EXCEPTION 'column "%" not found in relation "%.%"', $3, $1, $2;
+    END IF;
+
+	/* Lock the locked table stats */
+	PERFORM * from dbms_stats.relation_stats_locked r
+        WHERE  relid = dbms_stats.relname($1, $2)::regclass FOR SHARE;
+
+    DELETE FROM dbms_stats._column_stats_locked
+      WHERE starelid = dbms_stats.relname($1, $2)::regclass
+        AND staattnum = set_attnum;
+
+    RETURN QUERY
+        SELECT dbms_stats.relname($1, $2)::regclass;
+END;
+$$
+LANGUAGE plpgsql STRICT;
+
 CREATE OR REPLACE FUNCTION dbms_stats.unlock_schema_stats(
     schemaname text
 ) RETURNS SETOF regclass AS
@@ -703,16 +877,14 @@ BEGIN
         RAISE EXCEPTION 'unlocking statistics is not allowed for system schemas: "%"', $1;
     END IF;
 
-    LOCK dbms_stats._relation_stats_locked IN SHARE UPDATE EXCLUSIVE MODE;
-    LOCK dbms_stats._column_stats_locked IN SHARE UPDATE EXCLUSIVE MODE;
-
     FOR unlock_id IN
-        SELECT relid
-          FROM dbms_stats._relation_stats_locked, pg_class c, pg_namespace n
+        SELECT r.relid
+          FROM dbms_stats._relation_stats_locked r, pg_class c, pg_namespace n
          WHERE relid = c.oid
            AND c.relnamespace = n.oid
            AND n.nspname = $1
          ORDER BY relid
+         FOR UPDATE
     LOOP
         DELETE FROM dbms_stats._relation_stats_locked
          WHERE relid = unlock_id;
@@ -736,12 +908,14 @@ BEGIN
         RAISE EXCEPTION 'column "%" not found in relation "%"', $2, $1;
     END IF;
 
-    LOCK dbms_stats._relation_stats_locked IN SHARE UPDATE EXCLUSIVE MODE;
-    LOCK dbms_stats._column_stats_locked IN SHARE UPDATE EXCLUSIVE MODE;
+	/* Lock the locked table stats */
+    PERFORM * from dbms_stats.relation_stats_locked r
+        WHERE r.relid = $1 FOR SHARE;
 
-        DELETE FROM dbms_stats._column_stats_locked
-         WHERE starelid = $1
-           AND staattnum = set_attnum;
+    DELETE FROM dbms_stats._column_stats_locked
+      WHERE starelid = $1
+        AND staattnum = set_attnum;
+
     RETURN QUERY
         SELECT $1;
 END;
@@ -764,12 +938,14 @@ BEGIN
 		RAISE EXCEPTION 'column "%" not found in relation "%.%"', $3, $1, $2;
     END IF;
 
-    LOCK dbms_stats._relation_stats_locked IN SHARE UPDATE EXCLUSIVE MODE;
-    LOCK dbms_stats._column_stats_locked IN SHARE UPDATE EXCLUSIVE MODE;
+	/* Lock the locked table stats */
+	PERFORM * from dbms_stats.relation_stats_locked r
+        WHERE  relid = dbms_stats.relname($1, $2)::regclass FOR SHARE;
 
-        DELETE FROM dbms_stats._column_stats_locked
-         WHERE starelid = dbms_stats.relname($1, $2)::regclass
-           AND staattnum = set_attnum;
+    DELETE FROM dbms_stats._column_stats_locked
+      WHERE starelid = dbms_stats.relname($1, $2)::regclass
+        AND staattnum = set_attnum;
+
     RETURN QUERY
         SELECT dbms_stats.relname($1, $2)::regclass;
 END;
@@ -783,7 +959,7 @@ CREATE OR REPLACE FUNCTION dbms_stats.purge_stats(
 $$
 DECLARE
     delete_id int8;
-    deleted   dbms_stats.backup_history;
+    todelete   dbms_stats.backup_history;
 BEGIN
     IF $1 IS NULL THEN
         RAISE EXCEPTION 'backup id required';
@@ -792,11 +968,8 @@ BEGIN
         RAISE EXCEPTION 'NULL is not allowed as the second parameter';
     END IF;
 
-    LOCK dbms_stats.backup_history IN SHARE UPDATE EXCLUSIVE MODE;
-    LOCK dbms_stats.relation_stats_backup IN SHARE UPDATE EXCLUSIVE MODE;
-    LOCK dbms_stats.column_stats_backup IN SHARE UPDATE EXCLUSIVE MODE;
-
-    IF NOT EXISTS(SELECT * FROM dbms_stats.backup_history WHERE id = $1) THEN
+    IF NOT EXISTS(SELECT * FROM dbms_stats.backup_history
+                  WHERE id = $1 FOR UPDATE) THEN
         RAISE EXCEPTION 'backup id % not found', $1;
     END IF;
     IF NOT $2 AND NOT EXISTS(SELECT *
@@ -808,15 +981,59 @@ BEGIN
         RETURN;
     END IF;
 
-    FOR deleted IN
+    FOR todelete IN
         SELECT * FROM dbms_stats.backup_history
          WHERE id <= $1
-         ORDER BY id
+         ORDER BY id FOR UPDATE
     LOOP
         DELETE FROM dbms_stats.backup_history
-         WHERE id = deleted.id;
-        RETURN NEXT deleted;
+         WHERE id = todelete.id;
+        RETURN NEXT todelete;
     END LOOP;
 END;
+$$
+LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION dbms_stats.clean_up_stats() RETURNS SETOF text AS
+$$
+DECLARE
+	clean_relid		Oid;
+	clean_attnum	int2;
+	clean_inherit	bool;
+	clean_rel_col	text;
+BEGIN
+	-- We don't have to check that table-level dummy statistics of the table
+	-- exists here, because the foreign key constraints defined on column-level
+	-- dummy static table ensures that.
+	FOR clean_rel_col, clean_relid, clean_attnum, clean_inherit IN
+		SELECT r.relname || ', ' || v.staattnum::text,
+			   v.starelid, v.staattnum, v.stainherit
+		  FROM dbms_stats._column_stats_locked v
+		  JOIN dbms_stats._relation_stats_locked r ON (v.starelid = r.relid)
+		 WHERE NOT EXISTS (
+			SELECT NULL
+			  FROM pg_attribute a
+			 WHERE a.attrelid = v.starelid
+			   AND a.attnum = v.staattnum
+			   AND a.attisdropped  = false
+         FOR UPDATE
+		)
+	LOOP
+		DELETE FROM dbms_stats._column_stats_locked
+		 WHERE starelid = clean_relid
+		   AND staattnum = clean_attnum
+		   AND stainherit = clean_inherit;
+		RETURN NEXT clean_rel_col;
+	END LOOP;
+
+	RETURN QUERY
+		DELETE FROM dbms_stats._relation_stats_locked r
+		 WHERE NOT EXISTS (
+			SELECT NULL
+			  FROM pg_class c
+			 WHERE c.oid = r.relid)
+		 RETURNING relname || ',';
+	RETURN;
+END
 $$
 LANGUAGE plpgsql;

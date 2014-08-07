@@ -2077,16 +2077,14 @@ SELECT relation::regclass, mode
      OR relation::regclass::text LIKE 'dbms_stats.backup_history'
      OR relation::regclass::text LIKE 'dbms_stats.%\_backup'
   ORDER BY relation::regclass::text, mode;
-             relation             |           mode           
-----------------------------------+--------------------------
+             relation             |       mode       
+----------------------------------+------------------
  dbms_stats.backup_history        | AccessShareLock
  dbms_stats.backup_history        | RowExclusiveLock
- dbms_stats.backup_history        | ShareUpdateExclusiveLock
+ dbms_stats.backup_history        | RowShareLock
  dbms_stats.column_stats_backup   | RowExclusiveLock
- dbms_stats.column_stats_backup   | ShareUpdateExclusiveLock
  dbms_stats.relation_stats_backup | RowExclusiveLock
- dbms_stats.relation_stats_backup | ShareUpdateExclusiveLock
-(7 rows)
+(5 rows)
 
 COMMIT;
 SELECT * FROM dbms_stats.backup_history;

@@ -1,4 +1,5 @@
 \pset null '(null)'
+
 /*
  * No.2-3 dbms_stats.backup_history_id_seq
  */
@@ -26,6 +27,7 @@ DELETE FROM dbms_stats._relation_stats_locked;
 EXPLAIN (costs false) SELECT * FROM s0.st2 WHERE id < 1;
 SELECT dbms_stats.lock_table_stats('s0.st2'::regclass);
 UPDATE dbms_stats._relation_stats_locked SET curpages = 10000;
+VACUUM dbms_stats._relation_stats_locked;  -- in order to avoid auto vacuum
 -- No.3-1-1
 SET pg_dbms_stats.use_locked_stats TO ON;
 EXPLAIN (costs false) SELECT * FROM s0.st2 WHERE id < 1;
@@ -41,7 +43,7 @@ EXPLAIN (costs false) SELECT * FROM s0.st2 WHERE id < 1;
 RESET pg_dbms_stats.use_locked_stats;
 EXPLAIN (costs false) SELECT * FROM s0.st2 WHERE id < 1;
 -- clean up
-\c - postgres
+\c - super_user
 DELETE FROM dbms_stats._relation_stats_locked;
 
 /*
@@ -137,7 +139,7 @@ SELECT dbms_stats.unlock_database_stats();
 SELECT dbms_stats.lock_table_stats('st1');
 
 /*
- * No.5-2 dbms_stats.invalidate_column_cache
+ * No.5-2 invalid calls of dbms_stats.invalidate_column_cache
  */
 -- No.5-2-1
 SELECT dbms_stats.invalidate_column_cache();
@@ -197,6 +199,7 @@ UPDATE dbms_stats._column_stats_locked SET stanullfrac = 1
  WHERE starelid = 'st1'::regclass
    AND staattnum = 1
    AND stainherit = false;
+VACUUM dbms_stats._relation_stats_locked;  -- in order to avoid auto vacuum
 EXPLAIN (costs false) SELECT * FROM st1 WHERE val IS NULL;
 
 -- No.5-2-10
@@ -291,6 +294,7 @@ EXPLAIN (costs false) SELECT * FROM st1 WHERE val IS NULL;
 EXPLAIN (costs false) SELECT * FROM st1 WHERE val IS NULL;
 UPDATE dbms_stats._relation_stats_locked SET curpages = 1
  WHERE relid = 'st1'::regclass;
+VACUUM dbms_stats._relation_stats_locked;  -- in order to avoid auto vacuum
 EXPLAIN (costs false) SELECT * FROM st1 WHERE val IS NULL;
 
 -- No.5-3-10
@@ -311,11 +315,13 @@ SELECT dbms_stats.lock_table_stats('st1');
 SELECT relname, curpages FROM dbms_stats.relation_stats_locked
  WHERE relid = 'st1'::regclass;
 SELECT pg_sleep(0.5);
-SELECT pg_stat_reset();
+SELECT reset_stat_and_cache();
+VACUUM dbms_stats._relation_stats_locked;  -- in order to avoid auto vacuum
 UPDATE dbms_stats._relation_stats_locked SET curpages = 1000
  WHERE relid = 'st1_exp'::regclass;
 SELECT pg_sleep(0.5);
 SELECT * FROM lockd_io;
+SELECT reset_stat_and_cache();
 SELECT relname, curpages FROM dbms_stats.relation_stats_locked
  WHERE relid = 'st1'::regclass;
 SELECT pg_sleep(0.5);
@@ -327,6 +333,7 @@ SELECT * FROM lockd_io;
 -- No.5-4-1
 UPDATE dbms_stats._relation_stats_locked SET curpages = 1
  WHERE relid = 'st1'::regclass;
+VACUUM dbms_stats._relation_stats_locked;  -- in order to avoid auto vacuum
 EXPLAIN (costs false) SELECT * FROM st1 WHERE val IS NULL;
 \c
 SET pg_dbms_stats.use_locked_stats to NO;
@@ -360,10 +367,11 @@ VACUUM ANALYZE;
 SELECT * FROM s0.droptest
  WHERE id = 1;
 SELECT pg_sleep(0.5);
-SELECT pg_stat_reset();
+SELECT reset_stat_and_cache();
 ALTER TABLE s0.droptest RENAME TO test;
 SELECT pg_sleep(0.5);
 SELECT * FROM lockd_io;
+SELECT reset_stat_and_cache();
 SELECT * FROM s0.test
  WHERE id = 1;
 SELECT pg_sleep(0.5);
@@ -374,10 +382,11 @@ ALTER TABLE s0.test RENAME TO droptest;
 SELECT * FROM s0.droptest
  WHERE id = 1;
 SELECT pg_sleep(0.5);
-SELECT pg_stat_reset();
+SELECT reset_stat_and_cache();
 ALTER TABLE s0.droptest RENAME id TO test;
 SELECT pg_sleep(0.5);
 SELECT * FROM lockd_io;
+SELECT reset_stat_and_cache();
 SELECT * FROM s0.droptest
  WHERE test = 1;
 SELECT pg_sleep(0.5);
@@ -389,10 +398,11 @@ INSERT INTO s0.droptest VALUES (4);
 SELECT * FROM s0.droptest
  WHERE id = 1;
 SELECT pg_sleep(0.5);
-SELECT pg_stat_reset();
+SELECT reset_stat_and_cache();
 ANALYZE;
 SELECT pg_sleep(0.5);
 SELECT * FROM lockd_io;
+SELECT reset_stat_and_cache();
 SELECT * FROM s0.droptest
  WHERE id = 1;
 SELECT pg_sleep(1.0);
@@ -404,10 +414,11 @@ INSERT INTO s0.droptest VALUES (4),(5);
 SELECT * FROM s0.droptest
  WHERE id = 4;
 SELECT pg_sleep(0.5);
-SELECT pg_stat_reset();
+SELECT reset_stat_and_cache();
 VACUUM;
 SELECT pg_sleep(0.5);
 SELECT * FROM lockd_io;
+SELECT reset_stat_and_cache();
 SELECT * FROM s0.droptest
  WHERE id = 4;
 SELECT pg_sleep(0.5);
@@ -903,13 +914,17 @@ SELECT * FROM dbms_stats.backup_history;
 BEGIN;
 SELECT relation::regclass, mode
   FROM pg_locks
- WHERE mode LIKE '%ExclusiveLock%'
- ORDER BY relation::regclass::text, mode;
+  WHERE relation::regclass::text LIKE 'dbms_stats.\_%\_locked'
+     OR relation::regclass::text LIKE 'dbms_stats.backup_history'
+     OR relation::regclass::text LIKE 'dbms_stats.%\_backup'
+  ORDER BY relation::regclass::text, mode;
 SELECT id, unit, comment FROM dbms_stats.purge_stats(2);
 SELECT relation::regclass, mode
   FROM pg_locks
- WHERE mode LIKE '%ExclusiveLock%'
- ORDER BY relation::regclass::text, mode;
+  WHERE relation::regclass::text LIKE 'dbms_stats.\_%\_locked'
+     OR relation::regclass::text LIKE 'dbms_stats.backup_history'
+     OR relation::regclass::text LIKE 'dbms_stats.%\_backup'
+  ORDER BY relation::regclass::text, mode;
 COMMIT;
 SELECT * FROM dbms_stats.backup_history;
 -- No.15-1-6
@@ -1122,4 +1137,4 @@ SELECT count(*) FROM dbms_stats.stats WHERE false;
 SELECT count(*) FROM dbms_stats._relation_stats_locked WHERE false;
 -- No.19-1-5
 SELECT count(*) FROM dbms_stats._columnns_user WHERE false;
-\c - postgres
+\c - super_user

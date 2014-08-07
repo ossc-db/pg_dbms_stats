@@ -872,8 +872,10 @@ SELECT dbms_stats.unlock_database_stats();
 /*
  * No.6-4 dbms_stats.is_target_relkind
  */
--- No.6-4-10
-SELECT dbms_stats.is_target_relkind('f');
+-- No.6-4- 10-11
+SELECT dbms_stats.is_target_relkind(k::"char")
+ FROM (VALUES ('r'), ('i'), ('f'), ('m'),
+ 			  ('S'), ('t'), ('v'), ('c')) t(k);
 
 /*
  * No.7-1 dbms_stats.backup
@@ -884,6 +886,13 @@ INSERT INTO dbms_stats.backup_history(id, time, unit) values(1, '2012-01-01', 'd
 SELECT dbms_stats.backup(1, 's0.sft0'::regclass, NULL);
 SELECT count(*) FROM dbms_stats.relation_stats_backup;
 SELECT count(*) FROM dbms_stats.column_stats_backup;
+
+-- No.7-1-10
+-- #### 9.2 doesn't has materialized views
+-- DELETE FROM dbms_stats.relation_stats_backup;
+-- SELECT dbms_stats.backup(1, 's0.smv0'::regclass, NULL);
+-- SELECT count(*) FROM dbms_stats.relation_stats_backup;
+-- SELECT count(*) FROM dbms_stats.column_stats_backup;
 
 -- No.7-1-12
 DELETE FROM dbms_stats.relation_stats_backup;
@@ -994,6 +1003,12 @@ SELECT id, unit, comment FROM dbms_stats.backup_history;
 DELETE FROM dbms_stats.backup_history;
 SELECT dbms_stats.backup('s0.sft0'::regclass, NULL, 'dummy comment');
 SELECT id, unit, comment FROM dbms_stats.backup_history;
+
+-- No.8-1-12
+-- #### 9.2 doesn't has materialized views
+-- DELETE FROM dbms_stats.backup_history;
+-- SELECT dbms_stats.backup('s0.smv0'::regclass, NULL, 'dummy comment');
+-- SELECT id, unit, comment FROM dbms_stats.backup_history;
 
 -- No.8-1-13
 DELETE FROM dbms_stats.backup_history;
@@ -1139,16 +1154,11 @@ VACUUM ANALYZE;
  */
 -- No.9-1-1
 DELETE FROM dbms_stats._relation_stats_locked;
+VACUUM dbms_stats._relation_stats_locked;  -- in order to avoid auto vacuum
 BEGIN;
-SELECT relation::regclass, mode
- FROM pg_locks l join pg_class c on (l.relation = c.oid and c.relkind = 'r')
- WHERE mode LIKE '%ExclusiveLock%'
- ORDER BY relation::regclass::text, mode;
+SELECT * FROM internal_locks;
 SELECT dbms_stats.restore(2, 's0.st0', NULL);
-SELECT relation::regclass, mode
- FROM pg_locks l join pg_class c on (l.relation = c.oid and c.relkind = 'r')
- WHERE mode LIKE '%ExclusiveLock%'
- ORDER BY relation::regclass::text, mode;
+SELECT * FROM internal_locks;
 COMMIT;
 SELECT relid::regclass FROM dbms_stats.relation_stats_locked
  GROUP BY relid
@@ -1353,6 +1363,26 @@ DELETE FROM dbms_stats.relation_stats_backup
  WHERE id = 3
    AND relname = 's0.sft0';
 
+-- No.9-1-22
+-- #### 9.2 doesn't has materialized views
+-- DELETE FROM dbms_stats._relation_stats_locked;
+-- INSERT INTO dbms_stats.relation_stats_backup(
+--                id, relid, relname, relpages, reltuples,
+--                relallvisible,
+--                curpages)
+--      VALUES (3, 's0.smv0'::regclass, 's0.smv0', 1, 1,
+--              1,
+--              1);
+-- SELECT * FROM relations_backup_v
+--  WHERE id = 3
+--    AND relname = 's0.smv0';
+-- SELECT dbms_stats.restore(2, 's0.smv0', NULL);
+-- SELECT count(*) FROM dbms_stats.column_stats_locked;
+-- SELECT count(*) FROM dbms_stats.relation_stats_locked;
+-- DELETE FROM dbms_stats.relation_stats_backup
+--  WHERE id = 3
+--    AND relname = 's0.smv0';
+
 -- No.9-1-23
 DELETE FROM dbms_stats._relation_stats_locked;
 INSERT INTO dbms_stats.relation_stats_backup(
@@ -1468,16 +1498,11 @@ SELECT dbms_stats.restore_stats(0);
 
 -- No.10-7-3
 DELETE FROM dbms_stats._relation_stats_locked;
+VACUUM dbms_stats._relation_stats_locked;  -- in order to avoid auto vacuum
 BEGIN;
-SELECT relation::regclass, mode
- FROM pg_locks l join pg_class c on (l.relation = c.oid and c.relkind = 'r')
- WHERE mode LIKE '%ExclusiveLock%'
- ORDER BY relation::regclass::text, mode;
+SELECT * FROM internal_locks;
 SELECT dbms_stats.restore_stats(2);
-SELECT relation::regclass, mode
- FROM pg_locks l join pg_class c on (l.relation = c.oid and c.relkind = 'r')
- WHERE mode LIKE '%ExclusiveLock%'
- ORDER BY relation::regclass::text, mode;
+SELECT * FROM internal_locks;
 COMMIT;
 SELECT relid::regclass FROM dbms_stats.relation_stats_locked
  GROUP BY relid
@@ -1571,6 +1596,12 @@ DELETE FROM dbms_stats._relation_stats_locked;
 SELECT dbms_stats.lock('s0.sft0', 'id');
 SELECT * FROM relations_locked_v;
 SELECT * FROM columns_locked_v c;
+-- No.11-1-13
+-- #### 9.2 doesn't has materialized views
+-- DELETE FROM dbms_stats._relation_stats_locked;
+-- SELECT dbms_stats.lock('s0.smv0', 'id');
+-- SELECT * FROM relations_locked_v;
+-- SELECT * FROM columns_locked_v c;
 -- No.11-1-14
 DELETE FROM dbms_stats._relation_stats_locked;
 SELECT dbms_stats.lock('pg_catalog.pg_class', 'id');
@@ -1626,18 +1657,13 @@ SELECT starelid, attname, stainherit FROM columns_locked_v c;
  */
 -- No.11-2-1
 DELETE FROM dbms_stats._relation_stats_locked;
+VACUUM dbms_stats._relation_stats_locked;  -- in order to avoid auto vacuum
 BEGIN;
-SELECT relation::regclass, mode
- FROM pg_locks l join pg_class c on (l.relation = c.oid and c.relkind = 'r')
- WHERE mode LIKE '%ExclusiveLock%'
- ORDER BY relation::regclass::text, mode;
+SELECT * FROM internal_locks;
 SELECT dbms_stats.lock('s0.st0');
 SELECT * FROM relations_locked_v;
 SELECT * FROM columns_locked_v c;
-SELECT relation::regclass, mode
- FROM pg_locks l join pg_class c on (l.relation = c.oid and c.relkind = 'r')
- WHERE mode LIKE '%ExclusiveLock%'
- ORDER BY relation::regclass::text, mode;
+SELECT * FROM internal_locks;
 COMMIT;
 
 -- No.11-2-2
@@ -1670,6 +1696,12 @@ DELETE FROM dbms_stats._relation_stats_locked;
 SELECT dbms_stats.lock('s0.sft0');
 SELECT * FROM relations_locked_v;
 SELECT * FROM columns_locked_v c;
+-- No.11-2-10
+-- #### 9.2 doesn't has materialized views
+-- DELETE FROM dbms_stats._relation_stats_locked;
+-- SELECT dbms_stats.lock('s0.smv0');
+-- SELECT * FROM relations_locked_v;
+-- SELECT * FROM columns_locked_v c;
 -- No.11-2-11
 DELETE FROM dbms_stats._relation_stats_locked;
 SELECT dbms_stats.lock('pg_catalog.pg_class');
@@ -1901,7 +1933,7 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  ORDER BY relid;
 SELECT starelid::regclass, staattnum FROM dbms_stats._column_stats_locked
  GROUP BY starelid, staattnum
- ORDER BY starelid;
+ ORDER BY starelid, staattnum;
 
 -- No.13-1-11
 DELETE FROM dbms_stats._relation_stats_locked;
@@ -1911,14 +1943,14 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  ORDER BY relid;
 SELECT starelid::regclass, staattnum FROM dbms_stats._column_stats_locked
  GROUP BY starelid, staattnum
- ORDER BY starelid;
+ ORDER BY starelid, staattnum;
 SELECT dbms_stats.unlock(NULL, 'id');
 SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  GROUP BY relid
  ORDER BY relid;
 SELECT starelid::regclass, staattnum FROM dbms_stats._column_stats_locked
  GROUP BY starelid, staattnum
- ORDER BY starelid;
+ ORDER BY starelid, staattnum;
 
 -- No.13-1-12
 DELETE FROM dbms_stats._relation_stats_locked;
@@ -1928,30 +1960,25 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  ORDER BY relid;
 SELECT starelid::regclass, staattnum FROM dbms_stats._column_stats_locked
  GROUP BY starelid, staattnum
- ORDER BY starelid;
+ ORDER BY starelid, staattnum;
 SELECT dbms_stats.unlock('s0.st0', NULL);
 SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  GROUP BY relid
  ORDER BY relid;
 SELECT starelid::regclass, staattnum FROM dbms_stats._column_stats_locked
  GROUP BY starelid, staattnum
- ORDER BY starelid;
+ ORDER BY starelid, staattnum;
 
 -- No.13-1-13
 DELETE FROM dbms_stats._relation_stats_locked;
+VACUUM dbms_stats._relation_stats_locked;  -- in order to avoid auto vacuum
 SELECT dbms_stats.lock_database_stats();
 SELECT count(*) FROM dbms_stats._relation_stats_locked;
 SELECT count(*) FROM dbms_stats._column_stats_locked;
 BEGIN;
-SELECT relation::regclass, mode
- FROM pg_locks l join pg_class c on (l.relation = c.oid and c.relkind = 'r')
- WHERE mode LIKE '%ExclusiveLock%'
- ORDER BY relation::regclass::text, mode;
+SELECT * FROM internal_locks;
 SELECT dbms_stats.unlock();
-SELECT relation::regclass, mode
- FROM pg_locks l join pg_class c on (l.relation = c.oid and c.relkind = 'r')
- WHERE mode LIKE '%ExclusiveLock%'
- ORDER BY relation::regclass::text, mode;
+SELECT * FROM internal_locks;
 COMMIT;
 SELECT count(*) FROM dbms_stats._relation_stats_locked;
 SELECT count(*) FROM dbms_stats._column_stats_locked;
@@ -1993,19 +2020,14 @@ SELECT count(*) FROM dbms_stats._column_stats_locked;
 
 -- No.14-1-4
 DELETE FROM dbms_stats._relation_stats_locked;
+VACUUM dbms_stats._relation_stats_locked;  -- in order to avoid auto vacuum
 SELECT dbms_stats.lock_database_stats();
 SELECT count(*) FROM dbms_stats._relation_stats_locked;
 SELECT count(*) FROM dbms_stats._column_stats_locked;
 BEGIN;
-SELECT relation::regclass, mode
- FROM pg_locks l join pg_class c on (l.relation = c.oid and c.relkind = 'r')
- WHERE mode LIKE '%ExclusiveLock%'
- ORDER BY relation::regclass::text, mode;
+SELECT * FROM internal_locks;
 SELECT dbms_stats.unlock_database_stats();
-SELECT relation::regclass, mode
- FROM pg_locks l join pg_class c on (l.relation = c.oid and c.relkind = 'r')
- WHERE mode LIKE '%ExclusiveLock%'
- ORDER BY relation::regclass::text, mode;
+SELECT * FROM internal_locks;
 COMMIT;
 SELECT count(*) FROM dbms_stats._relation_stats_locked;
 SELECT count(*) FROM dbms_stats._column_stats_locked;
@@ -2142,6 +2164,7 @@ SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
 
 -- No.14-2-8
 DELETE FROM dbms_stats._relation_stats_locked;
+VACUUM dbms_stats._relation_stats_locked;  -- in order to avoid auto vacuum
 SELECT dbms_stats.lock_database_stats();
 SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  GROUP BY relid
@@ -2150,15 +2173,9 @@ SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
  GROUP BY starelid
  ORDER BY starelid;
 BEGIN;
-SELECT relation::regclass, mode
- FROM pg_locks l join pg_class c on (l.relation = c.oid and c.relkind = 'r')
- WHERE mode LIKE '%ExclusiveLock%'
- ORDER BY relation::regclass::text, mode;
+SELECT * FROM internal_locks;
 SELECT dbms_stats.unlock_schema_stats('s0');
-SELECT relation::regclass, mode
- FROM pg_locks l join pg_class c on (l.relation = c.oid and c.relkind = 'r')
- WHERE mode LIKE '%ExclusiveLock%'
- ORDER BY relation::regclass::text, mode;
+SELECT * FROM internal_locks;
 COMMIT;
 SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  GROUP BY relid
@@ -2299,6 +2316,7 @@ SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
 
 -- No.14-3-8
 DELETE FROM dbms_stats._relation_stats_locked;
+VACUUM dbms_stats._relation_stats_locked;  -- in order to avoid auto vacuum
 SELECT dbms_stats.lock_database_stats();
 SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  GROUP BY relid
@@ -2307,15 +2325,9 @@ SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
  GROUP BY starelid
  ORDER BY starelid;
 BEGIN;
-SELECT relation::regclass, mode
- FROM pg_locks l join pg_class c on (l.relation = c.oid and c.relkind = 'r')
- WHERE mode LIKE '%ExclusiveLock%'
- ORDER BY relation::regclass::text, mode;
+SELECT * FROM internal_locks;
 SELECT dbms_stats.unlock_table_stats('s0.st0');
-SELECT relation::regclass, mode
- FROM pg_locks l join pg_class c on (l.relation = c.oid and c.relkind = 'r')
- WHERE mode LIKE '%ExclusiveLock%'
- ORDER BY relation::regclass::text, mode;
+SELECT * FROM internal_locks;
 COMMIT;
 SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  GROUP BY relid
@@ -2456,6 +2468,7 @@ SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
 
 -- No.14-4-8
 DELETE FROM dbms_stats._relation_stats_locked;
+VACUUM dbms_stats._relation_stats_locked;  -- in order to avoid auto vacuum
 SELECT dbms_stats.lock_database_stats();
 SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  GROUP BY relid
@@ -2464,15 +2477,9 @@ SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
  GROUP BY starelid
  ORDER BY starelid;
 BEGIN;
-SELECT relation::regclass, mode
- FROM pg_locks l join pg_class c on (l.relation = c.oid and c.relkind = 'r')
- WHERE mode LIKE '%ExclusiveLock%'
- ORDER BY relation::regclass::text, mode;
+SELECT * FROM internal_locks;
 SELECT dbms_stats.unlock_table_stats('s0', 'st0');
-SELECT relation::regclass, mode
- FROM pg_locks l join pg_class c on (l.relation = c.oid and c.relkind = 'r')
- WHERE mode LIKE '%ExclusiveLock%'
- ORDER BY relation::regclass::text, mode;
+SELECT * FROM internal_locks;
 COMMIT;
 SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  GROUP BY relid
@@ -2598,21 +2605,16 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
 
 -- No.14-5-9
 DELETE FROM dbms_stats._relation_stats_locked;
+VACUUM dbms_stats._relation_stats_locked;  -- in order to avoid auto vacuum
 SELECT dbms_stats.lock_database_stats();
 SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  GROUP BY relid
  ORDER BY relid;
 SELECT starelid, attname, stainherit FROM columns_locked_v c;
 BEGIN;
-SELECT relation::regclass, mode
- FROM pg_locks l join pg_class c on (l.relation = c.oid and c.relkind = 'r')
- WHERE mode LIKE '%ExclusiveLock%'
- ORDER BY relation::regclass::text, mode;
+SELECT * FROM internal_locks;
 SELECT dbms_stats.unlock_column_stats('s0.st0', 'id');
-SELECT relation::regclass, mode
- FROM pg_locks l join pg_class c on (l.relation = c.oid and c.relkind = 'r')
- WHERE mode LIKE '%ExclusiveLock%'
- ORDER BY relation::regclass::text, mode;
+SELECT * FROM internal_locks;
 COMMIT;
 SELECT starelid, attname, stainherit FROM columns_locked_v c;
 SELECT relid::regclass FROM dbms_stats._relation_stats_locked
@@ -2721,21 +2723,16 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
 
 -- No.14-6-8
 DELETE FROM dbms_stats._relation_stats_locked;
+VACUUM dbms_stats._relation_stats_locked;  -- in order to avoid auto vacuum
 SELECT dbms_stats.lock_database_stats();
 SELECT relid::regclass FROM dbms_stats._relation_stats_locked
  GROUP BY relid
  ORDER BY relid;
 SELECT starelid, attname, stainherit FROM columns_locked_v c;
 BEGIN;
-SELECT relation::regclass, mode
- FROM pg_locks l join pg_class c on (l.relation = c.oid and c.relkind = 'r')
- WHERE mode LIKE '%ExclusiveLock%'
- ORDER BY relation::regclass::text, mode;
+SELECT * FROM internal_locks;
 SELECT dbms_stats.unlock_column_stats('s0', 'st0', 'id');
-SELECT relation::regclass, mode
- FROM pg_locks l join pg_class c on (l.relation = c.oid and c.relkind = 'r')
- WHERE mode LIKE '%ExclusiveLock%'
- ORDER BY relation::regclass::text, mode;
+SELECT * FROM internal_locks;
 COMMIT;
 SELECT starelid, attname, stainherit FROM columns_locked_v c;
 SELECT relid::regclass FROM dbms_stats._relation_stats_locked

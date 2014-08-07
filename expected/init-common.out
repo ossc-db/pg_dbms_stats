@@ -11,7 +11,8 @@ SET client_min_messages = warning;
 DROP ROLE IF EXISTS regular_user;
 CREATE ROLE regular_user LOGIN;
 SET client_min_messages = fatal;
-CREATE ROLE postgres SUPERUSER CREATEDB CREATEROLE INHERIT LOGIN;
+DROP ROLE IF EXISTS super_user;
+CREATE ROLE super_user SUPERUSER CREATEDB CREATEROLE INHERIT LOGIN;
 -- create object
 CREATE TABLE pt0(id integer, day date);
 CREATE INDEX pt0_idx ON pt0(id);
@@ -40,6 +41,13 @@ CREATE TYPE complex AS (
      r double precision,
      i double precision
 );
+-- updating _relation_stats_locked leads to merged stats caches
+-- See StatsCacheRelCallback() in pg_dbms_stats.c for details.
+CREATE FUNCTION reset_stat_and_cache() RETURNS void AS $$
+  UPDATE dbms_stats._relation_stats_locked SET relpages = relpages;
+  SELECT pg_stat_reset();
+$$
+LANGUAGE sql;
 CREATE FUNCTION inform(VARIADIC arr text[]) RETURNS int AS $$
 DECLARE
     str text := 'arguments are ';
@@ -59,14 +67,22 @@ BEGIN
     RETURN 1;
 END;
 $$LANGUAGE plpgsql;
+-- Table or index fetches will take place if stats merge performed.
 CREATE VIEW lockd_io AS
        SELECT relname,
-              heap_blks_read + heap_blks_hit > 0  hb_fetch,
-              idx_blks_read  + idx_blks_hit  > 0  ib_fetch
+              heap_blks_read + heap_blks_hit +
+              idx_blks_read  + idx_blks_hit  > 0  fetches
          FROM pg_statio_user_tables
         WHERE schemaname = 'dbms_stats'
-          AND relname LIKE '%stats_locked'
+          AND relname LIKE '\_%\_stats_locked'
         ORDER BY relid;
+CREATE VIEW internal_locks AS
+    SELECT relation::regclass, mode
+      FROM pg_locks
+      WHERE relation::regclass::text LIKE 'dbms_stats.\_%\_locked'
+         OR relation::regclass::text LIKE 'dbms_stats.backup_history'
+         OR relation::regclass::text LIKE 'dbms_stats.%\_backup'
+      ORDER BY relation::regclass::text, mode;
 -- load data
 INSERT INTO st0 VALUES (1, 'test'), (2, 'test');
 INSERT INTO st1 SELECT i % 3, i % 3 FROM generate_series(1, 10000) t(i);

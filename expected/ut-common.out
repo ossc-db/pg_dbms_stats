@@ -59,6 +59,7 @@ SELECT dbms_stats.lock_table_stats('s0.st2'::regclass);
 (1 row)
 
 UPDATE dbms_stats._relation_stats_locked SET curpages = 10000;
+VACUUM dbms_stats._relation_stats_locked;  -- in order to avoid auto vacuum
 -- No.3-1-1
 SET pg_dbms_stats.use_locked_stats TO ON;
 EXPLAIN (costs false) SELECT * FROM s0.st2 WHERE id < 1;
@@ -108,7 +109,7 @@ EXPLAIN (costs false) SELECT * FROM s0.st2 WHERE id < 1;
 (2 rows)
 
 -- clean up
-\c - postgres
+\c - super_user
 DELETE FROM dbms_stats._relation_stats_locked;
 /*
  * No.4-1 DATA TYPE dbms_stats.anyarray
@@ -301,7 +302,7 @@ SELECT dbms_stats.lock_table_stats('st1');
 (1 row)
 
 /*
- * No.5-2 dbms_stats.invalidate_column_cache
+ * No.5-2 invalid calls of dbms_stats.invalidate_column_cache
  */
 -- No.5-2-1
 SELECT dbms_stats.invalidate_column_cache();
@@ -384,6 +385,7 @@ UPDATE dbms_stats._column_stats_locked SET stanullfrac = 1
  WHERE starelid = 'st1'::regclass
    AND staattnum = 1
    AND stainherit = false;
+VACUUM dbms_stats._relation_stats_locked;  -- in order to avoid auto vacuum
 EXPLAIN (costs false) SELECT * FROM st1 WHERE val IS NULL;
        QUERY PLAN        
 -------------------------
@@ -569,6 +571,7 @@ EXPLAIN (costs false) SELECT * FROM st1 WHERE val IS NULL;
 
 UPDATE dbms_stats._relation_stats_locked SET curpages = 1
  WHERE relid = 'st1'::regclass;
+VACUUM dbms_stats._relation_stats_locked;  -- in order to avoid auto vacuum
 EXPLAIN (costs false) SELECT * FROM st1 WHERE val IS NULL;
        QUERY PLAN        
 -------------------------
@@ -638,12 +641,13 @@ SELECT pg_sleep(0.5);
  
 (1 row)
 
-SELECT pg_stat_reset();
- pg_stat_reset 
----------------
+SELECT reset_stat_and_cache();
+ reset_stat_and_cache 
+----------------------
  
 (1 row)
 
+VACUUM dbms_stats._relation_stats_locked;  -- in order to avoid auto vacuum
 UPDATE dbms_stats._relation_stats_locked SET curpages = 1000
  WHERE relid = 'st1_exp'::regclass;
 SELECT pg_sleep(0.5);
@@ -653,11 +657,17 @@ SELECT pg_sleep(0.5);
 (1 row)
 
 SELECT * FROM lockd_io;
-        relname         | hb_fetch | ib_fetch 
-------------------------+----------+----------
- _relation_stats_locked | f        | t
- _column_stats_locked   | f        | f
+        relname         | fetches 
+------------------------+---------
+ _relation_stats_locked | t
+ _column_stats_locked   | f
 (2 rows)
+
+SELECT reset_stat_and_cache();
+ reset_stat_and_cache 
+----------------------
+ 
+(1 row)
 
 SELECT relname, curpages FROM dbms_stats.relation_stats_locked
  WHERE relid = 'st1'::regclass;
@@ -673,10 +683,10 @@ SELECT pg_sleep(0.5);
 (1 row)
 
 SELECT * FROM lockd_io;
-        relname         | hb_fetch | ib_fetch 
-------------------------+----------+----------
- _relation_stats_locked | t        | t
- _column_stats_locked   | f        | f
+        relname         | fetches 
+------------------------+---------
+ _relation_stats_locked | t
+ _column_stats_locked   | f
 (2 rows)
 
 /*
@@ -685,6 +695,7 @@ SELECT * FROM lockd_io;
 -- No.5-4-1
 UPDATE dbms_stats._relation_stats_locked SET curpages = 1
  WHERE relid = 'st1'::regclass;
+VACUUM dbms_stats._relation_stats_locked;  -- in order to avoid auto vacuum
 EXPLAIN (costs false) SELECT * FROM st1 WHERE val IS NULL;
        QUERY PLAN        
 -------------------------
@@ -795,9 +806,9 @@ SELECT pg_sleep(0.5);
  
 (1 row)
 
-SELECT pg_stat_reset();
- pg_stat_reset 
----------------
+SELECT reset_stat_and_cache();
+ reset_stat_and_cache 
+----------------------
  
 (1 row)
 
@@ -809,11 +820,17 @@ SELECT pg_sleep(0.5);
 (1 row)
 
 SELECT * FROM lockd_io;
-        relname         | hb_fetch | ib_fetch 
-------------------------+----------+----------
- _relation_stats_locked | f        | f
- _column_stats_locked   | f        | f
+        relname         | fetches 
+------------------------+---------
+ _relation_stats_locked | f
+ _column_stats_locked   | f
 (2 rows)
+
+SELECT reset_stat_and_cache();
+ reset_stat_and_cache 
+----------------------
+ 
+(1 row)
 
 SELECT * FROM s0.test
  WHERE id = 1;
@@ -829,10 +846,10 @@ SELECT pg_sleep(0.5);
 (1 row)
 
 SELECT * FROM lockd_io;
-        relname         | hb_fetch | ib_fetch 
-------------------------+----------+----------
- _relation_stats_locked | f        | t
- _column_stats_locked   | f        | t
+        relname         | fetches 
+------------------------+---------
+ _relation_stats_locked | t
+ _column_stats_locked   | t
 (2 rows)
 
 ALTER TABLE s0.test RENAME TO droptest;
@@ -850,9 +867,9 @@ SELECT pg_sleep(0.5);
  
 (1 row)
 
-SELECT pg_stat_reset();
- pg_stat_reset 
----------------
+SELECT reset_stat_and_cache();
+ reset_stat_and_cache 
+----------------------
  
 (1 row)
 
@@ -864,11 +881,17 @@ SELECT pg_sleep(0.5);
 (1 row)
 
 SELECT * FROM lockd_io;
-        relname         | hb_fetch | ib_fetch 
-------------------------+----------+----------
- _relation_stats_locked | f        | f
- _column_stats_locked   | f        | f
+        relname         | fetches 
+------------------------+---------
+ _relation_stats_locked | f
+ _column_stats_locked   | f
 (2 rows)
+
+SELECT reset_stat_and_cache();
+ reset_stat_and_cache 
+----------------------
+ 
+(1 row)
 
 SELECT * FROM s0.droptest
  WHERE test = 1;
@@ -884,10 +907,10 @@ SELECT pg_sleep(0.5);
 (1 row)
 
 SELECT * FROM lockd_io;
-        relname         | hb_fetch | ib_fetch 
-------------------------+----------+----------
- _relation_stats_locked | f        | t
- _column_stats_locked   | f        | t
+        relname         | fetches 
+------------------------+---------
+ _relation_stats_locked | t
+ _column_stats_locked   | t
 (2 rows)
 
 ALTER TABLE s0.droptest RENAME test TO id;
@@ -906,9 +929,9 @@ SELECT pg_sleep(0.5);
  
 (1 row)
 
-SELECT pg_stat_reset();
- pg_stat_reset 
----------------
+SELECT reset_stat_and_cache();
+ reset_stat_and_cache 
+----------------------
  
 (1 row)
 
@@ -920,11 +943,17 @@ SELECT pg_sleep(0.5);
 (1 row)
 
 SELECT * FROM lockd_io;
-        relname         | hb_fetch | ib_fetch 
-------------------------+----------+----------
- _relation_stats_locked | f        | f
- _column_stats_locked   | f        | f
+        relname         | fetches 
+------------------------+---------
+ _relation_stats_locked | f
+ _column_stats_locked   | f
 (2 rows)
+
+SELECT reset_stat_and_cache();
+ reset_stat_and_cache 
+----------------------
+ 
+(1 row)
 
 SELECT * FROM s0.droptest
  WHERE id = 1;
@@ -940,10 +969,10 @@ SELECT pg_sleep(1.0);
 (1 row)
 
 SELECT * FROM lockd_io;
-        relname         | hb_fetch | ib_fetch 
-------------------------+----------+----------
- _relation_stats_locked | f        | t
- _column_stats_locked   | f        | t
+        relname         | fetches 
+------------------------+---------
+ _relation_stats_locked | t
+ _column_stats_locked   | t
 (2 rows)
 
 -- No.5-4-9
@@ -962,9 +991,9 @@ SELECT pg_sleep(0.5);
  
 (1 row)
 
-SELECT pg_stat_reset();
- pg_stat_reset 
----------------
+SELECT reset_stat_and_cache();
+ reset_stat_and_cache 
+----------------------
  
 (1 row)
 
@@ -976,11 +1005,17 @@ SELECT pg_sleep(0.5);
 (1 row)
 
 SELECT * FROM lockd_io;
-        relname         | hb_fetch | ib_fetch 
-------------------------+----------+----------
- _relation_stats_locked | t        | t
- _column_stats_locked   | t        | t
+        relname         | fetches 
+------------------------+---------
+ _relation_stats_locked | t
+ _column_stats_locked   | t
 (2 rows)
+
+SELECT reset_stat_and_cache();
+ reset_stat_and_cache 
+----------------------
+ 
+(1 row)
 
 SELECT * FROM s0.droptest
  WHERE id = 4;
@@ -996,10 +1031,10 @@ SELECT pg_sleep(0.5);
 (1 row)
 
 SELECT * FROM lockd_io;
-        relname         | hb_fetch | ib_fetch 
-------------------------+----------+----------
- _relation_stats_locked | t        | t
- _column_stats_locked   | t        | t
+        relname         | fetches 
+------------------------+---------
+ _relation_stats_locked | t
+ _column_stats_locked   | t
 (2 rows)
 
 -- clean up
@@ -2021,12 +2056,13 @@ SELECT * FROM dbms_stats.backup_history;
 BEGIN;
 SELECT relation::regclass, mode
   FROM pg_locks
- WHERE mode LIKE '%ExclusiveLock%'
- ORDER BY relation::regclass::text, mode;
- relation |     mode      
-----------+---------------
- (null)   | ExclusiveLock
-(1 row)
+  WHERE relation::regclass::text LIKE 'dbms_stats.\_%\_locked'
+     OR relation::regclass::text LIKE 'dbms_stats.backup_history'
+     OR relation::regclass::text LIKE 'dbms_stats.%\_backup'
+  ORDER BY relation::regclass::text, mode;
+ relation | mode 
+----------+------
+(0 rows)
 
 SELECT id, unit, comment FROM dbms_stats.purge_stats(2);
  id | unit | comment 
@@ -2037,22 +2073,20 @@ SELECT id, unit, comment FROM dbms_stats.purge_stats(2);
 
 SELECT relation::regclass, mode
   FROM pg_locks
- WHERE mode LIKE '%ExclusiveLock%'
- ORDER BY relation::regclass::text, mode;
-               relation                |           mode           
----------------------------------------+--------------------------
- dbms_stats.backup_history             | RowExclusiveLock
- dbms_stats.backup_history             | ShareUpdateExclusiveLock
- dbms_stats.backup_history_pkey        | RowExclusiveLock
- dbms_stats.column_stats_backup        | RowExclusiveLock
- dbms_stats.column_stats_backup        | ShareUpdateExclusiveLock
- dbms_stats.column_stats_backup_pkey   | RowExclusiveLock
- dbms_stats.relation_stats_backup      | RowExclusiveLock
- dbms_stats.relation_stats_backup      | ShareUpdateExclusiveLock
- dbms_stats.relation_stats_backup_pkey | RowExclusiveLock
- (null)                                | ExclusiveLock
- (null)                                | ExclusiveLock
-(11 rows)
+  WHERE relation::regclass::text LIKE 'dbms_stats.\_%\_locked'
+     OR relation::regclass::text LIKE 'dbms_stats.backup_history'
+     OR relation::regclass::text LIKE 'dbms_stats.%\_backup'
+  ORDER BY relation::regclass::text, mode;
+             relation             |           mode           
+----------------------------------+--------------------------
+ dbms_stats.backup_history        | AccessShareLock
+ dbms_stats.backup_history        | RowExclusiveLock
+ dbms_stats.backup_history        | ShareUpdateExclusiveLock
+ dbms_stats.column_stats_backup   | RowExclusiveLock
+ dbms_stats.column_stats_backup   | ShareUpdateExclusiveLock
+ dbms_stats.relation_stats_backup | RowExclusiveLock
+ dbms_stats.relation_stats_backup | ShareUpdateExclusiveLock
+(7 rows)
 
 COMMIT;
 SELECT * FROM dbms_stats.backup_history;
@@ -2661,4 +2695,4 @@ SELECT count(*) FROM dbms_stats._columnns_user WHERE false;
 ERROR:  relation "dbms_stats._columnns_user" does not exist
 LINE 1: SELECT count(*) FROM dbms_stats._columnns_user WHERE false;
                              ^
-\c - postgres
+\c - super_user

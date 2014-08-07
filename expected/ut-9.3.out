@@ -1393,19 +1393,21 @@ SELECT dbms_stats.unlock_database_stats();
 /*
  * No.6-4 dbms_stats.is_target_relkind
  */
--- No.6-4-10
-SELECT dbms_stats.is_target_relkind('f');
+-- No.6-4- 10-11
+SELECT dbms_stats.is_target_relkind(k::"char")
+ FROM (VALUES ('r'), ('i'), ('f'), ('m'),
+ 			  ('S'), ('t'), ('v'), ('c')) t(k);
  is_target_relkind 
 -------------------
  t
-(1 row)
-
--- No.6-4-11
-SELECT dbms_stats.is_target_relkind('m');
- is_target_relkind 
--------------------
  t
-(1 row)
+ t
+ t
+ f
+ f
+ f
+ f
+(8 rows)
 
 /*
  * No.7-1 dbms_stats.backup
@@ -2179,15 +2181,12 @@ VACUUM ANALYZE;
  */
 -- No.9-1-1
 DELETE FROM dbms_stats._relation_stats_locked;
+VACUUM dbms_stats._relation_stats_locked;  -- in order to avoid auto vacuum
 BEGIN;
-SELECT relation::regclass, mode
-  FROM pg_locks
- WHERE mode LIKE '%ExclusiveLock%'
- ORDER BY relation::regclass::text, mode;
- relation |     mode      
-----------+---------------
- (null)   | ExclusiveLock
-(1 row)
+SELECT * FROM internal_locks;
+ relation | mode 
+----------+------
+(0 rows)
 
 SELECT dbms_stats.restore(2, 's0.st0', NULL);
  restore 
@@ -2195,20 +2194,17 @@ SELECT dbms_stats.restore(2, 's0.st0', NULL);
  s0.st0
 (1 row)
 
-SELECT relation::regclass, mode
-  FROM pg_locks
- WHERE mode LIKE '%ExclusiveLock%'
- ORDER BY relation::regclass::text, mode;
-                relation                |           mode           
-----------------------------------------+--------------------------
- dbms_stats._column_stats_locked        | RowExclusiveLock
- dbms_stats._column_stats_locked        | ShareUpdateExclusiveLock
- dbms_stats._column_stats_locked_pkey   | RowExclusiveLock
- dbms_stats._relation_stats_locked      | RowExclusiveLock
- dbms_stats._relation_stats_locked      | ShareUpdateExclusiveLock
- dbms_stats._relation_stats_locked_pkey | RowExclusiveLock
- (null)                                 | ExclusiveLock
- (null)                                 | ExclusiveLock
+SELECT * FROM internal_locks;
+             relation              |           mode           
+-----------------------------------+--------------------------
+ dbms_stats.backup_history         | AccessShareLock
+ dbms_stats.column_stats_backup    | AccessShareLock
+ dbms_stats._column_stats_locked   | RowExclusiveLock
+ dbms_stats._column_stats_locked   | ShareUpdateExclusiveLock
+ dbms_stats.relation_stats_backup  | AccessShareLock
+ dbms_stats._relation_stats_locked | RowExclusiveLock
+ dbms_stats._relation_stats_locked | RowShareLock
+ dbms_stats._relation_stats_locked | ShareUpdateExclusiveLock
 (8 rows)
 
 COMMIT;
@@ -3219,15 +3215,12 @@ SELECT dbms_stats.restore_stats(0);
 ERROR:  backup id 0 not found
 -- No.10-7-3
 DELETE FROM dbms_stats._relation_stats_locked;
+VACUUM dbms_stats._relation_stats_locked;  -- in order to avoid auto vacuum
 BEGIN;
-SELECT relation::regclass, mode
-  FROM pg_locks
- WHERE mode LIKE '%ExclusiveLock%'
- ORDER BY relation::regclass::text, mode;
- relation |     mode      
-----------+---------------
- (null)   | ExclusiveLock
-(1 row)
+SELECT * FROM internal_locks;
+ relation | mode 
+----------+------
+(0 rows)
 
 SELECT dbms_stats.restore_stats(2);
  restore_stats 
@@ -3249,20 +3242,17 @@ SELECT dbms_stats.restore_stats(2);
  st1_idx
 (15 rows)
 
-SELECT relation::regclass, mode
-  FROM pg_locks
- WHERE mode LIKE '%ExclusiveLock%'
- ORDER BY relation::regclass::text, mode;
-                relation                |           mode           
-----------------------------------------+--------------------------
- dbms_stats._column_stats_locked        | RowExclusiveLock
- dbms_stats._column_stats_locked        | ShareUpdateExclusiveLock
- dbms_stats._column_stats_locked_pkey   | RowExclusiveLock
- dbms_stats._relation_stats_locked      | RowExclusiveLock
- dbms_stats._relation_stats_locked      | ShareUpdateExclusiveLock
- dbms_stats._relation_stats_locked_pkey | RowExclusiveLock
- (null)                                 | ExclusiveLock
- (null)                                 | ExclusiveLock
+SELECT * FROM internal_locks;
+             relation              |           mode           
+-----------------------------------+--------------------------
+ dbms_stats.backup_history         | AccessShareLock
+ dbms_stats.column_stats_backup    | AccessShareLock
+ dbms_stats._column_stats_locked   | RowExclusiveLock
+ dbms_stats._column_stats_locked   | ShareUpdateExclusiveLock
+ dbms_stats.relation_stats_backup  | AccessShareLock
+ dbms_stats._relation_stats_locked | RowExclusiveLock
+ dbms_stats._relation_stats_locked | RowShareLock
+ dbms_stats._relation_stats_locked | ShareUpdateExclusiveLock
 (8 rows)
 
 COMMIT;
@@ -3722,15 +3712,12 @@ SELECT starelid, attname, stainherit FROM columns_locked_v c;
  */
 -- No.11-2-1
 DELETE FROM dbms_stats._relation_stats_locked;
+VACUUM dbms_stats._relation_stats_locked;  -- in order to avoid auto vacuum
 BEGIN;
-SELECT relation::regclass, mode
-  FROM pg_locks
- WHERE mode LIKE '%ExclusiveLock%'
- ORDER BY relation::regclass::text, mode;
- relation |     mode      
-----------+---------------
- (null)   | ExclusiveLock
-(1 row)
+SELECT * FROM internal_locks;
+ relation | mode 
+----------+------
+(0 rows)
 
 SELECT dbms_stats.lock('s0.st0');
   lock  
@@ -3753,21 +3740,17 @@ SELECT * FROM columns_locked_v c;
  s0.st0   |         2 | num     | t          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)      | {1}         | (null)      | (null)      | (null)      | {10,20,40,50,60} | (null)     | (null)     | (null)     | (null)
 (4 rows)
 
-SELECT relation::regclass, mode
-  FROM pg_locks
- WHERE mode LIKE '%ExclusiveLock%'
- ORDER BY relation::regclass::text, mode;
-                relation                |           mode           
-----------------------------------------+--------------------------
- dbms_stats._column_stats_locked        | RowExclusiveLock
- dbms_stats._column_stats_locked        | ShareUpdateExclusiveLock
- dbms_stats._column_stats_locked_pkey   | RowExclusiveLock
- dbms_stats._relation_stats_locked      | RowExclusiveLock
- dbms_stats._relation_stats_locked      | ShareUpdateExclusiveLock
- dbms_stats._relation_stats_locked_pkey | RowExclusiveLock
- (null)                                 | ExclusiveLock
- (null)                                 | ExclusiveLock
-(8 rows)
+SELECT * FROM internal_locks;
+             relation              |           mode           
+-----------------------------------+--------------------------
+ dbms_stats._column_stats_locked   | AccessShareLock
+ dbms_stats._column_stats_locked   | RowExclusiveLock
+ dbms_stats._column_stats_locked   | ShareUpdateExclusiveLock
+ dbms_stats._relation_stats_locked | AccessShareLock
+ dbms_stats._relation_stats_locked | RowExclusiveLock
+ dbms_stats._relation_stats_locked | RowShareLock
+ dbms_stats._relation_stats_locked | ShareUpdateExclusiveLock
+(7 rows)
 
 COMMIT;
 -- No.11-2-2
@@ -4971,7 +4954,7 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
 
 SELECT starelid::regclass, staattnum FROM dbms_stats._column_stats_locked
  GROUP BY starelid, staattnum
- ORDER BY starelid;
+ ORDER BY starelid, staattnum;
  starelid | staattnum 
 ----------+-----------
 (0 rows)
@@ -5024,7 +5007,7 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
 
 SELECT starelid::regclass, staattnum FROM dbms_stats._column_stats_locked
  GROUP BY starelid, staattnum
- ORDER BY starelid;
+ ORDER BY starelid, staattnum;
  starelid | staattnum 
 ----------+-----------
  st0      |         1
@@ -5073,7 +5056,7 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
 
 SELECT starelid::regclass, staattnum FROM dbms_stats._column_stats_locked
  GROUP BY starelid, staattnum
- ORDER BY starelid;
+ ORDER BY starelid, staattnum;
  starelid | staattnum 
 ----------+-----------
  st0      |         1
@@ -5143,7 +5126,7 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
 
 SELECT starelid::regclass, staattnum FROM dbms_stats._column_stats_locked
  GROUP BY starelid, staattnum
- ORDER BY starelid;
+ ORDER BY starelid, staattnum;
  starelid | staattnum 
 ----------+-----------
  st0      |         1
@@ -5195,7 +5178,7 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
 
 SELECT starelid::regclass, staattnum FROM dbms_stats._column_stats_locked
  GROUP BY starelid, staattnum
- ORDER BY starelid;
+ ORDER BY starelid, staattnum;
  starelid | staattnum 
 ----------+-----------
  st0      |         1
@@ -5217,6 +5200,7 @@ SELECT starelid::regclass, staattnum FROM dbms_stats._column_stats_locked
 
 -- No.13-1-13
 DELETE FROM dbms_stats._relation_stats_locked;
+VACUUM dbms_stats._relation_stats_locked;  -- in order to avoid auto vacuum
 SELECT dbms_stats.lock_database_stats();
  lock_database_stats 
 ---------------------
@@ -5251,14 +5235,10 @@ SELECT count(*) FROM dbms_stats._column_stats_locked;
 (1 row)
 
 BEGIN;
-SELECT relation::regclass, mode
-  FROM pg_locks
- WHERE mode LIKE '%ExclusiveLock%'
- ORDER BY relation::regclass::text, mode;
- relation |     mode      
-----------+---------------
- (null)   | ExclusiveLock
-(1 row)
+SELECT * FROM internal_locks;
+ relation | mode 
+----------+------
+(0 rows)
 
 SELECT dbms_stats.unlock();
    unlock   
@@ -5281,19 +5261,15 @@ SELECT dbms_stats.unlock();
  s1.st0
 (16 rows)
 
-SELECT relation::regclass, mode
-  FROM pg_locks
- WHERE mode LIKE '%ExclusiveLock%'
- ORDER BY relation::regclass::text, mode;
+SELECT * FROM internal_locks;
              relation              |           mode           
 -----------------------------------+--------------------------
  dbms_stats._column_stats_locked   | RowExclusiveLock
  dbms_stats._column_stats_locked   | ShareUpdateExclusiveLock
+ dbms_stats._relation_stats_locked | AccessShareLock
  dbms_stats._relation_stats_locked | RowExclusiveLock
  dbms_stats._relation_stats_locked | ShareUpdateExclusiveLock
- (null)                            | ExclusiveLock
- (null)                            | ExclusiveLock
-(6 rows)
+(5 rows)
 
 COMMIT;
 SELECT count(*) FROM dbms_stats._relation_stats_locked;
@@ -5515,6 +5491,7 @@ SELECT count(*) FROM dbms_stats._column_stats_locked;
 
 -- No.14-1-4
 DELETE FROM dbms_stats._relation_stats_locked;
+VACUUM dbms_stats._relation_stats_locked;  -- in order to avoid auto vacuum
 SELECT dbms_stats.lock_database_stats();
  lock_database_stats 
 ---------------------
@@ -5549,14 +5526,10 @@ SELECT count(*) FROM dbms_stats._column_stats_locked;
 (1 row)
 
 BEGIN;
-SELECT relation::regclass, mode
-  FROM pg_locks
- WHERE mode LIKE '%ExclusiveLock%'
- ORDER BY relation::regclass::text, mode;
- relation |     mode      
-----------+---------------
- (null)   | ExclusiveLock
-(1 row)
+SELECT * FROM internal_locks;
+ relation | mode 
+----------+------
+(0 rows)
 
 SELECT dbms_stats.unlock_database_stats();
  unlock_database_stats 
@@ -5579,19 +5552,15 @@ SELECT dbms_stats.unlock_database_stats();
  s1.st0
 (16 rows)
 
-SELECT relation::regclass, mode
-  FROM pg_locks
- WHERE mode LIKE '%ExclusiveLock%'
- ORDER BY relation::regclass::text, mode;
+SELECT * FROM internal_locks;
              relation              |           mode           
 -----------------------------------+--------------------------
  dbms_stats._column_stats_locked   | RowExclusiveLock
  dbms_stats._column_stats_locked   | ShareUpdateExclusiveLock
+ dbms_stats._relation_stats_locked | AccessShareLock
  dbms_stats._relation_stats_locked | RowExclusiveLock
  dbms_stats._relation_stats_locked | ShareUpdateExclusiveLock
- (null)                            | ExclusiveLock
- (null)                            | ExclusiveLock
-(6 rows)
+(5 rows)
 
 COMMIT;
 SELECT count(*) FROM dbms_stats._relation_stats_locked;
@@ -6301,6 +6270,7 @@ SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
 
 -- No.14-2-8
 DELETE FROM dbms_stats._relation_stats_locked;
+VACUUM dbms_stats._relation_stats_locked;  -- in order to avoid auto vacuum
 SELECT dbms_stats.lock_database_stats();
  lock_database_stats 
 ---------------------
@@ -6362,14 +6332,10 @@ SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
 (9 rows)
 
 BEGIN;
-SELECT relation::regclass, mode
-  FROM pg_locks
- WHERE mode LIKE '%ExclusiveLock%'
- ORDER BY relation::regclass::text, mode;
- relation |     mode      
-----------+---------------
- (null)   | ExclusiveLock
-(1 row)
+SELECT * FROM internal_locks;
+ relation | mode 
+----------+------
+(0 rows)
 
 SELECT dbms_stats.unlock_schema_stats('s0');
  unlock_schema_stats 
@@ -6384,19 +6350,15 @@ SELECT dbms_stats.unlock_schema_stats('s0');
  s0.smv0
 (8 rows)
 
-SELECT relation::regclass, mode
-  FROM pg_locks
- WHERE mode LIKE '%ExclusiveLock%'
- ORDER BY relation::regclass::text, mode;
+SELECT * FROM internal_locks;
              relation              |           mode           
 -----------------------------------+--------------------------
  dbms_stats._column_stats_locked   | RowExclusiveLock
  dbms_stats._column_stats_locked   | ShareUpdateExclusiveLock
+ dbms_stats._relation_stats_locked | AccessShareLock
  dbms_stats._relation_stats_locked | RowExclusiveLock
  dbms_stats._relation_stats_locked | ShareUpdateExclusiveLock
- (null)                            | ExclusiveLock
- (null)                            | ExclusiveLock
-(6 rows)
+(5 rows)
 
 COMMIT;
 SELECT relid::regclass FROM dbms_stats._relation_stats_locked
@@ -7132,6 +7094,7 @@ SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
 
 -- No.14-3-8
 DELETE FROM dbms_stats._relation_stats_locked;
+VACUUM dbms_stats._relation_stats_locked;  -- in order to avoid auto vacuum
 SELECT dbms_stats.lock_database_stats();
  lock_database_stats 
 ---------------------
@@ -7193,14 +7156,10 @@ SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
 (9 rows)
 
 BEGIN;
-SELECT relation::regclass, mode
-  FROM pg_locks
- WHERE mode LIKE '%ExclusiveLock%'
- ORDER BY relation::regclass::text, mode;
- relation |     mode      
-----------+---------------
- (null)   | ExclusiveLock
-(1 row)
+SELECT * FROM internal_locks;
+ relation | mode 
+----------+------
+(0 rows)
 
 SELECT dbms_stats.unlock_table_stats('s0.st0');
  unlock_table_stats 
@@ -7208,20 +7167,14 @@ SELECT dbms_stats.unlock_table_stats('s0.st0');
  s0.st0
 (1 row)
 
-SELECT relation::regclass, mode
-  FROM pg_locks
- WHERE mode LIKE '%ExclusiveLock%'
- ORDER BY relation::regclass::text, mode;
-                relation                |           mode           
-----------------------------------------+--------------------------
- dbms_stats._column_stats_locked        | RowExclusiveLock
- dbms_stats._column_stats_locked        | ShareUpdateExclusiveLock
- dbms_stats._relation_stats_locked      | RowExclusiveLock
- dbms_stats._relation_stats_locked      | ShareUpdateExclusiveLock
- dbms_stats._relation_stats_locked_pkey | RowExclusiveLock
- (null)                                 | ExclusiveLock
- (null)                                 | ExclusiveLock
-(7 rows)
+SELECT * FROM internal_locks;
+             relation              |           mode           
+-----------------------------------+--------------------------
+ dbms_stats._column_stats_locked   | RowExclusiveLock
+ dbms_stats._column_stats_locked   | ShareUpdateExclusiveLock
+ dbms_stats._relation_stats_locked | RowExclusiveLock
+ dbms_stats._relation_stats_locked | ShareUpdateExclusiveLock
+(4 rows)
 
 COMMIT;
 SELECT relid::regclass FROM dbms_stats._relation_stats_locked
@@ -7968,6 +7921,7 @@ SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
 
 -- No.14-4-8
 DELETE FROM dbms_stats._relation_stats_locked;
+VACUUM dbms_stats._relation_stats_locked;  -- in order to avoid auto vacuum
 SELECT dbms_stats.lock_database_stats();
  lock_database_stats 
 ---------------------
@@ -8029,14 +7983,10 @@ SELECT starelid::regclass, count(*) FROM dbms_stats._column_stats_locked
 (9 rows)
 
 BEGIN;
-SELECT relation::regclass, mode
-  FROM pg_locks
- WHERE mode LIKE '%ExclusiveLock%'
- ORDER BY relation::regclass::text, mode;
- relation |     mode      
-----------+---------------
- (null)   | ExclusiveLock
-(1 row)
+SELECT * FROM internal_locks;
+ relation | mode 
+----------+------
+(0 rows)
 
 SELECT dbms_stats.unlock_table_stats('s0', 'st0');
  unlock_table_stats 
@@ -8044,20 +7994,14 @@ SELECT dbms_stats.unlock_table_stats('s0', 'st0');
  s0.st0
 (1 row)
 
-SELECT relation::regclass, mode
-  FROM pg_locks
- WHERE mode LIKE '%ExclusiveLock%'
- ORDER BY relation::regclass::text, mode;
-                relation                |           mode           
-----------------------------------------+--------------------------
- dbms_stats._column_stats_locked        | RowExclusiveLock
- dbms_stats._column_stats_locked        | ShareUpdateExclusiveLock
- dbms_stats._relation_stats_locked      | RowExclusiveLock
- dbms_stats._relation_stats_locked      | ShareUpdateExclusiveLock
- dbms_stats._relation_stats_locked_pkey | RowExclusiveLock
- (null)                                 | ExclusiveLock
- (null)                                 | ExclusiveLock
-(7 rows)
+SELECT * FROM internal_locks;
+             relation              |           mode           
+-----------------------------------+--------------------------
+ dbms_stats._column_stats_locked   | RowExclusiveLock
+ dbms_stats._column_stats_locked   | ShareUpdateExclusiveLock
+ dbms_stats._relation_stats_locked | RowExclusiveLock
+ dbms_stats._relation_stats_locked | ShareUpdateExclusiveLock
+(4 rows)
 
 COMMIT;
 SELECT relid::regclass FROM dbms_stats._relation_stats_locked
@@ -9084,6 +9028,7 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
 
 -- No.14-5-9
 DELETE FROM dbms_stats._relation_stats_locked;
+VACUUM dbms_stats._relation_stats_locked;  -- in order to avoid auto vacuum
 SELECT dbms_stats.lock_database_stats();
  lock_database_stats 
 ---------------------
@@ -9153,14 +9098,10 @@ SELECT starelid, attname, stainherit FROM columns_locked_v c;
 (19 rows)
 
 BEGIN;
-SELECT relation::regclass, mode
-  FROM pg_locks
- WHERE mode LIKE '%ExclusiveLock%'
- ORDER BY relation::regclass::text, mode;
- relation |     mode      
-----------+---------------
- (null)   | ExclusiveLock
-(1 row)
+SELECT * FROM internal_locks;
+ relation | mode 
+----------+------
+(0 rows)
 
 SELECT dbms_stats.unlock_column_stats('s0.st0', 'id');
  unlock_column_stats 
@@ -9168,19 +9109,13 @@ SELECT dbms_stats.unlock_column_stats('s0.st0', 'id');
  s0.st0
 (1 row)
 
-SELECT relation::regclass, mode
-  FROM pg_locks
- WHERE mode LIKE '%ExclusiveLock%'
- ORDER BY relation::regclass::text, mode;
-               relation               |           mode           
---------------------------------------+--------------------------
- dbms_stats._column_stats_locked      | RowExclusiveLock
- dbms_stats._column_stats_locked      | ShareUpdateExclusiveLock
- dbms_stats._column_stats_locked_pkey | RowExclusiveLock
- dbms_stats._relation_stats_locked    | ShareUpdateExclusiveLock
- (null)                               | ExclusiveLock
- (null)                               | ExclusiveLock
-(6 rows)
+SELECT * FROM internal_locks;
+             relation              |           mode           
+-----------------------------------+--------------------------
+ dbms_stats._column_stats_locked   | RowExclusiveLock
+ dbms_stats._column_stats_locked   | ShareUpdateExclusiveLock
+ dbms_stats._relation_stats_locked | ShareUpdateExclusiveLock
+(3 rows)
 
 COMMIT;
 SELECT starelid, attname, stainherit FROM columns_locked_v c;
@@ -10081,6 +10016,7 @@ SELECT relid::regclass FROM dbms_stats._relation_stats_locked
 
 -- No.14-6-8
 DELETE FROM dbms_stats._relation_stats_locked;
+VACUUM dbms_stats._relation_stats_locked;  -- in order to avoid auto vacuum
 SELECT dbms_stats.lock_database_stats();
  lock_database_stats 
 ---------------------
@@ -10150,14 +10086,10 @@ SELECT starelid, attname, stainherit FROM columns_locked_v c;
 (19 rows)
 
 BEGIN;
-SELECT relation::regclass, mode
-  FROM pg_locks
- WHERE mode LIKE '%ExclusiveLock%'
- ORDER BY relation::regclass::text, mode;
- relation |     mode      
-----------+---------------
- (null)   | ExclusiveLock
-(1 row)
+SELECT * FROM internal_locks;
+ relation | mode 
+----------+------
+(0 rows)
 
 SELECT dbms_stats.unlock_column_stats('s0', 'st0', 'id');
  unlock_column_stats 
@@ -10165,19 +10097,13 @@ SELECT dbms_stats.unlock_column_stats('s0', 'st0', 'id');
  s0.st0
 (1 row)
 
-SELECT relation::regclass, mode
-  FROM pg_locks
- WHERE mode LIKE '%ExclusiveLock%'
- ORDER BY relation::regclass::text, mode;
-               relation               |           mode           
---------------------------------------+--------------------------
- dbms_stats._column_stats_locked      | RowExclusiveLock
- dbms_stats._column_stats_locked      | ShareUpdateExclusiveLock
- dbms_stats._column_stats_locked_pkey | RowExclusiveLock
- dbms_stats._relation_stats_locked    | ShareUpdateExclusiveLock
- (null)                               | ExclusiveLock
- (null)                               | ExclusiveLock
-(6 rows)
+SELECT * FROM internal_locks;
+             relation              |           mode           
+-----------------------------------+--------------------------
+ dbms_stats._column_stats_locked   | RowExclusiveLock
+ dbms_stats._column_stats_locked   | ShareUpdateExclusiveLock
+ dbms_stats._relation_stats_locked | ShareUpdateExclusiveLock
+(3 rows)
 
 COMMIT;
 SELECT starelid, attname, stainherit FROM columns_locked_v c;

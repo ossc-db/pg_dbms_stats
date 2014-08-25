@@ -1290,7 +1290,7 @@ init_rel_stats(void)
 	ctl.hcxt = CacheMemoryContext;
 	hash = hash_create("dbms_stats relation statistics cache",
 					   MAX_REL_CACHE,
-					   &ctl, HASH_ELEM | HASH_CONTEXT);
+					   &ctl, HASH_ELEM | HASH_CONTEXT | HASH_FUNCTION);
 
 	rel_stats = hash;
 }

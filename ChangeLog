@@ -1,3 +1,14 @@
+2014-08-25 Kyotaro Horiguchi <horiguchi.kyotaro@lab.ntt.co.jp>
+	* pg_dbms_stats.c: Fixed a bug that relation ids which are the
+	keys for the relation statistics cache was mistakenly treated as
+	strings. This causes a false match between oids having a
+	intermediate 0x00 byte and identical lower bytes (for the little
+	endian case). Returning the wrong statistics cache can result in
+	server crash, or at least unexpected plans.
+	* pg_dbms_stats-1.3.3.sql: Lock granurality for pg_dbms_stats's
+	operations was raised. Simultaneous lock operations on different
+	tables no longer block each other.
+
 2014-06-06 Kyotaro Horiguchi <horiguchi.kyotaro@lab.ntt.co.jp>
 	* pg_dbms_stats.c: pg_dbms_stats no more causes planner to access
 	repeatedly to the tables of pg_dbms_stats for nonexistent saved
@@ -8,7 +19,6 @@
 	tables/indexes.
 
 	* pg_dbms_stats.c: Fix a bug potentially causes SEGV crash.
-	しました。
 
 	* pg_dbms_stats--*.sql, pg_dbms_stats.control: Now declares the
 	right version to the extension framework. ALTER EXTENSION can be

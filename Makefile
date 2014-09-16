@@ -2,7 +2,7 @@
 
 MODULE_big = pg_dbms_stats
 OBJS = pg_dbms_stats.o dump.o import.o
-DBMSSTATSVER = 1.3.3
+DBMSSTATSVER = 1.3.4
 DOCDIR = doc
 EXTDIR = ext_scripts
 
@@ -14,7 +14,7 @@ LAST_LIBPATH=$(shell echo $(LD_LIBRARY_PATH) | sed -e "s/^.*;//")
 CHECKING=$(shell echo $(LAST_LIBPATH)| grep './tmp_check/install/' | wc -l)
 
 EXTENSION = pg_dbms_stats
-DATA = pg_dbms_stats--1.3.3.sql pg_dbms_stats--1.0--1.3.2.sql pg_dbms_stats--1.3.2--1.3.3.sql
+DATA = pg_dbms_stats--1.3.4.sql pg_dbms_stats--1.0--1.3.2.sql pg_dbms_stats--1.3.2--1.3.3.sql pg_dbms_stats--1.3.3--1.3.4.sql
 
 REGRESS = init-common ut_fdw_init init-$(MAJORVERSION) ut-common \
 		  ut-$(MAJORVERSION)  ut_imp_exp-$(MAJORVERSION)
@@ -29,7 +29,7 @@ STARBALL94 = pg_dbms_stats94-$(DBMSSTATSVER).tar.gz
 STARBALL93 = pg_dbms_stats93-$(DBMSSTATSVER).tar.gz
 STARBALL92 = pg_dbms_stats92-$(DBMSSTATSVER).tar.gz
 STARBALL91 = pg_dbms_stats91-$(DBMSSTATSVER).tar.gz
-STARBALLS = $(STARBALL) $(STARBALL94s) $(STARBALL93) $(STARBALL92) $(STARBALL91)
+STARBALLS = $(STARBALL) $(STARBALL94) $(STARBALL93) $(STARBALL92) $(STARBALL91)
 
 EXTRA_CLEAN = sql/ut_anyarray-*.sql expected/ut_anyarray-*.out \
 	sql/ut_imp_exp-*.sql expected/ut_imp_exp-*.out \

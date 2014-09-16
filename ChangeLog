@@ -1,3 +1,8 @@
+2014-09-16 Kyotaro Horiguchi <horiguchi.kyotaro@lab.ntt.co.jp>
+	* pg_dbms_stats.c: Fix a bug that inheritance state was wrongly
+	ahndled. This was resulted in a failure of statistics locking for
+	inheritance parents.
+
 2014-08-25 Kyotaro Horiguchi <horiguchi.kyotaro@lab.ntt.co.jp>
 	* pg_dbms_stats.c: Fixed a bug that relation ids which are the
 	keys for the relation statistics cache was mistakenly treated as

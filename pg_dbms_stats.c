@@ -65,6 +65,7 @@ typedef struct StatsColumnEntry
 {
   bool		negative;
   int32		attnum;
+  bool		inh;
   HeapTuple tuple;
 } StatsColumnEntry;
 
@@ -143,7 +144,8 @@ static HeapTuple get_merged_column_stats(Oid relid, AttrNumber attnum,
 	bool inh);
 static HeapTuple column_cache_search(Oid relid, AttrNumber attnum,
 									 bool inh, bool*negative);
-static HeapTuple column_cache_enter(Oid relid, int32 attnum, HeapTuple tuple);
+static HeapTuple column_cache_enter(Oid relid, int32 attnum, bool inh,
+									HeapTuple tuple);
 static bool execute_plan(SPIPlanPtr *plan, const char *query, Oid relid,
 	const AttrNumber *attnum, bool inh);
 static void StatsCacheRelCallback(Datum arg, Oid relid);
@@ -1066,7 +1068,7 @@ get_merged_column_stats(Oid relid, AttrNumber attnum, bool inh)
 				tuple = NULL;
 
 			/* Cache merged result for subsequent calls. */
-			tuple = column_cache_enter(relid, attnum, tuple);
+			tuple = column_cache_enter(relid, attnum, inh, tuple);
 
 			/* Return system stats if the merging results in failure. */
 			if (!HeapTupleIsValid(tuple))
@@ -1118,7 +1120,7 @@ column_cache_search(Oid relid, AttrNumber attnum, bool inh, bool *negative)
 	{
 		StatsColumnEntry *ent = (StatsColumnEntry*) lfirst (lc);
 
-		if (ent->attnum != attnum) continue;
+		if (ent->attnum != attnum || ent->inh != inh) continue;
 
 		if (ent->negative)
 		{
@@ -1126,15 +1128,8 @@ column_cache_search(Oid relid, AttrNumber attnum, bool inh, bool *negative)
 			*negative = true;
 			return NULL;
 		}
-		else
-		{
-			HeapTuple	tuple = (HeapTuple) ent->tuple;
-			Form_pg_statistic form = get_pg_statistic(tuple);
 
-			/* Find statistic of the given column from the cache. */
-			if (form->stainherit == inh)
-				return tuple;
-		}
+		return ent->tuple;
 	}
 
 	return NULL;	/* Not yet registered. */
@@ -1146,7 +1141,7 @@ column_cache_search(Oid relid, AttrNumber attnum, bool inh, bool *negative)
  * table definition have been changed.
  */
 static HeapTuple
-column_cache_enter(Oid relid, int32 attnum, HeapTuple tuple)
+column_cache_enter(Oid relid, int32 attnum, bool inh, HeapTuple tuple)
 {
 	MemoryContext	oldcontext;
 	StatsColumnEntry *newcolent;
@@ -1166,6 +1161,8 @@ column_cache_enter(Oid relid, int32 attnum, HeapTuple tuple)
 	oldcontext = MemoryContextSwitchTo(CacheMemoryContext);
 	newcolent = (StatsColumnEntry*)palloc(sizeof(StatsColumnEntry));
 	newcolent->attnum = attnum;
+	newcolent->inh = inh;
+
 	if (HeapTupleIsValid(tuple))
 	{
 		newcolent->negative = false;

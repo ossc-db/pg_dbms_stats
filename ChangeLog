@@ -1,6 +1,9 @@
+2014-11-06 Kyotaro Horiguchi <horiguchi.kyotaro@lab.ntt.co.jp>
+	* pg_dbms_stats.control: Correct default_version.
+
 2014-09-16 Kyotaro Horiguchi <horiguchi.kyotaro@lab.ntt.co.jp>
 	* pg_dbms_stats.c: Fix a bug that inheritance state was wrongly
-	ahndled. This was resulted in a failure of statistics locking for
+	handled. This was resulted in a failure of statistics locking for
 	inheritance parents.
 
 2014-08-25 Kyotaro Horiguchi <horiguchi.kyotaro@lab.ntt.co.jp>

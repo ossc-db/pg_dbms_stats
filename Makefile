@@ -2,7 +2,7 @@
 
 MODULE_big = pg_dbms_stats
 OBJS = pg_dbms_stats.o dump.o import.o
-DBMSSTATSVER = 1.3.4
+DBMSSTATSVER = 1.3.5
 DOCDIR = doc
 EXTDIR = ext_scripts
 
@@ -14,12 +14,13 @@ LAST_LIBPATH=$(shell echo $(LD_LIBRARY_PATH) | sed -e "s/^.*;//")
 CHECKING=$(shell echo $(LAST_LIBPATH)| grep './tmp_check/install/' | wc -l)
 
 EXTENSION = pg_dbms_stats
-DATA = pg_dbms_stats--1.3.4.sql pg_dbms_stats--1.0--1.3.2.sql pg_dbms_stats--1.3.2--1.3.3.sql pg_dbms_stats--1.3.3--1.3.4.sql
 
 REGRESS = init-common ut_fdw_init init-$(MAJORVERSION) ut-common \
 		  ut-$(MAJORVERSION)  ut_imp_exp-$(MAJORVERSION)
 
 REGRESS_OPTS = --encoding=UTF8 --temp-config=regress.conf --extra-install=contrib/file_fdw
+
+DATA = pg_dbms_stats--1.3.5.sql pg_dbms_stats--1.0--1.3.2.sql pg_dbms_stats--1.3.2--1.3.3.sql pg_dbms_stats--1.3.3--1.3.4.sql pg_dbms_stats--1.3.4--1.3.5.sql
 
 DOCS = $(DOCDIR)/export_effective_stats-$(MAJORVERSION).sql.sample \
 	$(DOCDIR)/export_plain_stats-$(MAJORVERSION).sql.sample
@@ -54,11 +55,8 @@ include $(top_builddir)/src/Makefile.global
 include $(top_srcdir)/contrib/contrib-global.mk
 endif
 
-ifeq "$(MAJORVERSION)" "9.4"
-MAJORVERSION=9.3
-endif
 ifeq "$(MAJORVERSION)" "9.5"
-MAJORVERSION=9.3
+MAJORVERSION=9.4
 endif
 
 TARSOURCES = Makefile *.c  *.h \

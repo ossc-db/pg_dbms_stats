@@ -14,8 +14,8 @@
 ## Set general information for pg_dbms_stats.
 Summary:    Plan Stabilizer for PostgreSQL 9.2
 Name:       pg_dbms_stats92
-Version:    1.3.4
-Release:    2%{?dist}
+Version:    1.3.5
+Release:    1%{?dist}
 License:    BSD
 Group:      Applications/Databases
 Source:     %{name}-%{version}.tar.gz
@@ -56,10 +56,11 @@ rm -rf %{buildroot}
 install -d %{buildroot}%{_libdir}
 install -m 755 pg_dbms_stats.so %{buildroot}%{_libdir}/pg_dbms_stats.so
 install -d %{buildroot}%{_datadir}/extension
-install -m 644 pg_dbms_stats--1.3.4.sql %{buildroot}%{_datadir}/extension/pg_dbms_stats--1.3.4.sql
+install -m 644 pg_dbms_stats--1.3.5.sql %{buildroot}%{_datadir}/extension/pg_dbms_stats--1.3.5.sql
 install -m 644 pg_dbms_stats--1.0--1.3.2.sql %{buildroot}%{_datadir}/extension/pg_dbms_stats--1.0--1.3.2.sql
 install -m 644 pg_dbms_stats--1.3.2--1.3.3.sql %{buildroot}%{_datadir}/extension/pg_dbms_stats--1.3.2--1.3.3.sql
 install -m 644 pg_dbms_stats--1.3.3--1.3.4.sql %{buildroot}%{_datadir}/extension/pg_dbms_stats--1.3.3--1.3.4.sql
+install -m 644 pg_dbms_stats--1.3.4--1.3.5.sql %{buildroot}%{_datadir}/extension/pg_dbms_stats--1.3.4--1.3.5.sql
 install -m 644 pg_dbms_stats.control %{buildroot}%{_datadir}/extension/pg_dbms_stats.control
 install -d %{buildroot}%{_docdir}/extension
 install -m 644 doc/export_effective_stats-9.2.sql.sample %{buildroot}%{_docdir}/extension/export_effective_stats-9.2.sql.sample
@@ -72,10 +73,11 @@ rm -rf %{buildroot}
 %defattr(0755,root,root)
 %{_libdir}/pg_dbms_stats.so
 %defattr(0644,root,root)
-%{_datadir}/extension/pg_dbms_stats--1.3.4.sql
+%{_datadir}/extension/pg_dbms_stats--1.3.5.sql
 %{_datadir}/extension/pg_dbms_stats--1.0--1.3.2.sql
 %{_datadir}/extension/pg_dbms_stats--1.3.2--1.3.3.sql
 %{_datadir}/extension/pg_dbms_stats--1.3.3--1.3.4.sql
+%{_datadir}/extension/pg_dbms_stats--1.3.4--1.3.5.sql
 %{_datadir}/extension/pg_dbms_stats.control
 %{_docdir}/extension/export_effective_stats-9.2.sql.sample
 %{_docdir}/extension/export_plain_stats-9.2.sql.sample

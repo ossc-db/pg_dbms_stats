@@ -11,7 +11,7 @@ SELECT relid::regclass,
        relpages,
        reltuples,
        curpages
-  FROM dbms_stats._relation_stats_locked
+  FROM dbms_stats.relation_stats_locked
  ORDER BY relid;
 CREATE VIEW relations_backup_v AS
 SELECT id,
@@ -38,7 +38,7 @@ SELECT starelid::regclass, staattnum, attname, stainherit,
        staop1, staop2, staop3, staop4,
        stanumbers1, stanumbers2, stanumbers3, stanumbers4,
        stavalues1, stavalues2, stavalues3, stavalues4
-  FROM dbms_stats._column_stats_locked c
+  FROM dbms_stats.column_stats_locked c
   JOIN pg_attribute a
     ON (c.starelid = a.attrelid AND c.staattnum = a.attnum)
  ORDER BY starelid, staattnum, stainherit;

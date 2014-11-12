@@ -49,10 +49,10 @@ CREATE TYPE complex AS (
      i double precision
 );
 
--- updating _relation_stats_locked leads to merged stats caches
+-- updating relation_stats_locked leads to merged stats caches
 -- See StatsCacheRelCallback() in pg_dbms_stats.c for details.
 CREATE FUNCTION reset_stat_and_cache() RETURNS void AS $$
-  UPDATE dbms_stats._relation_stats_locked SET relpages = relpages;
+  UPDATE dbms_stats.relation_stats_locked SET relpages = relpages;
   SELECT pg_stat_reset();
 $$
 LANGUAGE sql;
@@ -84,13 +84,13 @@ CREATE VIEW lockd_io AS
               idx_blks_read  + idx_blks_hit  > 0  fetches
          FROM pg_statio_user_tables
         WHERE schemaname = 'dbms_stats'
-          AND relname LIKE '\_%\_stats_locked'
+          AND relname LIKE '%\_stats_locked'
         ORDER BY relid;
 
 CREATE VIEW internal_locks AS
     SELECT relation::regclass, mode
       FROM pg_locks
-      WHERE relation::regclass::text LIKE 'dbms_stats.\_%\_locked'
+      WHERE relation::regclass::text LIKE 'dbms_stats.%\_locked'
          OR relation::regclass::text LIKE 'dbms_stats.backup_history'
          OR relation::regclass::text LIKE 'dbms_stats.%\_backup'
       ORDER BY relation::regclass::text, mode;

@@ -29,7 +29,7 @@ CREATE TYPE dbms_stats.anyarray (
 -- User defined stats tables
 --
 
-CREATE TABLE dbms_stats._relation_stats_locked (
+CREATE TABLE dbms_stats.relation_stats_locked (
     relid            oid    NOT NULL,
     relname          text   NOT NULL,
     relpages         int4,
@@ -40,7 +40,7 @@ CREATE TABLE dbms_stats._relation_stats_locked (
     PRIMARY KEY (relid)
 );
 
-CREATE TABLE dbms_stats._column_stats_locked (
+CREATE TABLE dbms_stats.column_stats_locked (
     starelid    oid    NOT NULL,
     staattnum   int2   NOT NULL,
     stainherit  bool   NOT NULL,
@@ -64,7 +64,7 @@ CREATE TABLE dbms_stats._column_stats_locked (
     stavalues3  dbms_stats.anyarray,
     stavalues4  dbms_stats.anyarray,
     PRIMARY KEY (starelid, staattnum, stainherit),
-    FOREIGN KEY (starelid) REFERENCES dbms_stats._relation_stats_locked (relid) ON DELETE CASCADE
+    FOREIGN KEY (starelid) REFERENCES dbms_stats.relation_stats_locked (relid) ON DELETE CASCADE
 );
 
 --
@@ -146,16 +146,16 @@ $$SELECT $1 IN ('r', 'i')$$
 LANGUAGE sql STABLE;
 
 CREATE FUNCTION dbms_stats.merge(
-    lhs dbms_stats._column_stats_locked,
+    lhs dbms_stats.column_stats_locked,
     rhs pg_catalog.pg_statistic
-) RETURNS dbms_stats._column_stats_locked AS
+) RETURNS dbms_stats.column_stats_locked AS
 'MODULE_PATHNAME', 'dbms_stats_merge'
 LANGUAGE C STABLE;
 
 --
 -- Statistics views for internal use
 --    These views are used to merge authentic stats and dummy stats by hook
---    function, so we don't grant SELECT privilege to PUBLIC.
+--    function.
 --
 
 CREATE VIEW dbms_stats.relation_stats_effective AS
@@ -176,7 +176,7 @@ CREATE VIEW dbms_stats.relation_stats_effective AS
       FROM pg_catalog.pg_class c
       JOIN pg_catalog.pg_namespace n
         ON c.relnamespace = n.oid
-      LEFT JOIN dbms_stats._relation_stats_locked v
+      LEFT JOIN dbms_stats.relation_stats_locked v
         ON v.relid = c.oid
      WHERE dbms_stats.is_target_relkind(c.relkind)
        AND NOT dbms_stats.is_system_schema(nspname);
@@ -185,7 +185,7 @@ CREATE VIEW dbms_stats.column_stats_effective AS
     SELECT * FROM (
         SELECT (dbms_stats.merge(v, s)).*
           FROM pg_catalog.pg_statistic s
-          FULL JOIN dbms_stats._column_stats_locked v
+          FULL JOIN dbms_stats.column_stats_locked v
          USING (starelid, staattnum, stainherit)
          WHERE NOT dbms_stats.is_system_catalog(starelid)
 		   AND EXISTS (
@@ -197,25 +197,6 @@ CREATE VIEW dbms_stats.column_stats_effective AS
 			)
         ) m
      WHERE starelid IS NOT NULL;
-
---
--- Statistics views for user use (including non-superusers)
---    These views allow users to see dummy statistics about tables which the
---    user has SELECT privilege.
---
-
-CREATE VIEW dbms_stats.relation_stats_locked
-    AS SELECT *
-         FROM dbms_stats._relation_stats_locked;
-
-GRANT SELECT ON dbms_stats.relation_stats_locked TO PUBLIC;
-
-CREATE VIEW dbms_stats.column_stats_locked
-    AS SELECT *
-         FROM dbms_stats._column_stats_locked
-        WHERE has_column_privilege(starelid, staattnum, 'SELECT');
-
-GRANT SELECT ON dbms_stats.column_stats_locked TO PUBLIC;
 
 --
 -- Note: This view is copied from pg_stats in
@@ -262,8 +243,6 @@ CREATE VIEW dbms_stats.stats AS
          LEFT JOIN pg_namespace n ON (n.oid = c.relnamespace)
     WHERE NOT attisdropped AND has_column_privilege(c.oid, a.attnum, 'select');
 
-GRANT SELECT ON dbms_stats.stats TO PUBLIC;
-
 --
 -- Utility functions
 --
@@ -273,10 +252,10 @@ CREATE FUNCTION dbms_stats.invalidate_relation_cache()
     'MODULE_PATHNAME', 'dbms_stats_invalidate_relation_cache'
     LANGUAGE C;
 
--- Invalidate cached plans when dbms_stats._relation_stats_locked is modified.
+-- Invalidate cached plans when dbms_stats.relation_stats_locked is modified.
 CREATE TRIGGER invalidate_relation_cache
     BEFORE INSERT OR DELETE OR UPDATE
-    ON dbms_stats._relation_stats_locked
+    ON dbms_stats.relation_stats_locked
    FOR EACH ROW EXECUTE PROCEDURE dbms_stats.invalidate_relation_cache();
 
 CREATE FUNCTION dbms_stats.invalidate_column_cache()
@@ -284,10 +263,10 @@ CREATE FUNCTION dbms_stats.invalidate_column_cache()
     'MODULE_PATHNAME', 'dbms_stats_invalidate_column_cache'
     LANGUAGE C;
 
--- Invalidate cached plans when dbms_stats._column_stats_locked is modified.
+-- Invalidate cached plans when dbms_stats.column_stats_locked is modified.
 CREATE TRIGGER invalidate_column_cache
     BEFORE INSERT OR DELETE OR UPDATE
-    ON dbms_stats._column_stats_locked
+    ON dbms_stats.column_stats_locked
     FOR EACH ROW EXECUTE PROCEDURE dbms_stats.invalidate_column_cache();
 
 --
@@ -516,11 +495,11 @@ BEGIN
                 RAISE EXCEPTION 'statistics of column "%" of relation "%" are not found in any backups before',$3, $2, $1;
             END IF;
         END IF;
-		PERFORM * FROM dbms_stats._relation_stats_locked r
+		PERFORM * FROM dbms_stats.relation_stats_locked r
                   WHERE r.relid = $2 FOR UPDATE;
     ELSE
 		/* Lock the whole relation stats if relation is not specified.*/
-	    LOCK dbms_stats._relation_stats_locked IN EXCLUSIVE MODE;
+	    LOCK dbms_stats.relation_stats_locked IN EXCLUSIVE MODE;
     END IF;
 
     FOR restore_id, restore_relid IN
@@ -536,7 +515,7 @@ BEGIN
       GROUP BY coid
       ORDER BY coid::regclass::text
     LOOP
-        UPDATE dbms_stats._relation_stats_locked r
+        UPDATE dbms_stats.relation_stats_locked r
            SET relid = b.relid,
                relname = b.relname,
                relpages = b.relpages,
@@ -549,7 +528,7 @@ BEGIN
            AND b.id = restore_id
            AND b.relid = restore_relid;
         IF NOT FOUND THEN
-            INSERT INTO dbms_stats._relation_stats_locked
+            INSERT INTO dbms_stats.relation_stats_locked
             SELECT b.relid,
                    b.relname,
                    b.relpages,
@@ -593,10 +572,10 @@ BEGIN
             RAISE WARNING 'data type of column "%.%" is inconsistent between database(%) and backup (%). Skip.',
                 restore_relid, restore_attname, cur_type, restore_type;
         ELSE
-            DELETE FROM dbms_stats._column_stats_locked
+            DELETE FROM dbms_stats.column_stats_locked
              WHERE starelid = restore_relid
                AND staattnum = restore_attnum;
-            INSERT INTO dbms_stats._column_stats_locked
+            INSERT INTO dbms_stats.column_stats_locked
                 SELECT starelid, staattnum, stainherit,
                        stanullfrac, stawidth, stadistinct,
                        stakind1, stakind2, stakind3, stakind4,
@@ -728,8 +707,8 @@ BEGIN
     PERFORM * from dbms_stats.relation_stats_backup b
         WHERE  id = $1 FOR SHARE;
 
-	/* Locking only _relation_stats_locked is sufficient */
-    LOCK dbms_stats._relation_stats_locked IN EXCLUSIVE MODE;
+	/* Locking only relation_stats_locked is sufficient */
+    LOCK dbms_stats.relation_stats_locked IN EXCLUSIVE MODE;
 
     FOR restore_relid IN
         SELECT b.relid
@@ -738,7 +717,7 @@ BEGIN
          WHERE b.id = $1
          ORDER BY c.oid::regclass::text
     LOOP
-        UPDATE dbms_stats._relation_stats_locked r
+        UPDATE dbms_stats.relation_stats_locked r
            SET relid = b.relid,
                relname = b.relname,
                relpages = b.relpages,
@@ -751,7 +730,7 @@ BEGIN
            AND b.id = $1
            AND b.relid = restore_relid;
         IF NOT FOUND THEN
-            INSERT INTO dbms_stats._relation_stats_locked
+            INSERT INTO dbms_stats.relation_stats_locked
             SELECT b.relid,
                    b.relname,
                    b.relpages,
@@ -782,10 +761,10 @@ BEGIN
             RAISE WARNING 'data type of column "%.%" is inconsistent between database(%) and backup (%). Skip.',
                 restore_relid, restore_attname, cur_type, restore_type;
         ELSE
-            DELETE FROM dbms_stats._column_stats_locked
+            DELETE FROM dbms_stats.column_stats_locked
              WHERE starelid = restore_relid
                AND staattnum = restore_attnum;
-            INSERT INTO dbms_stats._column_stats_locked
+            INSERT INTO dbms_stats.column_stats_locked
                 SELECT starelid, staattnum, stainherit,
                        stanullfrac, stawidth, stadistinct,
                        stakind1, stakind2, stakind3, stakind4,
@@ -846,9 +825,9 @@ BEGIN
 	 * If we don't have per-table statistics, create new one which has NULL for
 	 * every statistic value for column_stats_effective.
 	 */
-    IF NOT EXISTS(SELECT * FROM dbms_stats._relation_stats_locked ru
+    IF NOT EXISTS(SELECT * FROM dbms_stats.relation_stats_locked ru
                    WHERE ru.relid = $1 FOR SHARE) THEN
-        INSERT INTO dbms_stats._relation_stats_locked
+        INSERT INTO dbms_stats.relation_stats_locked
             SELECT $1, dbms_stats.relname(nspname, relname),
                    NULL, NULL, NULL, NULL, NULL
               FROM pg_catalog.pg_class c, pg_catalog.pg_namespace n
@@ -869,7 +848,7 @@ BEGIN
          WHERE starelid = $1
            AND staattnum = set_attnum
     LOOP
-        UPDATE dbms_stats._column_stats_locked c
+        UPDATE dbms_stats.column_stats_locked c
            SET stanullfrac = r.stanullfrac,
                stawidth = r.stawidth,
                stadistinct = r.stadistinct,
@@ -894,7 +873,7 @@ BEGIN
            AND c.stainherit = r.stainherit;
 
         IF NOT FOUND THEN
-            INSERT INTO dbms_stats._column_stats_locked
+            INSERT INTO dbms_stats.column_stats_locked
                  VALUES ($1,
                          set_attnum,
                          r.stainherit,
@@ -955,7 +934,7 @@ BEGIN
 		RAISE EXCEPTION 'locking statistics is not allowed for system catalogs: "%"', $1;
     END IF;
 
-    UPDATE dbms_stats._relation_stats_locked r
+    UPDATE dbms_stats.relation_stats_locked r
        SET relname = dbms_stats.relname(nspname, c.relname),
            relpages = v.relpages,
            reltuples = v.reltuples,
@@ -970,7 +949,7 @@ BEGIN
        AND c.relnamespace = n.oid
        AND v.relid = $1;
     IF NOT FOUND THEN
-        INSERT INTO dbms_stats._relation_stats_locked
+        INSERT INTO dbms_stats.relation_stats_locked
         SELECT $1, dbms_stats.relname(nspname, c.relname),
                v.relpages, v.reltuples, v.curpages,
                v.last_analyze, v.last_autoanalyze
@@ -1001,7 +980,7 @@ BEGIN
           FROM dbms_stats.column_stats_effective
          WHERE starelid = $1
     LOOP
-        UPDATE dbms_stats._column_stats_locked c
+        UPDATE dbms_stats.column_stats_locked c
            SET stanullfrac = i.stanullfrac,
                stawidth = i.stawidth,
                stadistinct = i.stadistinct,
@@ -1026,7 +1005,7 @@ BEGIN
            AND c.stainherit = i.stainherit;
 
         IF NOT FOUND THEN
-            INSERT INTO dbms_stats._column_stats_locked
+            INSERT INTO dbms_stats.column_stats_locked
                  VALUES ($1,
                          i.staattnum,
                          i.stainherit,
@@ -1153,7 +1132,7 @@ BEGIN
 	/*
 	 * Lock the target relation to prevent conflicting with stats lock/restore
      */
-	PERFORM * FROM dbms_stats._relation_stats_locked ru
+	PERFORM * FROM dbms_stats.relation_stats_locked ru
          WHERE (ru.relid = $1 OR $1 IS NULL) FOR UPDATE;
 
     SELECT a.attnum INTO set_attnum FROM pg_catalog.pg_attribute a
@@ -1162,7 +1141,7 @@ BEGIN
         RAISE EXCEPTION 'column "%" not found in relation "%"', $2, $1;
     END IF;
 
-    DELETE FROM dbms_stats._column_stats_locked
+    DELETE FROM dbms_stats.column_stats_locked
      WHERE (starelid = $1 OR $1 IS NULL)
        AND (staattnum = set_attnum OR $2 IS NULL);
 
@@ -1172,11 +1151,11 @@ BEGIN
     END IF;
     FOR unlock_id IN
         SELECT ru.relid
-          FROM dbms_stats._relation_stats_locked ru
+          FROM dbms_stats.relation_stats_locked ru
          WHERE (ru.relid = $1 OR $1 IS NULL) AND ($2 IS NULL)
          ORDER BY ru.relid
     LOOP
-        DELETE FROM dbms_stats._relation_stats_locked ru
+        DELETE FROM dbms_stats.relation_stats_locked ru
          WHERE ru.relid = unlock_id;
         RETURN NEXT unlock_id;
     END LOOP;
@@ -1190,14 +1169,14 @@ $$
 DECLARE
     unlock_id int8;
 BEGIN
-    LOCK dbms_stats._relation_stats_locked IN EXCLUSIVE MODE;
+    LOCK dbms_stats.relation_stats_locked IN EXCLUSIVE MODE;
 
     FOR unlock_id IN
         SELECT relid
-          FROM dbms_stats._relation_stats_locked
+          FROM dbms_stats.relation_stats_locked
          ORDER BY relid
     LOOP
-        DELETE FROM dbms_stats._relation_stats_locked
+        DELETE FROM dbms_stats.relation_stats_locked
          WHERE relid = unlock_id;
         RETURN NEXT unlock_id;
     END LOOP;
@@ -1221,14 +1200,14 @@ BEGIN
 
     FOR unlock_id IN
         SELECT r.relid
-          FROM dbms_stats._relation_stats_locked r, pg_class c, pg_namespace n
+          FROM dbms_stats.relation_stats_locked r, pg_class c, pg_namespace n
          WHERE relid = c.oid
            AND c.relnamespace = n.oid
            AND n.nspname = $1
          ORDER BY relid
          FOR UPDATE
     LOOP
-        DELETE FROM dbms_stats._relation_stats_locked
+        DELETE FROM dbms_stats.relation_stats_locked
          WHERE relid = unlock_id;
         RETURN NEXT unlock_id;
     END LOOP;
@@ -1239,7 +1218,7 @@ LANGUAGE plpgsql STRICT;
 CREATE FUNCTION dbms_stats.unlock_table_stats(relid regclass)
   RETURNS SETOF regclass AS
 $$
-DELETE FROM dbms_stats._relation_stats_locked
+DELETE FROM dbms_stats.relation_stats_locked
  WHERE relid = $1
  RETURNING relid::regclass
 $$
@@ -1250,7 +1229,7 @@ CREATE FUNCTION dbms_stats.unlock_table_stats(
     tablename text
 ) RETURNS SETOF regclass AS
 $$
-DELETE FROM dbms_stats._relation_stats_locked
+DELETE FROM dbms_stats.relation_stats_locked
  WHERE relid = dbms_stats.relname($1, $2)::regclass
  RETURNING relid::regclass
 $$
@@ -1274,7 +1253,7 @@ BEGIN
     PERFORM * from dbms_stats.relation_stats_locked r
         WHERE r.relid = $1 FOR SHARE;
 
-    DELETE FROM dbms_stats._column_stats_locked
+    DELETE FROM dbms_stats.column_stats_locked
       WHERE starelid = $1
         AND staattnum = set_attnum;
 
@@ -1304,7 +1283,7 @@ BEGIN
 	PERFORM * from dbms_stats.relation_stats_locked r
         WHERE  relid = dbms_stats.relname($1, $2)::regclass FOR SHARE;
 
-    DELETE FROM dbms_stats._column_stats_locked
+    DELETE FROM dbms_stats.column_stats_locked
       WHERE starelid = dbms_stats.relname($1, $2)::regclass
         AND staattnum = set_attnum;
 
@@ -1445,8 +1424,8 @@ BEGIN
 	FOR clean_rel_col, clean_relid, clean_attnum, clean_inherit IN
 		SELECT r.relname || ', ' || v.staattnum::text,
 			   v.starelid, v.staattnum, v.stainherit
-		  FROM dbms_stats._column_stats_locked v
-		  JOIN dbms_stats._relation_stats_locked r ON (v.starelid = r.relid)
+		  FROM dbms_stats.column_stats_locked v
+		  JOIN dbms_stats.relation_stats_locked r ON (v.starelid = r.relid)
 		 WHERE NOT EXISTS (
 			SELECT NULL
 			  FROM pg_attribute a
@@ -1456,7 +1435,7 @@ BEGIN
          FOR UPDATE
 		)
 	LOOP
-		DELETE FROM dbms_stats._column_stats_locked
+		DELETE FROM dbms_stats.column_stats_locked
 		 WHERE starelid = clean_relid
 		   AND staattnum = clean_attnum
 		   AND stainherit = clean_inherit;
@@ -1464,7 +1443,7 @@ BEGIN
 	END LOOP;
 
 	RETURN QUERY
-		DELETE FROM dbms_stats._relation_stats_locked r
+		DELETE FROM dbms_stats.relation_stats_locked r
 		 WHERE NOT EXISTS (
 			SELECT NULL
 			  FROM pg_class c
@@ -1474,6 +1453,4 @@ BEGIN
 END
 $$
 LANGUAGE plpgsql;
-
-GRANT USAGE ON schema dbms_stats TO PUBLIC;
 --

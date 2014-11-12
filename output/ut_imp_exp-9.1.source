@@ -5,8 +5,8 @@ CREATE TABLE s0.st3();
  */
 -- No.16-1-1
 ANALYZE;
-DELETE FROM dbms_stats._column_stats_locked;
-DELETE FROM dbms_stats._relation_stats_locked;
+DELETE FROM dbms_stats.column_stats_locked;
+DELETE FROM dbms_stats.relation_stats_locked;
 SELECT dbms_stats.lock_database_stats();
  lock_database_stats 
 ---------------------
@@ -27,9 +27,9 @@ SELECT dbms_stats.lock_database_stats();
  s0.st3
 (15 rows)
 
-UPDATE dbms_stats._relation_stats_locked
+UPDATE dbms_stats.relation_stats_locked
    SET (relpages, reltuples, curpages) = (0,0,0);
-UPDATE dbms_stats._column_stats_locked SET
+UPDATE dbms_stats.column_stats_locked SET
     stanullfrac = -staattnum,
     stawidth = -staattnum,
     stadistinct = -staattnum,
@@ -992,9 +992,9 @@ SELECT dbms_stats.lock_database_stats();
  s0.st3
 (15 rows)
 
-UPDATE dbms_stats._relation_stats_locked
+UPDATE dbms_stats.relation_stats_locked
    SET (relpages, reltuples, curpages) = (NULL, NULL, NULL);
-UPDATE dbms_stats._column_stats_locked
+UPDATE dbms_stats.column_stats_locked
    SET (stanullfrac, stawidth, stadistinct,
         stakind1, stakind2, stakind3, stakind4,
         staop1, staop2, staop3, staop4,

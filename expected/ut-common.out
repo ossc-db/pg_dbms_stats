@@ -44,7 +44,7 @@ DELETE FROM dbms_stats.backup_history;
 /*
  * No.3-1 dbms_stats.use_locked_stats
  */
-DELETE FROM dbms_stats._relation_stats_locked;
+DELETE FROM dbms_stats.relation_stats_locked;
 EXPLAIN (costs false) SELECT * FROM s0.st2 WHERE id < 1;
      QUERY PLAN     
 --------------------
@@ -58,7 +58,7 @@ SELECT dbms_stats.lock_table_stats('s0.st2'::regclass);
  s0.st2
 (1 row)
 
-UPDATE dbms_stats._relation_stats_locked SET curpages = 10000;
+UPDATE dbms_stats.relation_stats_locked SET curpages = 10000;
 VACUUM ANALYZE;
 -- No.3-1-1
 SET pg_dbms_stats.use_locked_stats TO ON;
@@ -112,7 +112,7 @@ EXPLAIN (costs false) SELECT * FROM s0.st2 WHERE id < 1;
 -- clean up
 /* Reconnection as super user */
 \c - super_user
-DELETE FROM dbms_stats._relation_stats_locked;
+DELETE FROM dbms_stats.relation_stats_locked;
 /*
  * No.4-1 DATA TYPE dbms_stats.anyarray
  */
@@ -350,8 +350,8 @@ EXPLAIN (costs false) SELECT * FROM st1 WHERE val IS NULL;
    Index Cond: (val IS NULL)
 (2 rows)
 
-INSERT INTO dbms_stats._relation_stats_locked (relid, relname) VALUES (0, 'dummy');
-INSERT INTO dbms_stats._column_stats_locked (starelid, staattnum, stainherit)
+INSERT INTO dbms_stats.relation_stats_locked (relid, relname) VALUES (0, 'dummy');
+INSERT INTO dbms_stats.column_stats_locked (starelid, staattnum, stainherit)
     VALUES (0, 1, true);
 EXPLAIN (costs false) SELECT * FROM st1 WHERE val IS NULL;
            QUERY PLAN            
@@ -361,7 +361,7 @@ EXPLAIN (costs false) SELECT * FROM st1 WHERE val IS NULL;
 (2 rows)
 
 -- No.5-2-6
-INSERT INTO dbms_stats._column_stats_locked (starelid, staattnum, stainherit)
+INSERT INTO dbms_stats.column_stats_locked (starelid, staattnum, stainherit)
     VALUES ('st1_idx'::regclass, 1, true);
 ERROR:  "st1_idx" is an index except an index expression
 EXPLAIN (costs false) SELECT * FROM st1 WHERE val IS NULL;
@@ -372,7 +372,7 @@ EXPLAIN (costs false) SELECT * FROM st1 WHERE val IS NULL;
 (2 rows)
 
 -- No.5-2-7
-INSERT INTO dbms_stats._column_stats_locked (starelid, staattnum, stainherit)
+INSERT INTO dbms_stats.column_stats_locked (starelid, staattnum, stainherit)
     VALUES ('complex'::regclass, 1, true);
 ERROR:  "complex" is a composite type
 EXPLAIN (costs false) SELECT * FROM st1 WHERE val IS NULL;
@@ -383,7 +383,7 @@ EXPLAIN (costs false) SELECT * FROM st1 WHERE val IS NULL;
 (2 rows)
 
 -- No.5-2-9
-UPDATE dbms_stats._column_stats_locked SET stanullfrac = 1
+UPDATE dbms_stats.column_stats_locked SET stanullfrac = 1
  WHERE starelid = 'st1'::regclass
    AND staattnum = 1
    AND stainherit = false;
@@ -396,7 +396,7 @@ EXPLAIN (costs false) SELECT * FROM st1 WHERE val IS NULL;
 (2 rows)
 
 -- No.5-2-10
-DELETE FROM dbms_stats._column_stats_locked
+DELETE FROM dbms_stats.column_stats_locked
  WHERE starelid = 'st1'::regclass
    AND staattnum = 1
    AND stainherit = false;
@@ -408,7 +408,7 @@ EXPLAIN (costs false) SELECT * FROM st1 WHERE val IS NULL;
 (2 rows)
 
 -- No.5-2-8
-INSERT INTO dbms_stats._column_stats_locked
+INSERT INTO dbms_stats.column_stats_locked
     (starelid, staattnum, stainherit, stanullfrac)
     VALUES ('st1'::regclass, 1, false, 1);
 EXPLAIN (costs false) SELECT * FROM st1 WHERE val IS NULL;
@@ -434,9 +434,9 @@ EXPLAIN (costs false) EXECUTE p2;
    Index Cond: (lower(str) IS NULL)
 (2 rows)
 
-INSERT INTO dbms_stats._relation_stats_locked (relid, relname)
+INSERT INTO dbms_stats.relation_stats_locked (relid, relname)
     VALUES ('st1_exp'::regclass, 'dummy');
-INSERT INTO dbms_stats._column_stats_locked
+INSERT INTO dbms_stats.column_stats_locked
     (starelid, staattnum, stainherit, stanullfrac)
     VALUES ('st1_exp'::regclass, 1, false, 1);
 EXPLAIN (costs false) SELECT str FROM st1 WHERE lower(str) IS NULL;
@@ -520,7 +520,7 @@ EXPLAIN (costs false) SELECT * FROM st1 WHERE val IS NULL;
    Index Cond: (val IS NULL)
 (2 rows)
 
-INSERT INTO dbms_stats._relation_stats_locked (relid, relname) VALUES (0, 'dummy');
+INSERT INTO dbms_stats.relation_stats_locked (relid, relname) VALUES (0, 'dummy');
 EXPLAIN (costs false) SELECT * FROM st1 WHERE val IS NULL;
            QUERY PLAN            
 ---------------------------------
@@ -536,7 +536,7 @@ EXPLAIN (costs false) SELECT * FROM st1 WHERE val IS NULL;
    Index Cond: (val IS NULL)
 (2 rows)
 
-INSERT INTO dbms_stats._relation_stats_locked (relid, relname)
+INSERT INTO dbms_stats.relation_stats_locked (relid, relname)
     VALUES ('st1_idx'::regclass, 'st1_idx');
 EXPLAIN (costs false) SELECT * FROM st1 WHERE val IS NULL;
            QUERY PLAN            
@@ -553,7 +553,7 @@ EXPLAIN (costs false) SELECT * FROM st1 WHERE val IS NULL;
    Index Cond: (val IS NULL)
 (2 rows)
 
-INSERT INTO dbms_stats._relation_stats_locked (relid, relname)
+INSERT INTO dbms_stats.relation_stats_locked (relid, relname)
     VALUES ('complex'::regclass, 'complex');
 ERROR:  "complex" is a composite type
 EXPLAIN (costs false) SELECT * FROM st1 WHERE val IS NULL;
@@ -571,7 +571,7 @@ EXPLAIN (costs false) SELECT * FROM st1 WHERE val IS NULL;
    Index Cond: (val IS NULL)
 (2 rows)
 
-UPDATE dbms_stats._relation_stats_locked SET curpages = 1
+UPDATE dbms_stats.relation_stats_locked SET curpages = 1
  WHERE relid = 'st1'::regclass;
 VACUUM ANALYZE;
 EXPLAIN (costs false) SELECT * FROM st1 WHERE val IS NULL;
@@ -589,7 +589,7 @@ EXPLAIN (costs false) SELECT * FROM st1 WHERE val IS NULL;
    Filter: (val IS NULL)
 (2 rows)
 
-DELETE FROM dbms_stats._relation_stats_locked
+DELETE FROM dbms_stats.relation_stats_locked
  WHERE relid = 'st1'::regclass;
 EXPLAIN (costs false) SELECT * FROM st1 WHERE val IS NULL;
            QUERY PLAN            
@@ -606,7 +606,7 @@ EXPLAIN (costs false) SELECT * FROM st1 WHERE val IS NULL;
    Index Cond: (val IS NULL)
 (2 rows)
 
-INSERT INTO dbms_stats._relation_stats_locked (relid, relname, curpages)
+INSERT INTO dbms_stats.relation_stats_locked (relid, relname, curpages)
     VALUES ('st1'::regclass, 'st1', 1);
 EXPLAIN (costs false) SELECT * FROM st1 WHERE val IS NULL;
        QUERY PLAN        
@@ -650,7 +650,7 @@ SELECT reset_stat_and_cache();
 (1 row)
 
 VACUUM ANALYZE;
-UPDATE dbms_stats._relation_stats_locked SET curpages = 1000
+UPDATE dbms_stats.relation_stats_locked SET curpages = 1000
  WHERE relid = 'st1_exp'::regclass;
 SELECT pg_sleep(0.7);
  pg_sleep 
@@ -659,10 +659,10 @@ SELECT pg_sleep(0.7);
 (1 row)
 
 SELECT * FROM lockd_io;
-        relname         | fetches 
-------------------------+---------
- _relation_stats_locked | t
- _column_stats_locked   | t
+        relname        | fetches 
+-----------------------+---------
+ relation_stats_locked | t
+ column_stats_locked   | t
 (2 rows)
 
 SELECT reset_stat_and_cache();
@@ -685,17 +685,17 @@ SELECT pg_sleep(0.7);
 (1 row)
 
 SELECT * FROM lockd_io;
-        relname         | fetches 
-------------------------+---------
- _relation_stats_locked | t
- _column_stats_locked   | f
+        relname        | fetches 
+-----------------------+---------
+ relation_stats_locked | t
+ column_stats_locked   | f
 (2 rows)
 
 /*
  * No.5-4 StatsCacheRelCallback
  */
 -- No.5-4-1
-UPDATE dbms_stats._relation_stats_locked SET curpages = 1
+UPDATE dbms_stats.relation_stats_locked SET curpages = 1
  WHERE relid = 'st1'::regclass;
 VACUUM ANALYZE;
 EXPLAIN (costs false) SELECT * FROM st1 WHERE val IS NULL;
@@ -742,7 +742,7 @@ EXPLAIN (costs false) SELECT * FROM st1 WHERE val IS NULL;
    Index Cond: (val IS NULL)
 (2 rows)
 
-\! psql contrib_regression -c "UPDATE dbms_stats._column_stats_locked SET stanullfrac = 1 WHERE starelid = 'st1'::regclass"
+\! psql contrib_regression -c "UPDATE dbms_stats.column_stats_locked SET stanullfrac = 1 WHERE starelid = 'st1'::regclass"
 UPDATE 2
 EXPLAIN (costs false) SELECT * FROM st1 WHERE val IS NULL;
        QUERY PLAN        
@@ -759,7 +759,7 @@ EXPLAIN (costs false) SELECT * FROM st1 WHERE val IS NULL;
    Filter: (val IS NULL)
 (2 rows)
 
-\! psql contrib_regression -c "DELETE FROM dbms_stats._column_stats_locked WHERE starelid = 'st1'::regclass"
+\! psql contrib_regression -c "DELETE FROM dbms_stats.column_stats_locked WHERE starelid = 'st1'::regclass"
 DELETE 2
 EXPLAIN (costs false) SELECT * FROM st1 WHERE val IS NULL;
            QUERY PLAN            
@@ -776,7 +776,7 @@ EXPLAIN (costs false) SELECT * FROM st1 WHERE val IS NULL;
    Index Cond: (val IS NULL)
 (2 rows)
 
-\! psql contrib_regression -c "INSERT INTO dbms_stats._column_stats_locked (starelid, staattnum, stainherit, stanullfrac) VALUES ('st1'::regclass, 1, false, 1)"
+\! psql contrib_regression -c "INSERT INTO dbms_stats.column_stats_locked (starelid, staattnum, stainherit, stanullfrac) VALUES ('st1'::regclass, 1, false, 1)"
 INSERT 0 1
 EXPLAIN (costs false) SELECT * FROM st1 WHERE val IS NULL;
        QUERY PLAN        
@@ -822,10 +822,10 @@ SELECT pg_sleep(0.7);
 (1 row)
 
 SELECT * FROM lockd_io;
-        relname         | fetches 
-------------------------+---------
- _relation_stats_locked | f
- _column_stats_locked   | f
+        relname        | fetches 
+-----------------------+---------
+ relation_stats_locked | f
+ column_stats_locked   | f
 (2 rows)
 
 SELECT reset_stat_and_cache();
@@ -848,10 +848,10 @@ SELECT pg_sleep(0.7);
 (1 row)
 
 SELECT * FROM lockd_io;
-        relname         | fetches 
-------------------------+---------
- _relation_stats_locked | t
- _column_stats_locked   | t
+        relname        | fetches 
+-----------------------+---------
+ relation_stats_locked | t
+ column_stats_locked   | t
 (2 rows)
 
 ALTER TABLE s0.test RENAME TO droptest;
@@ -884,10 +884,10 @@ SELECT pg_sleep(0.7);
 (1 row)
 
 SELECT * FROM lockd_io;
-        relname         | fetches 
-------------------------+---------
- _relation_stats_locked | f
- _column_stats_locked   | f
+        relname        | fetches 
+-----------------------+---------
+ relation_stats_locked | f
+ column_stats_locked   | f
 (2 rows)
 
 SELECT reset_stat_and_cache();
@@ -910,10 +910,10 @@ SELECT pg_sleep(0.7);
 (1 row)
 
 SELECT * FROM lockd_io;
-        relname         | fetches 
-------------------------+---------
- _relation_stats_locked | t
- _column_stats_locked   | t
+        relname        | fetches 
+-----------------------+---------
+ relation_stats_locked | t
+ column_stats_locked   | t
 (2 rows)
 
 ALTER TABLE s0.droptest RENAME test TO id;
@@ -946,10 +946,10 @@ SELECT pg_sleep(0.7);
 (1 row)
 
 SELECT * FROM lockd_io;
-        relname         | fetches 
-------------------------+---------
- _relation_stats_locked | f
- _column_stats_locked   | f
+        relname        | fetches 
+-----------------------+---------
+ relation_stats_locked | f
+ column_stats_locked   | f
 (2 rows)
 
 SELECT reset_stat_and_cache();
@@ -972,10 +972,10 @@ SELECT pg_sleep(1.0);
 (1 row)
 
 SELECT * FROM lockd_io;
-        relname         | fetches 
-------------------------+---------
- _relation_stats_locked | t
- _column_stats_locked   | t
+        relname        | fetches 
+-----------------------+---------
+ relation_stats_locked | t
+ column_stats_locked   | t
 (2 rows)
 
 -- No.5-4-9
@@ -1008,10 +1008,10 @@ SELECT pg_sleep(0.7);
 (1 row)
 
 SELECT * FROM lockd_io;
-        relname         | fetches 
-------------------------+---------
- _relation_stats_locked | t
- _column_stats_locked   | t
+        relname        | fetches 
+-----------------------+---------
+ relation_stats_locked | t
+ column_stats_locked   | t
 (2 rows)
 
 SELECT reset_stat_and_cache();
@@ -1034,10 +1034,10 @@ SELECT pg_sleep(0.7);
 (1 row)
 
 SELECT * FROM lockd_io;
-        relname         | fetches 
-------------------------+---------
- _relation_stats_locked | t
- _column_stats_locked   | t
+        relname        | fetches 
+-----------------------+---------
+ relation_stats_locked | t
+ column_stats_locked   | t
 (2 rows)
 
 -- clean up
@@ -2459,7 +2459,7 @@ SELECT count(*) FROM dbms_stats.column_stats_locked;
 
 -- No.18-1-2
 -- No.18-1-7
-DELETE FROM dbms_stats._relation_stats_locked;
+DELETE FROM dbms_stats.relation_stats_locked;
 SELECT count(*) FROM dbms_stats.relation_stats_locked;
  count 
 -------
@@ -2518,7 +2518,7 @@ SELECT count(*) FROM dbms_stats.relation_stats_locked;
 (1 row)
 
 -- No.18-1-4
-DELETE FROM dbms_stats._relation_stats_locked;
+DELETE FROM dbms_stats.relation_stats_locked;
 SELECT count(*) FROM dbms_stats.relation_stats_locked;
  count 
 -------
@@ -2548,7 +2548,7 @@ SELECT dbms_stats.lock_table_stats('clean_test');
 
 ALTER TABLE clean_test DROP COLUMN num;
 ALTER TABLE clean_test ADD num integer;
-UPDATE dbms_stats._column_stats_locked
+UPDATE dbms_stats.column_stats_locked
    SET staattnum = 3
  WHERE starelid = 'clean_test'::regclass
    AND staattnum = 2;
@@ -2580,7 +2580,7 @@ SELECT count(*) FROM dbms_stats.column_stats_locked
 (1 row)
 
 -- No.18-1-8
-DELETE FROM dbms_stats._column_stats_locked
+DELETE FROM dbms_stats.column_stats_locked
  WHERE starelid = 'clean_test'::regclass
    AND staattnum = 3;
 SELECT count(*) FROM pg_statistic
@@ -2639,7 +2639,7 @@ SELECT count(*) FROM dbms_stats.column_stats_locked
 (1 row)
 
 -- No.18-1-10
-DELETE FROM dbms_stats._column_stats_locked
+DELETE FROM dbms_stats.column_stats_locked
  WHERE starelid = 'clean_test'::regclass
    AND staattnum = 3;
 SELECT count(*) FROM dbms_stats.column_stats_locked
@@ -2661,7 +2661,7 @@ SELECT count(*) FROM dbms_stats.column_stats_locked
      1
 (1 row)
 
-DELETE FROM dbms_stats._relation_stats_locked;
+DELETE FROM dbms_stats.relation_stats_locked;
 DROP TABLE clean_test;
 /*
  * No.19-1 dummy statistics view for general users privileges.
@@ -2669,29 +2669,97 @@ DROP TABLE clean_test;
 SET SESSION AUTHORIZATION regular_user;
 -- No.19-1-1
 SELECT count(*) FROM dbms_stats.relation_stats_locked WHERE false;
- count 
--------
-     0
-(1 row)
-
+ERROR:  permission denied for schema dbms_stats
+LINE 1: SELECT count(*) FROM dbms_stats.relation_stats_locked WHERE ...
+                             ^
 -- No.19-1-2
 SELECT count(*) FROM dbms_stats.column_stats_locked WHERE false;
- count 
--------
-     0
-(1 row)
-
+ERROR:  permission denied for schema dbms_stats
+LINE 1: SELECT count(*) FROM dbms_stats.column_stats_locked WHERE fa...
+                             ^
 -- No.19-1-3
 SELECT count(*) FROM dbms_stats.stats WHERE false;
- count 
--------
-     0
+ERROR:  permission denied for schema dbms_stats
+LINE 1: SELECT count(*) FROM dbms_stats.stats WHERE false;
+                             ^
+RESET SESSION AUTHORIZATION;
+/*
+ * No.20-1 confirm change at 1.3.5.
+ */
+SELECT CURRENT_USER;
+ current_user 
+--------------
+ super_user
 (1 row)
 
--- No.19-1-4
-SELECT count(*) FROM dbms_stats._relation_stats_locked WHERE false;
-ERROR:  permission denied for relation _relation_stats_locked
--- No.19-1-5
-SELECT count(*) FROM dbms_stats._column_stats_locked WHERE false;
-ERROR:  permission denied for relation _column_stats_locked
+CREATE TABLE s0.st4 (a int, b text);
+CREATE INDEX i_st4_a on s0.st4 (a);
+CREATE VIEW s0.vst4 AS select * FROM s0.st4;
+GRANT SELECT ON s0.vst4 TO regular_user;
+INSERT INTO s0.st4 (SELECT a, a::text FROM generate_series(0, 999) a);
+ANALYZE s0.st4;
+SELECT dbms_stats.lock('s0.st4');
+  lock  
+--------
+ s0.st4
+(1 row)
+
+DELETE FROM s0.st4;
+INSERT INTO s0.st4 (SELECT 1, a::text FROM generate_series(0, 999) a);
+ANALYZE s0.st4;
+EXPLAIN (COSTS OFF) SELECT * FROM s0.vst4 WHERE a = 1;
+           QUERY PLAN            
+---------------------------------
+ Index Scan using i_st4_a on st4
+   Index Cond: (a = 1)
+(2 rows)
+
+EXPLAIN (COSTS OFF) SELECT * FROM s0.st4  WHERE a = 1;
+           QUERY PLAN            
+---------------------------------
+ Index Scan using i_st4_a on st4
+   Index Cond: (a = 1)
+(2 rows)
+
+SET SESSION AUTHORIZATION regular_user;
+EXPLAIN (COSTS OFF) SELECT * FROM s0.st4  WHERE a = 1;
+ERROR:  permission denied for relation st4
+EXPLAIN (COSTS OFF) SELECT * FROM s0.vst4 WHERE a = 1;
+           QUERY PLAN            
+---------------------------------
+ Index Scan using i_st4_a on st4
+   Index Cond: (a = 1)
+(2 rows)
+
+SET pg_dbms_stats.use_locked_stats TO off;
+EXPLAIN (COSTS OFF) SELECT * FROM s0.vst4 WHERE a = 1;
+    QUERY PLAN     
+-------------------
+ Seq Scan on st4
+   Filter: (a = 1)
+(2 rows)
+
+/*
+ * No.20-2 error description. -- abnormal case.
+ */
 RESET SESSION AUTHORIZATION;
+ALTER TABLE dbms_stats.relation_stats_locked OWNER TO regular_user;
+/* reconnection needed to flush cache */
+\c - regular_user
+EXPLAIN (COSTS OFF) SELECT * FROM s0.vst4 WHERE a = 1;
+ERROR:  permission denied for schema dbms_stats
+LINE 1: ...elpages, reltuples, curpages, relallvisible  FROM dbms_stats...
+                                                             ^
+DETAIL:  dbms_stats could not access the object as the role "regular_user".
+HINT:  Check your settings of pg_dbms_stats.
+QUERY:  SELECT relpages, reltuples, curpages, relallvisible  FROM dbms_stats.relation_stats_locked WHERE relid = $1
+\c - super_user
+ALTER TABLE dbms_stats.relation_stats_locked OWNER TO super_user;
+SELECT dbms_stats.unlock('s0.st4');
+ unlock 
+--------
+ s0.st4
+(1 row)
+
+DROP TABLE s0.st4 CASCADE;
+NOTICE:  drop cascades to view s0.vst4

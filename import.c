@@ -89,9 +89,9 @@ dbms_stats_import(PG_FUNCTION_ARGS)
 		elog(ERROR, "pg_dbms_stats: SPI_connect => %d", ret);
 
 	/* lock dummy statistics tables. */
-	spi_exec_utility("LOCK dbms_stats._relation_stats_locked"
+	spi_exec_utility("LOCK dbms_stats.relation_stats_locked"
 						" IN SHARE UPDATE EXCLUSIVE MODE");
-	spi_exec_utility("LOCK dbms_stats._column_stats_locked"
+	spi_exec_utility("LOCK dbms_stats.column_stats_locked"
 						" IN SHARE UPDATE EXCLUSIVE MODE");
 
 	/*
@@ -218,10 +218,10 @@ dbms_stats_import(PG_FUNCTION_ARGS)
 		/*
 		 * First we try UPDATE with the oid.  When no record matched, try
 		 * INSERT.  We can't use DELETE-then-INSERT method because we have FK
-		 * on _relation_stats_locked so DELETE would delete child records in
+		 * on relation_stats_locked so DELETE would delete child records in
 		 * _column_stats_locked undesirably.
 		 */
-		spi_exec_query("UPDATE dbms_stats._relation_stats_locked SET "
+		spi_exec_query("UPDATE dbms_stats.relation_stats_locked SET "
 				"relname = quote_ident($1) || '.' || quote_ident($2), "
 				"relpages = $3, reltuples = $4, "
 #if PG_VERSION_NUM >= 90200
@@ -233,7 +233,7 @@ dbms_stats_import(PG_FUNCTION_ARGS)
 				SPI_OK_UPDATE);
 		if (SPI_processed == 0)
 		{
-			spi_exec_query("INSERT INTO dbms_stats._relation_stats_locked "
+			spi_exec_query("INSERT INTO dbms_stats.relation_stats_locked "
 					"(relname, relpages, reltuples, curpages, "
 					"last_analyze, last_autoanalyze, relid"
 #if PG_VERSION_NUM >= 90200

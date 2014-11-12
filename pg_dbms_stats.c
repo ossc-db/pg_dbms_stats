@@ -10,17 +10,21 @@
 #include "access/transam.h"
 #include "catalog/pg_statistic.h"
 #include "catalog/pg_type.h"
+#include "catalog/namespace.h"
+#include "catalog/pg_authid.h"
 #include "commands/trigger.h"
 #include "executor/spi.h"
 #include "funcapi.h"
 #include "optimizer/plancat.h"
 #include "storage/bufmgr.h"
 #include "utils/builtins.h"
+#include "utils/elog.h"
 #include "utils/guc.h"
 #include "utils/inval.h"
 #include "utils/lsyscache.h"
 #include "utils/selfuncs.h"
 #include "utils/syscache.h"
+#include "miscadmin.h"
 #if PG_VERSION_NUM >= 90200
 #include "utils/rel.h"
 #endif
@@ -75,20 +79,25 @@ get_attavgwidth_hook_type		prev_get_attavgwidth = NULL;
 get_relation_stats_hook_type	prev_get_relation_stats = NULL;
 get_index_stats_hook_type		prev_get_index_stats = NULL;
 
+/* namings */
+#define NSPNAME "dbms_stats"
+#define RELSTAT_TBLNAME "relation_stats_locked"
+#define COLSTAT_TBLNAME "column_stats_locked"
+
 /* rows_query(oid) RETURNS int4, float4, int4 */
 static const char  *rows_query =
 	"SELECT relpages, reltuples, curpages"
 #if PG_VERSION_NUM >= 90200
 	", relallvisible"
 #endif
-	"  FROM dbms_stats.relation_stats_locked"
+	"  FROM " NSPNAME "." RELSTAT_TBLNAME
 	" WHERE relid = $1";
 static SPIPlanPtr	rows_plan = NULL;
 
 /* tuple_query(oid, int2, bool) RETURNS pg_statistic */
 static const char  *tuple_query =
 	"SELECT * "
-	"  FROM dbms_stats.column_stats_locked "
+	"  FROM " NSPNAME "." COLSTAT_TBLNAME
 	" WHERE starelid = $1 "
 	"   AND staattnum = $2 "
 	"   AND stainherit = $3";
@@ -104,6 +113,12 @@ static int			nested_level = 0;
  * The relation_stats_effective statistic cache is stored in hash table.
  */
 static HTAB	   *rel_stats;
+
+/*
+ * The owner of pg_dbms_stats statistic tables.
+ */
+static Oid	stats_table_owner = InvalidOid;
+static char *stats_table_owner_name = "";
 
 #define get_pg_statistic(tuple)	((Form_pg_statistic) GETSTRUCT(tuple))
 
@@ -162,6 +177,15 @@ static int32 dbms_stats_get_rel_data_width(Relation rel, int32 *attr_widths);
 extern void test_import(int *passed, int *total);
 extern void test_dump(int *passed, int *total);
 extern void test_pg_dbms_stats(int *passed, int *total);
+#endif
+
+/* SPI_keepplan() is since 9.2  */
+#if PG_VERSION_NUM < 90200
+#define SPI_keepplan(pplan) {\ 
+SPIPlanPtr tp = *plan;\
+	*plan = SPI_saveplan(tp);\
+	SPI_freeplan(tp);\
+}
 #endif
 
 /*
@@ -228,6 +252,45 @@ _PG_fini(void)
 	get_index_stats_hook = prev_get_index_stats;
 
 	/* A function to unregister callback for relcache is NOT provided. */
+}
+
+/*
+ * Find and store the owner of the dummy statistics table.
+ *
+ * We will access statistics tables using this owner
+ */
+static Oid
+get_stats_table_owner(void)
+{
+	HeapTuple tp;
+
+	if (!OidIsValid(stats_table_owner))
+	{
+		tp = SearchSysCache2(RELNAMENSP,
+					 PointerGetDatum(RELSTAT_TBLNAME),
+					 ObjectIdGetDatum(get_namespace_oid(NSPNAME, false)));
+		if (!HeapTupleIsValid(tp))
+			elog(ERROR, "table \"%s.%s\" not found in pg_class",
+				 NSPNAME, RELSTAT_TBLNAME);
+		stats_table_owner =	((Form_pg_class) GETSTRUCT(tp))->relowner;
+		if (!OidIsValid(stats_table_owner))
+			elog(ERROR, "owner uid of table \"%s.%s\" is invalid",
+				 NSPNAME, RELSTAT_TBLNAME);
+		ReleaseSysCache(tp);
+
+		tp = SearchSysCache1(AUTHOID, ObjectIdGetDatum(stats_table_owner));
+		if (!HeapTupleIsValid(tp))
+		{
+			elog(ERROR,
+				 "role id %u for the owner of the relation \"%s.%s\"is invalid",
+				 stats_table_owner, NSPNAME, RELSTAT_TBLNAME);
+		}
+		/* This will be done once for the session, so not pstrdup. */
+		stats_table_owner_name =
+			strdup(NameStr(((Form_pg_authid) GETSTRUCT(tp))->rolname));
+		ReleaseSysCache(tp);
+	}
+	return stats_table_owner;
 }
 
 /*
@@ -601,7 +664,7 @@ dbms_stats_is_system_schema_internal(char *schema_name)
 	if (strcmp(schema_name, "pg_catalog") == 0 ||
 		strcmp(schema_name, "pg_toast") == 0 ||
 		strcmp(schema_name, "information_schema") == 0 ||
-		strcmp(schema_name, "dbms_stats") == 0)
+		strcmp(schema_name, NSPNAME) == 0)
 		return true;
 
 	return false;
@@ -867,7 +930,7 @@ get_merged_relation_stats(Oid relid, BlockNumber *pages, double *tuples,
 		 * eliminates excessive SPI calls below. Negative caches will be
 		 * invalidated again on invalidation of system relation cache, which
 		 * occur on modification of the dummy stats tables
-		 * dbms_stats._relation_stats_locked and _column_stats_locked.
+		 * dbms_stats.relation_stats_locked and column_stats_locked.
 		 */
 		if (entry->relpages == InvalidBlockNumber)
 			return;
@@ -884,7 +947,6 @@ get_merged_relation_stats(Oid relid, BlockNumber *pages, double *tuples,
 		PG_TRY();
 		{
 			++nested_level;
-
 			SPI_connect();
 
 			/*
@@ -1199,27 +1261,54 @@ execute_plan(SPIPlanPtr *plan,
 	int		nargs;
 	Datum	values[3];
 	bool	nulls[3] = { false, false, false };
+	Oid			save_userid;
+	int			save_sec_context;
 
+	/* XXXX: this works for now but should be fixed later.. */
 	nargs = (attnum ? 3 : 1);
 
-	/* When plan is not given, create plan from query string at first. */
-	if (*plan == NULL)
+	/*
+	 * The dummy statistics table allows access from no one other than its
+	 * owner or superuser.
+	 */
+	GetUserIdAndSecContext(&save_userid, &save_sec_context);
+	SetUserIdAndSecContext(get_stats_table_owner(),
+						   save_sec_context | SECURITY_LOCAL_USERID_CHANGE);
+
+	PG_TRY();
 	{
-		SPIPlanPtr p;
-		p = SPI_prepare(query, nargs, argtypes);
-		if (p == NULL)
-			elog(ERROR, "pg_dbms_stats: SPI_prepare => %d", SPI_result);
-		*plan = SPI_saveplan(p);
-		SPI_freeplan(p);
+		/* Create plan from the query if not yet. */
+		if (*plan == NULL)
+		{
+			*plan = SPI_prepare(query, nargs, argtypes);
+			if (*plan == NULL)
+				elog(ERROR,
+					 "pg_dbms_stats: SPI_prepare() failed. result = %d",
+					 SPI_result);
+
+			SPI_keepplan(*plan);
+		}
+
+		values[0] = ObjectIdGetDatum(relid);
+		values[1] = Int16GetDatum(attnum ? *attnum : 0);
+		values[2] = BoolGetDatum(inh);
+
+		ret = SPI_execute_plan(*plan, values, nulls, true, 1);
 	}
+	PG_CATCH();
+	{
+		SetUserIdAndSecContext(save_userid, save_sec_context);
+		if (geterrcode() == ERRCODE_INSUFFICIENT_PRIVILEGE)
+			errdetail("dbms_stats could not access the object as the role \"%s\".",
+				stats_table_owner_name);
+		errhint("Check your settings of pg_dbms_stats.");
+		PG_RE_THROW();
+	}
+	PG_END_TRY();
 
-	values[0] = ObjectIdGetDatum(relid);
-	values[1] = Int16GetDatum(attnum ? *attnum : 0);
-	values[2] = BoolGetDatum(inh);
-
-	ret = SPI_execute_plan(*plan, values, nulls, true, 1);
+	SetUserIdAndSecContext(save_userid, save_sec_context);
 	if (ret != SPI_OK_SELECT)
-		elog(ERROR, "pg_dbms_stats: SPI_execute_plan => %d", ret);
+		elog(ERROR, "pg_dbms_stats: SPI_execute_plan() returned %d", ret);
 
 	return SPI_processed > 0;
 }

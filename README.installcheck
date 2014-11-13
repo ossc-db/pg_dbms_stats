@@ -1,7 +1,7 @@
 Preparation for make installcheck
 
 1. Install pg_dbms_stats into the target binary tree. Make sure to
-   prpare the PATH environment variable properly to execute the right
+   prepare the PATH environment variable properly to execute the right
    pg_config for the version of target PostgreSQL server.
 
   postgres$ which pg_config

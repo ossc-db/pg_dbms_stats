@@ -1409,12 +1409,12 @@ init_rel_stats_entry(StatsRelationEntry *entry, Oid relid)
  * the attribute widths for estimation purposes.
  *
  * Note: This function is copied from plancat.c in core source tree of version
- * 9.2, and customized for pg_dbms_stats.  Changes from orignal one are:
+ * 9.2, and customized for pg_dbms_stats.  Changes from original one are:
  *   - rename by prefixing dbms_stats_
  *   - add 3 parameters (relpages, reltuples, curpage) to pass dummy curpage
  *     values.
  *   - Get current # of pages only when supplied curpages is InvalidBlockNumber
- *   - get franction of all-visible-pages
+ *   - get fraction of all-visible-pages
  */
 static void
 dbms_stats_estimate_rel_size(Relation rel, int32 *attr_widths,

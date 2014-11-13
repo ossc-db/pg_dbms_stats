@@ -1,3 +1,19 @@
+2014-11-13 Kyotaro Horiguchi <horiguchi.kyotaro@lab.ntt.co.jp>
+	* pg_dbms_stats.c: Fixed a bug that locked statistics won't be
+	effective when accessing tables without select privilege via
+	views.
+	On the current implement, when planner requested the statistics
+	for a column, pg_dbms_stats takes it from the dummy statistics
+	tables via views which gives stats only of columns that the
+	current user can SELECT.
+	Under that way it works, pg_dbms_stats cannot read the dummy
+	statistics of objects invisible from the current user so accessing
+	such objects via views will done using system statistics, even if
+	their statistics are locked.
+	In order to resolve the problem, privileges for the dummy stats
+	tables and the user under which pg_dbms_stats accesses them are
+	changed.
+
 2014-11-06 Kyotaro Horiguchi <horiguchi.kyotaro@lab.ntt.co.jp>
 	* pg_dbms_stats.control: Correct default_version.
 
@@ -13,7 +29,7 @@
 	intermediate 0x00 byte and identical lower bytes (for the little
 	endian case). Returning the wrong statistics cache can result in
 	server crash, or at least unexpected plans.
-	* pg_dbms_stats-1.3.3.sql: Lock granurality for pg_dbms_stats's
+	* pg_dbms_stats-1.3.3.sql: Lock granularity for pg_dbms_stats's
 	operations was raised. Simultaneous lock operations on different
 	tables no longer block each other.
 
@@ -38,7 +54,7 @@
 
 	* Added clean_up_stats() function, which erases all saved
 	statistics left alone after deleting tables before unlocking
-	staistics.
+	statistics.
 
 2013-11-07 Kyotaro Horiguchi <horiguchi.kyotaro@lab.ntt.co.jp>
 	* First published version.

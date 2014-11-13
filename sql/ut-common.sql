@@ -27,7 +27,7 @@ DELETE FROM dbms_stats._relation_stats_locked;
 EXPLAIN (costs false) SELECT * FROM s0.st2 WHERE id < 1;
 SELECT dbms_stats.lock_table_stats('s0.st2'::regclass);
 UPDATE dbms_stats._relation_stats_locked SET curpages = 10000;
-VACUUM dbms_stats._relation_stats_locked;  -- in order to avoid auto vacuum
+VACUUM ANALYZE;
 -- No.3-1-1
 SET pg_dbms_stats.use_locked_stats TO ON;
 EXPLAIN (costs false) SELECT * FROM s0.st2 WHERE id < 1;
@@ -35,6 +35,7 @@ EXPLAIN (costs false) SELECT * FROM s0.st2 WHERE id < 1;
 SET pg_dbms_stats.use_locked_stats TO OFF;
 EXPLAIN (costs false) SELECT * FROM s0.st2 WHERE id < 1;
 -- No.3-1-3
+/* Reconnection as regular user */
 \c - regular_user
 SHOW pg_dbms_stats.use_locked_stats;
 SET pg_dbms_stats.use_locked_stats TO OFF;
@@ -43,6 +44,7 @@ EXPLAIN (costs false) SELECT * FROM s0.st2 WHERE id < 1;
 RESET pg_dbms_stats.use_locked_stats;
 EXPLAIN (costs false) SELECT * FROM s0.st2 WHERE id < 1;
 -- clean up
+/* Reconnection as super user */
 \c - super_user
 DELETE FROM dbms_stats._relation_stats_locked;
 
@@ -199,7 +201,7 @@ UPDATE dbms_stats._column_stats_locked SET stanullfrac = 1
  WHERE starelid = 'st1'::regclass
    AND staattnum = 1
    AND stainherit = false;
-VACUUM dbms_stats._relation_stats_locked;  -- in order to avoid auto vacuum
+VACUUM ANALYZE;
 EXPLAIN (costs false) SELECT * FROM st1 WHERE val IS NULL;
 
 -- No.5-2-10
@@ -294,7 +296,7 @@ EXPLAIN (costs false) SELECT * FROM st1 WHERE val IS NULL;
 EXPLAIN (costs false) SELECT * FROM st1 WHERE val IS NULL;
 UPDATE dbms_stats._relation_stats_locked SET curpages = 1
  WHERE relid = 'st1'::regclass;
-VACUUM dbms_stats._relation_stats_locked;  -- in order to avoid auto vacuum
+VACUUM ANALYZE;
 EXPLAIN (costs false) SELECT * FROM st1 WHERE val IS NULL;
 
 -- No.5-3-10
@@ -314,17 +316,17 @@ SELECT dbms_stats.unlock_database_stats();
 SELECT dbms_stats.lock_table_stats('st1');
 SELECT relname, curpages FROM dbms_stats.relation_stats_locked
  WHERE relid = 'st1'::regclass;
-SELECT pg_sleep(0.5);
+SELECT pg_sleep(0.7);
 SELECT reset_stat_and_cache();
-VACUUM dbms_stats._relation_stats_locked;  -- in order to avoid auto vacuum
+VACUUM ANALYZE;
 UPDATE dbms_stats._relation_stats_locked SET curpages = 1000
  WHERE relid = 'st1_exp'::regclass;
-SELECT pg_sleep(0.5);
+SELECT pg_sleep(0.7);
 SELECT * FROM lockd_io;
 SELECT reset_stat_and_cache();
 SELECT relname, curpages FROM dbms_stats.relation_stats_locked
  WHERE relid = 'st1'::regclass;
-SELECT pg_sleep(0.5);
+SELECT pg_sleep(0.7);
 SELECT * FROM lockd_io;
 
 /*
@@ -333,7 +335,7 @@ SELECT * FROM lockd_io;
 -- No.5-4-1
 UPDATE dbms_stats._relation_stats_locked SET curpages = 1
  WHERE relid = 'st1'::regclass;
-VACUUM dbms_stats._relation_stats_locked;  -- in order to avoid auto vacuum
+VACUUM ANALYZE;
 EXPLAIN (costs false) SELECT * FROM st1 WHERE val IS NULL;
 \c
 SET pg_dbms_stats.use_locked_stats to NO;
@@ -366,30 +368,31 @@ INSERT INTO s0.droptest VALUES (1),(2),(3);
 VACUUM ANALYZE;
 SELECT * FROM s0.droptest
  WHERE id = 1;
-SELECT pg_sleep(0.5);
+SELECT pg_sleep(0.7);
 SELECT reset_stat_and_cache();
 ALTER TABLE s0.droptest RENAME TO test;
-SELECT pg_sleep(0.5);
+SELECT pg_sleep(0.7);
 SELECT * FROM lockd_io;
 SELECT reset_stat_and_cache();
 SELECT * FROM s0.test
  WHERE id = 1;
-SELECT pg_sleep(0.5);
+SELECT pg_sleep(0.7);
 SELECT * FROM lockd_io;
 ALTER TABLE s0.test RENAME TO droptest;
 
 -- No.5-4-6
+VACUUM ANALYZE;
 SELECT * FROM s0.droptest
  WHERE id = 1;
-SELECT pg_sleep(0.5);
+SELECT pg_sleep(0.7);
 SELECT reset_stat_and_cache();
 ALTER TABLE s0.droptest RENAME id TO test;
-SELECT pg_sleep(0.5);
+SELECT pg_sleep(0.7);
 SELECT * FROM lockd_io;
 SELECT reset_stat_and_cache();
 SELECT * FROM s0.droptest
  WHERE test = 1;
-SELECT pg_sleep(0.5);
+SELECT pg_sleep(0.7);
 SELECT * FROM lockd_io;
 ALTER TABLE s0.droptest RENAME test TO id;
 
@@ -397,10 +400,10 @@ ALTER TABLE s0.droptest RENAME test TO id;
 INSERT INTO s0.droptest VALUES (4);
 SELECT * FROM s0.droptest
  WHERE id = 1;
-SELECT pg_sleep(0.5);
+SELECT pg_sleep(0.7);
 SELECT reset_stat_and_cache();
 ANALYZE;
-SELECT pg_sleep(0.5);
+SELECT pg_sleep(0.7);
 SELECT * FROM lockd_io;
 SELECT reset_stat_and_cache();
 SELECT * FROM s0.droptest
@@ -413,15 +416,15 @@ DELETE FROM s0.droptest;
 INSERT INTO s0.droptest VALUES (4),(5);
 SELECT * FROM s0.droptest
  WHERE id = 4;
-SELECT pg_sleep(0.5);
+SELECT pg_sleep(0.7);
 SELECT reset_stat_and_cache();
-VACUUM;
-SELECT pg_sleep(0.5);
+VACUUM ANALYZE;
+SELECT pg_sleep(0.7);
 SELECT * FROM lockd_io;
 SELECT reset_stat_and_cache();
 SELECT * FROM s0.droptest
  WHERE id = 4;
-SELECT pg_sleep(0.5);
+SELECT pg_sleep(0.7);
 SELECT * FROM lockd_io;
 
 -- clean up
@@ -1126,7 +1129,7 @@ DROP TABLE clean_test;
 /*
  * No.19-1 dummy statistics view for general users privileges.
  */
-\c - regular_user
+SET SESSION AUTHORIZATION regular_user;
 -- No.19-1-1
 SELECT count(*) FROM dbms_stats.relation_stats_locked WHERE false;
 -- No.19-1-2
@@ -1136,5 +1139,6 @@ SELECT count(*) FROM dbms_stats.stats WHERE false;
 -- No.19-1-4
 SELECT count(*) FROM dbms_stats._relation_stats_locked WHERE false;
 -- No.19-1-5
-SELECT count(*) FROM dbms_stats._columnns_user WHERE false;
-\c - super_user
+SELECT count(*) FROM dbms_stats._column_stats_locked WHERE false;
+RESET SESSION AUTHORIZATION;
+

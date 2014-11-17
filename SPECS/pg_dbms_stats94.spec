@@ -15,7 +15,7 @@
 Summary:    Plan Stabilizer for PostgreSQL 9.4
 Name:       pg_dbms_stats94
 Version:    1.3.5
-Release:    1%{?dist}
+Release:    2%{?dist}
 License:    BSD
 Group:      Applications/Databases
 Source:     %{name}-%{version}.tar.gz

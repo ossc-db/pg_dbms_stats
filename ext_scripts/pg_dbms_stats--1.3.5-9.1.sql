@@ -492,7 +492,7 @@ BEGIN
 				RAISE EXCEPTION 'column "%" not found in relation %', $3, $2;
             END IF;
             IF NOT EXISTS(SELECT * FROM dbms_stats.column_stats_backup WHERE id <= $1 AND starelid = $2 AND staattnum = set_attnum) THEN
-                RAISE EXCEPTION 'statistics of column "%" of relation "%" are not found in any backups before',$3, $2, $1;
+                RAISE EXCEPTION 'statistics of column "%" of relation "%" are not found in any backups before backup id = %',$3, $2, $1;
             END IF;
         END IF;
 		PERFORM * FROM dbms_stats.relation_stats_locked r

@@ -151,7 +151,6 @@ dbms_stats_import(PG_FUNCTION_ARGS)
 	import_stats_from_file(filename, nspname, relname, attname);
 
 	/* Determine the Oid of local table from the tablename and schemaname. */
-	/* TODO 可視ページ数に対応する */
 	ret = SPI_execute("SELECT DISTINCT w.nspname, w.relname, c.oid, "
 							 "w.relpages, w.reltuples, "
 							 "w.curpages, w.last_analyze, w.last_autoanalyze "

@@ -2,7 +2,7 @@
 
 MODULE_big = pg_dbms_stats
 OBJS = pg_dbms_stats.o dump.o import.o
-DBMSSTATSVER = 1.3.5
+DBMSSTATSVER = 1.3.6
 DOCDIR = doc
 EXTDIR = ext_scripts
 
@@ -20,7 +20,7 @@ REGRESS = init-common ut_fdw_init init-$(MAJORVERSION) ut-common \
 
 REGRESS_OPTS = --encoding=UTF8 --temp-config=regress.conf --extra-install=contrib/file_fdw
 
-DATA = pg_dbms_stats--1.3.5.sql pg_dbms_stats--1.0--1.3.2.sql pg_dbms_stats--1.3.2--1.3.3.sql pg_dbms_stats--1.3.3--1.3.4.sql pg_dbms_stats--1.3.4--1.3.5.sql
+DATA = pg_dbms_stats--1.3.6.sql pg_dbms_stats--1.0--1.3.2.sql pg_dbms_stats--1.3.2--1.3.3.sql pg_dbms_stats--1.3.3--1.3.4.sql pg_dbms_stats--1.3.4--1.3.5.sql pg_dbms_stats--1.3.5--1.3.6.sql
 
 DOCS = $(DOCDIR)/export_effective_stats-$(MAJORVERSION).sql.sample \
 	$(DOCDIR)/export_plain_stats-$(MAJORVERSION).sql.sample

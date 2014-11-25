@@ -14,7 +14,7 @@
 ## Set general information for pg_dbms_stats.
 Summary:    Plan Stabilizer for PostgreSQL 9.4
 Name:       pg_dbms_stats94
-Version:    1.3.5
+Version:    1.3.6
 Release:    2%{?dist}
 License:    BSD
 Group:      Applications/Databases
@@ -61,7 +61,7 @@ rm -rf %{buildroot}
 install -d %{buildroot}%{_libdir}
 install -m 755 pg_dbms_stats.so %{buildroot}%{_libdir}/pg_dbms_stats.so
 install -d %{buildroot}%{_datadir}/extension
-install -m 644 pg_dbms_stats--1.3.5.sql %{buildroot}%{_datadir}/extension/pg_dbms_stats--1.3.5.sql
+install -m 644 pg_dbms_stats--1.3.6.sql %{buildroot}%{_datadir}/extension/pg_dbms_stats--1.3.6.sql
 install -m 644 pg_dbms_stats.control %{buildroot}%{_datadir}/extension/pg_dbms_stats.control
 install -d %{buildroot}%{_docdir}/extension
 install -m 644 doc/export_effective_stats-9.4.sql.sample %{buildroot}%{_docdir}/extension/export_effective_stats-9.4.sql.sample
@@ -74,21 +74,14 @@ rm -rf %{buildroot}
 %defattr(0755,root,root)
 %{_libdir}/pg_dbms_stats.so
 %defattr(0644,root,root)
-%{_datadir}/extension/pg_dbms_stats--1.3.5.sql
+%{_datadir}/extension/pg_dbms_stats--1.3.6.sql
 %{_datadir}/extension/pg_dbms_stats.control
 %{_docdir}/extension/export_effective_stats-9.4.sql.sample
 %{_docdir}/extension/export_plain_stats-9.4.sql.sample
 
 # History of pg_dbms_stats.
 %changelog
-* Thu Sep 16 2014 Kyotaro Horiguchi
-- Update to 1.3.4
-* Thu Aug 25 2014 Kyotaro Horiguchi
-- Update to 1.3.3
-* Thu Jun 05 2014 Kyotaro Horiguchi
-- Update to 1.3.2
-* Wed Nov 06 2013 Takashi Suzuki
-- Update to 1.3.1
-* Wed Sep 05 2012 Shigeru Hanada
-- Initial cut for 1.0.0
+* Thu XXX XX 2014 Kyotaro Horiguchi
+- pg_dbms_stats94 v1.3.6 release
+
 

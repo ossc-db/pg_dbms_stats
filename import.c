@@ -218,7 +218,7 @@ dbms_stats_import(PG_FUNCTION_ARGS)
 		 * First we try UPDATE with the oid.  When no record matched, try
 		 * INSERT.  We can't use DELETE-then-INSERT method because we have FK
 		 * on relation_stats_locked so DELETE would delete child records in
-		 * _column_stats_locked undesirably.
+		 * column_stats_locked undesirably.
 		 */
 		spi_exec_query("UPDATE dbms_stats.relation_stats_locked SET "
 				"relname = quote_ident($1) || '.' || quote_ident($2), "
@@ -256,7 +256,7 @@ dbms_stats_import(PG_FUNCTION_ARGS)
 
 		/*
 		 * Determine the attnum of the attribute with given name, and load
-		 * statistics from temp table into dbms._column_stats_locked.
+		 * statistics from temp table into dbms.column_stats_locked.
 		 */
 		spi_exec_query("SELECT w.stainherit, w.attname, a.attnum, "
 							  "w.nspname_of_typename, tn.nspname, "
@@ -370,11 +370,11 @@ dbms_stats_import(PG_FUNCTION_ARGS)
 			 * First delete old dummy statistics, and import new one.  We use
 			 * DELETE-then-INSERT method here to simplify codes.
 			 */
-			spi_exec_query("DELETE FROM dbms_stats._column_stats_locked "
+			spi_exec_query("DELETE FROM dbms_stats.column_stats_locked "
 					"WHERE starelid = $1 AND staattnum = $2", 2, c_types,
 					&c_del_plan, values, NULL, SPI_OK_DELETE);
 
-			spi_exec_query("INSERT INTO dbms_stats._column_stats_locked "
+			spi_exec_query("INSERT INTO dbms_stats.column_stats_locked "
 				"SELECT $1, $2, "
 				"stainherit, stanullfrac, stawidth, stadistinct, "
 				"stakind1, stakind2, stakind3, stakind4, "

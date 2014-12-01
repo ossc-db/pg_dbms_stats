@@ -15,7 +15,7 @@
 Summary:    Plan Stabilizer for PostgreSQL 9.2
 Name:       pg_dbms_stats92
 Version:    1.3.6
-Release:    2%{?dist}
+Release:    1%{?dist}
 License:    BSD
 Group:      Applications/Databases
 Source:     %{name}-%{version}.tar.gz
@@ -86,7 +86,7 @@ rm -rf %{buildroot}
 
 # History of pg_dbms_stats.
 %changelog
-* Thu XXX XX 2014 Kyotaro Horiguchi
+* Mon Dec 01 2014 Kyotaro Horiguchi
 - Update to 1.3.6
 * Thu Nov 13 2014 Kyotaro Horiguchi
 - Update to 1.3.5

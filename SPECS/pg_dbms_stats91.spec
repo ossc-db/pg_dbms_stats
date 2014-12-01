@@ -86,7 +86,7 @@ rm -rf %{buildroot}
 
 # History of pg_dbms_stats.
 %changelog
-* Thu XXX XX 2014 Kyotaro Horiguchi
+* Mon Dec 01 2014 Kyotaro Horiguchi
 - Update to 1.3.6
 * Thu Nov 13 2014 Kyotaro Horiguchi
 - Update to 1.3.5

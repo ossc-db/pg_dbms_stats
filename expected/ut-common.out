@@ -2739,20 +2739,6 @@ EXPLAIN (COSTS OFF) SELECT * FROM s0.vst4 WHERE a = 1;
    Filter: (a = 1)
 (2 rows)
 
-/*
- * No.20-2 error description. -- abnormal case.
- */
-RESET SESSION AUTHORIZATION;
-ALTER TABLE dbms_stats.relation_stats_locked OWNER TO regular_user;
-/* reconnection needed to flush cache */
-\c - regular_user
-EXPLAIN (COSTS OFF) SELECT * FROM s0.vst4 WHERE a = 1;
-ERROR:  permission denied for schema dbms_stats
-LINE 1: ...elpages, reltuples, curpages, relallvisible  FROM dbms_stats...
-                                                             ^
-DETAIL:  dbms_stats could not access the object as the role "regular_user".
-HINT:  Check your settings of pg_dbms_stats.
-QUERY:  SELECT relpages, reltuples, curpages, relallvisible  FROM dbms_stats.relation_stats_locked WHERE relid = $1
 \c - super_user
 ALTER TABLE dbms_stats.relation_stats_locked OWNER TO super_user;
 SELECT dbms_stats.unlock('s0.st4');

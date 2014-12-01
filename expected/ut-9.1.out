@@ -9108,3 +9108,22 @@ SELECT relid::regclass FROM dbms_stats.relation_stats_locked
  s1.st0
 (14 rows)
 
+-- No.15 error description. -- abnormal case.
+RESET SESSION AUTHORIZATION;
+CREATE TABLE s0.st4 (a int, b text);
+CREATE VIEW s0.vst4 AS select * FROM s0.st4;
+GRANT SELECT ON s0.vst4 TO regular_user;
+ALTER TABLE dbms_stats.relation_stats_locked OWNER TO regular_user;
+/* reconnection needed to flush cache */
+\c - regular_user
+EXPLAIN (COSTS OFF) SELECT * FROM s0.vst4 WHERE a = 1;
+ERROR:  permission denied for schema dbms_stats
+LINE 1: SELECT *   FROM dbms_stats.column_stats_locked WHERE stareli...
+                        ^
+DETAIL:  dbms_stats could not access the object as the role "regular_user".
+HINT:  Check your settings of pg_dbms_stats.
+QUERY:  SELECT *   FROM dbms_stats.column_stats_locked WHERE starelid = $1    AND staattnum = $2    AND stainherit = $3
+\c - super_user
+ALTER TABLE dbms_stats.relation_stats_locked OWNER TO super_user;
+DROP TABLE s0.st4 CASCADE;
+NOTICE:  drop cascades to view s0.vst4

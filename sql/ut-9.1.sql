@@ -2575,3 +2575,19 @@ SELECT starelid, attname, stainherit FROM columns_locked_v c;
 SELECT relid::regclass FROM dbms_stats.relation_stats_locked
  GROUP BY relid
  ORDER BY relid;
+
+-- No.15 error description. -- abnormal case.
+RESET SESSION AUTHORIZATION;
+CREATE TABLE s0.st4 (a int, b text);
+CREATE VIEW s0.vst4 AS select * FROM s0.st4;
+GRANT SELECT ON s0.vst4 TO regular_user;
+
+ALTER TABLE dbms_stats.relation_stats_locked OWNER TO regular_user;
+/* reconnection needed to flush cache */
+\c - regular_user
+
+EXPLAIN (COSTS OFF) SELECT * FROM s0.vst4 WHERE a = 1;
+
+\c - super_user
+ALTER TABLE dbms_stats.relation_stats_locked OWNER TO super_user;
+DROP TABLE s0.st4 CASCADE;

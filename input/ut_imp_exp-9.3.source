@@ -52,6 +52,8 @@ COPY dbms_stats.work FROM '@abs_srcdir@/export_stats.dmp' (FORMAT 'binary');
 SELECT * FROM work_v;
 TRUNCATE dbms_stats.work;
 \! rm doc/export_plain_stats-9.3.sql.sample_test
+-- No.16-1-3-1 Actual import test
+select dbms_stats.import_database_stats('@abs_srcdir@/export_stats.dmp');
 -- No.16-1-4
 \! sed '/ORDER/i\\ AND c.relname = '"\'pg_toast_1262\'" doc/export_plain_stats-9.3.sql.sample > doc/export_plain_stats-9.3.sql.sample_test
 \i doc/export_plain_stats-9.3.sql.sample_test

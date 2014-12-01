@@ -1163,17 +1163,6 @@ EXPLAIN (COSTS OFF) SELECT * FROM s0.vst4 WHERE a = 1;
 
 SET pg_dbms_stats.use_locked_stats TO off;
 EXPLAIN (COSTS OFF) SELECT * FROM s0.vst4 WHERE a = 1;
-
-/*
- * No.20-2 error description. -- abnormal case.
- */
-RESET SESSION AUTHORIZATION;
-ALTER TABLE dbms_stats.relation_stats_locked OWNER TO regular_user;
-/* reconnection needed to flush cache */
-\c - regular_user
-
-EXPLAIN (COSTS OFF) SELECT * FROM s0.vst4 WHERE a = 1;
-
 \c - super_user
 ALTER TABLE dbms_stats.relation_stats_locked OWNER TO super_user;
 

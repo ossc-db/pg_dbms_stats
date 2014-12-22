@@ -42,11 +42,6 @@ Note that this package is available for only PostgreSQL 9.4.
 ## pre work for build pg_dbms_stats
 %prep
 PATH=/usr/pgsql-9.4/bin:$PATH
-if [ "${MAKE_ROOT}" != "" ]; then
-  pushd ${MAKE_ROOT}
-  make clean %{name}-%{version}.tar.gz
-  popd
-fi
 if [ ! -d %{_rpmdir} ]; then mkdir -p %{_rpmdir}; fi
 %setup -q
 
@@ -81,7 +76,7 @@ rm -rf %{buildroot}
 
 # History of pg_dbms_stats.
 %changelog
-* Xxx XXX XX 2014 Kyotaro Horiguchi
+* Mon Dec 22 2014 Kyotaro Horiguchi
 - pg_dbms_stats94 v1.3.6 release
 
 

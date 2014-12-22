@@ -42,11 +42,6 @@ Note that this package is available for only PostgreSQL 9.3.
 ## pre work for build pg_dbms_stats
 %prep
 PATH=/usr/pgsql-9.3/bin:$PATH
-if [ "${MAKE_ROOT}" != "" ]; then
-  pushd ${MAKE_ROOT}
-  make USE_PGXS=1 clean %{name}-%{version}.tar.gz
-  popd
-fi
 if [ ! -d %{_rpmdir} ]; then mkdir -p %{_rpmdir}; fi
 %setup -q
 

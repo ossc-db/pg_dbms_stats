@@ -69,7 +69,7 @@ TARSOURCES = Makefile *.c  *.h \
 
 all: $(DATA) $(DOCS)
 
-rpms: rpm93 rpm92 rpm91
+rpms: rpm94 rpm93 rpm92 rpm91
 
 sourcetar: $(STARBALL)
 

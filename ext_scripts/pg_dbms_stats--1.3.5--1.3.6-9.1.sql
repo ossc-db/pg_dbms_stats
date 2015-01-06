@@ -26,7 +26,7 @@ DECLARE
   castdef varchar;
 BEGIN
   srctypname := $1 || '[]';
-  funcname := 'dbms_stats._' || $1 || 'ary_anyarray';
+  SELECT 'dbms_stats._' || replace(CAST($1 AS text), ' ','_') || 'ary_anyarray' INTO funcname;
   funcdef := funcname || '(' || srctypname || ')';
   castdef := '(' || srctypname || ' AS dbms_stats.anyarray)';
 
@@ -57,7 +57,7 @@ DECLARE
   castdef varchar;
 BEGIN
   srctypname := $1 || '[]';
-  funcname := 'dbms_stats._' || $1 || 'ary_anyarray';
+  SELECT 'dbms_stats._' || replace(CAST($1 AS text), ' ','_') || 'ary_anyarray' INTO funcname;
   funcdef := funcname || '(' || srctypname || ')';
   castdef := '(' || srctypname || ' AS dbms_stats.anyarray)';
 

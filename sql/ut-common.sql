@@ -57,8 +57,10 @@ ANALYZE st3;
 SELECT staattnum, stavalues1 FROM pg_statistic
  WHERE starelid = 'public.st3'::regclass
  ORDER BY staattnum;
-\copy (SELECT stavalues1::dbms_stats.anyarray FROM dbms_stats.column_stats_effective WHERE starelid = 'st3'::regclass) TO 'results/anyarray_test.cp' binary
-CREATE TABLE st4 (arr dbms_stats.anyarray);
+\copy (SELECT stavalues1::dbms_stats.anyarray FROM dbms_stats.column_stats_effective WHERE starelid = 'st3'::regclass ORDER BY staattnum) TO 'results/anyarray_test.cp' binary
+SET client_min_messages TO WARNING;
+CREATE TABLE st4 (arr dbms_stats.anyarray, ord serial);
+SET client_min_messages TO DEFAULT;
 
 SELECT t.typname, n.nspname,
        t.typlen, t.typbyval, t.typtype,
@@ -73,7 +75,7 @@ SELECT t.typname, n.nspname,
  ORDER BY t.typname;
 -- No.4-1-1
 INSERT INTO st4 VALUES(NULL);
-SELECT * FROM st4;
+SELECT * FROM st4 ORDER BY ord;
 -- No.4-1-2
 DELETE FROM st4;
 SELECT stavalues1::dbms_stats.anyarray
@@ -86,7 +88,7 @@ INSERT INTO st4
        FROM dbms_stats.column_stats_effective
       WHERE starelid = 'st3'::regclass
         AND staattnum = 1;
-SELECT * FROM st4;
+SELECT * FROM st4 ORDER BY ord;
 -- No.4-1-3
 DELETE FROM st4;
 SELECT stavalues1::dbms_stats.anyarray
@@ -99,7 +101,7 @@ INSERT INTO st4
        FROM dbms_stats.column_stats_effective
       WHERE starelid = 'st3'::regclass
         AND staattnum = 2;
-SELECT * FROM st4;
+SELECT * FROM st4 ORDER BY ord;
 -- No.4-1-4
 DELETE FROM st4;
 SELECT stavalues1::dbms_stats.anyarray
@@ -112,7 +114,7 @@ INSERT INTO st4
        FROM dbms_stats.column_stats_effective
       WHERE starelid = 'st3'::regclass
         AND staattnum = 1;
-SELECT * FROM st4;
+SELECT * FROM st4 ORDER BY ord;
 -- No.4-1-5
 DELETE FROM st4;
 SELECT stavalues1::dbms_stats.anyarray
@@ -125,14 +127,15 @@ INSERT INTO st4
        FROM dbms_stats.column_stats_effective
       WHERE starelid = 'st3'::regclass
         AND staattnum = 3;
-SELECT * FROM st4;
+SELECT * FROM st4 ORDER BY ord;
 -- No.4-1-6
 DELETE FROM st4;
 SELECT stavalues1::dbms_stats.anyarray
   FROM dbms_stats.column_stats_effective
- WHERE starelid = 'st3'::regclass;
+ WHERE starelid = 'st3'::regclass
+ ORDER BY staattnum;
 \copy st4(arr) FROM 'results/anyarray_test.cp' binary
-SELECT * FROM st4;
+SELECT * FROM st4 ORDER BY ord;
 -- clean up
 DROP TABLE st3;
 DROP TABLE st4;

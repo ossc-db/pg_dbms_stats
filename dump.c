@@ -27,7 +27,7 @@ static void ReadArrayBinary(StringInfo buf, int nitems,
 				int typlen, bool typbyval, char typalign,
 				Datum *values, bool *nulls,
 				bool *hasnulls, int32 *nbytes);
-static void CopyArrayEls(ArrayType *array,
+static void CopyAnyArrayEls(ArrayType *array,
 			 Datum *values, bool *nulls, int nitems,
 			 int typlen, bool typbyval, char typalign,
 			 bool freedata);
@@ -167,10 +167,10 @@ dbms_stats_array_recv(PG_FUNCTION_ARGS)
 	memcpy(ARR_DIMS(retval), dim, ndim * sizeof(int));
 	memcpy(ARR_LBOUND(retval), lBound, ndim * sizeof(int));
 
-	CopyArrayEls(retval,
-				 dataPtr, nullsPtr, nitems,
-				 typlen, typbyval, typalign,
-				 true);
+	CopyAnyArrayEls(retval,
+					dataPtr, nullsPtr, nitems,
+					typlen, typbyval, typalign,
+					true);
 
 	pfree(dataPtr);
 	pfree(nullsPtr);
@@ -278,14 +278,14 @@ ReadArrayBinary(StringInfo buf,
 }
 
 static void
-CopyArrayEls(ArrayType *array,
-			 Datum *values,
-			 bool *nulls,
-			 int nitems,
-			 int typlen,
-			 bool typbyval,
-			 char typalign,
-			 bool freedata)
+CopyAnyArrayEls(ArrayType *array,
+				Datum *values,
+				bool *nulls,
+				int nitems,
+				int typlen,
+				bool typbyval,
+				char typalign,
+				bool freedata)
 {
 	char	   *p = ARR_DATA_PTR(array);
 	bits8	   *bitmap = ARR_NULLBITMAP(array);

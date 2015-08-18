@@ -15,10 +15,12 @@ CHECKING=$(shell echo $(LAST_LIBPATH)| grep './tmp_check/install/' | wc -l)
 
 EXTENSION = pg_dbms_stats
 
-REGRESS = init-common ut_fdw_init init-$(MAJORVERSION) ut-common \
-		  ut-$(MAJORVERSION)  ut_imp_exp-$(MAJORVERSION)
+REGRESS = init-common ut_fdw_init init-$(REGTESTVER) ut-common \
+		  ut-$(REGTESTVER)  ut_imp_exp-$(REGTESTVER)
+EXTRA_INSTALL = contrib/file_fdw
 
-REGRESS_OPTS = --encoding=UTF8 --temp-config=regress.conf --extra-install=contrib/file_fdw
+# Before 9.5 needs extra-install flag for pg_regress
+REGRESS_OPTS = --encoding=UTF8 --temp-config=regress.conf $(if $(filter 0,$(shell test "$(MAJORVERSION)" \< "9.5"; echo $$?)),--extra-install=$(EXTRA_INSTALL))
 
 DATA = pg_dbms_stats--1.3.6.sql pg_dbms_stats--1.0--1.3.2.sql pg_dbms_stats--1.3.2--1.3.3.sql pg_dbms_stats--1.3.3--1.3.4.sql pg_dbms_stats--1.3.4--1.3.5.sql pg_dbms_stats--1.3.5--1.3.6.sql
 
@@ -55,9 +57,8 @@ include $(top_builddir)/src/Makefile.global
 include $(top_srcdir)/contrib/contrib-global.mk
 endif
 
-ifeq "$(MAJORVERSION)" "9.5"
-MAJORVERSION=9.4
-endif
+# Some versions makes no difference in regard to regression test
+REGTESTVER = $(if $(filter 0,$(shell test "$(MAJORVERSION)" \< "9.4"; echo $$?)),$(MAJORVERSION),9.4)
 
 TARSOURCES = Makefile *.c  *.h \
 	$(EXTDIR)/pg_dbms_stats--*-9.*.sql \
@@ -73,7 +74,7 @@ rpms: rpm94 rpm93 rpm92 rpm91
 
 sourcetar: $(STARBALL)
 
-$(DATA): %.sql: $(EXTDIR)/%-$(MAJORVERSION).sql
+$(DATA): %.sql: $(EXTDIR)/%-$(REGTESTVER).sql
 	cp $< $@
 
 $(STARBALLS): $(TARSOURCES)

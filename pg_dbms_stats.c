@@ -181,7 +181,7 @@ extern void test_pg_dbms_stats(int *passed, int *total);
 
 /* SPI_keepplan() is since 9.2  */
 #if PG_VERSION_NUM < 90200
-#define SPI_keepplan(pplan) {\ 
+#define SPI_keepplan(pplan) {\
 SPIPlanPtr tp = *plan;\
 	*plan = SPI_saveplan(tp);\
 	SPI_freeplan(tp);\

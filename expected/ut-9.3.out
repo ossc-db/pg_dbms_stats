@@ -223,10 +223,10 @@ View definition:
             (dbms_stats.merge(v.*, s.*)).stavalues4 AS stavalues4,
             (dbms_stats.merge(v.*, s.*)).stavalues5 AS stavalues5
            FROM pg_statistic s
-      FULL JOIN dbms_stats.column_stats_locked v USING (starelid, staattnum, stainherit)
-     WHERE NOT dbms_stats.is_system_catalog(starelid::regclass) AND (EXISTS ( SELECT NULL::unknown
-              FROM pg_attribute a
-             WHERE a.attrelid = starelid AND a.attnum = staattnum AND a.attisdropped = false))) m
+             FULL JOIN dbms_stats.column_stats_locked v USING (starelid, staattnum, stainherit)
+          WHERE NOT dbms_stats.is_system_catalog(starelid::regclass) AND (EXISTS ( SELECT NULL::unknown
+                   FROM pg_attribute a
+                  WHERE a.attrelid = starelid AND a.attnum = staattnum AND a.attisdropped = false))) m
   WHERE m.starelid IS NOT NULL;
 
 -- No.2-2-2
@@ -252,8 +252,8 @@ View definition:
     COALESCE(v.last_analyze, pg_stat_get_last_analyze_time(c.oid)) AS last_analyze,
     COALESCE(v.last_autoanalyze, pg_stat_get_last_autoanalyze_time(c.oid)) AS last_autoanalyze
    FROM pg_class c
-   JOIN pg_namespace n ON c.relnamespace = n.oid
-   LEFT JOIN dbms_stats.relation_stats_locked v ON v.relid = c.oid
+     JOIN pg_namespace n ON c.relnamespace = n.oid
+     LEFT JOIN dbms_stats.relation_stats_locked v ON v.relid = c.oid
   WHERE dbms_stats.is_target_relkind(c.relkind) AND NOT dbms_stats.is_system_schema(n.nspname::text);
 
 -- No.2-2-3
@@ -340,9 +340,9 @@ View definition:
             ELSE NULL::real[]
         END AS elem_count_histogram
    FROM dbms_stats.column_stats_effective s
-   JOIN pg_class c ON c.oid = s.starelid
-   JOIN pg_attribute a ON c.oid = a.attrelid AND a.attnum = s.staattnum
-   LEFT JOIN pg_namespace n ON n.oid = c.relnamespace
+     JOIN pg_class c ON c.oid = s.starelid
+     JOIN pg_attribute a ON c.oid = a.attrelid AND a.attnum = s.staattnum
+     LEFT JOIN pg_namespace n ON n.oid = c.relnamespace
   WHERE NOT a.attisdropped AND has_column_privilege(c.oid, a.attnum, 'select'::text);
 
 -- No.2-2-4

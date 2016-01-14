@@ -1,8 +1,11 @@
 # pg_dbms_stats/Makefile
 
+DBMSSTATSVER = 1.3.6
+PGVERS = 91 92 93 94
+IS_PRE_95 = $(filter 0,$(shell test "$(MAJORVERSION)" \< "9.5"; echo $$?))
+
 MODULE_big = pg_dbms_stats
 OBJS = pg_dbms_stats.o dump.o import.o
-DBMSSTATSVER = 1.3.6
 DOCDIR = doc
 EXTDIR = ext_scripts
 
@@ -12,7 +15,6 @@ endif
 
 LAST_LIBPATH=$(shell echo $(LD_LIBRARY_PATH) | sed -e "s/^.*;//")
 CHECKING=$(shell echo $(LAST_LIBPATH)| grep './tmp_check/install/' | wc -l)
-
 EXTENSION = pg_dbms_stats
 
 REGRESS = init-common ut_fdw_init init-$(REGTESTVER) ut-common \
@@ -20,19 +22,20 @@ REGRESS = init-common ut_fdw_init init-$(REGTESTVER) ut-common \
 EXTRA_INSTALL = contrib/file_fdw
 
 # Before 9.5 needs extra-install flag for pg_regress
-REGRESS_OPTS = --encoding=UTF8 --temp-config=regress.conf $(if $(filter 0,$(shell test "$(MAJORVERSION)" \< "9.5"; echo $$?)),--extra-install=$(EXTRA_INSTALL))
+REGRESS_OPTS = --encoding=UTF8 --temp-config=regress.conf $(if $(IS_PRE_95),--extra-install=$(EXTRA_INSTALL))
 
-DATA = pg_dbms_stats--1.3.6.sql pg_dbms_stats--1.0--1.3.2.sql pg_dbms_stats--1.3.2--1.3.3.sql pg_dbms_stats--1.3.3--1.3.4.sql pg_dbms_stats--1.3.4--1.3.5.sql pg_dbms_stats--1.3.5--1.3.6.sql
+# Pick up only the install scripts needed for the PG version.
+DATA = $(subst -$(MAJORVERSION).sql,.sql,$(filter %-$(MAJORVERSION).sql,$(notdir $(wildcard ext_scripts/*.sql))))
 
 DOCS = $(DOCDIR)/export_effective_stats-$(MAJORVERSION).sql.sample \
 	$(DOCDIR)/export_plain_stats-$(MAJORVERSION).sql.sample
 
+# Source tarballs required for rpmbuild
 STARBALL = pg_dbms_stats-$(DBMSSTATSVER).tar.gz
-STARBALL94 = pg_dbms_stats94-$(DBMSSTATSVER).tar.gz
-STARBALL93 = pg_dbms_stats93-$(DBMSSTATSVER).tar.gz
-STARBALL92 = pg_dbms_stats92-$(DBMSSTATSVER).tar.gz
-STARBALL91 = pg_dbms_stats91-$(DBMSSTATSVER).tar.gz
-STARBALLS = $(STARBALL) $(STARBALL94) $(STARBALL93) $(STARBALL92) $(STARBALL91)
+STARBALLS = $(STARBALL) $(foreach v,$(PGVERS),pg_dbms_stats$(v)-$(DBMSSTATSVER).tar.gz)
+
+# Generate RPM target names for all target PG versions
+RPMS = $(foreach v,$(PGVERS),rpm$(v))
 
 EXTRA_CLEAN = sql/ut_anyarray-*.sql expected/ut_anyarray-*.out \
 	sql/ut_imp_exp-*.sql expected/ut_imp_exp-*.out \
@@ -57,8 +60,8 @@ include $(top_builddir)/src/Makefile.global
 include $(top_srcdir)/contrib/contrib-global.mk
 endif
 
-# Some versions makes no difference in regard to regression test
-REGTESTVER = $(if $(filter 0,$(shell test "$(MAJORVERSION)" \< "9.4"; echo $$?)),$(MAJORVERSION),9.4)
+# 9.5 has no difference from 9.4 in regard to regression test
+REGTESTVER = $(if $(IS_PRE_95),$(MAJORVERSION),9.4)
 
 TARSOURCES = Makefile *.c  *.h \
 	$(EXTDIR)/pg_dbms_stats--*-9.*.sql \
@@ -70,13 +73,16 @@ TARSOURCES = Makefile *.c  *.h \
 
 all: $(DATA) $(DOCS)
 
-rpms: rpm94 rpm93 rpm92 rpm91
+rpms: $(RPMS)
 
 sourcetar: $(STARBALL)
 
-$(DATA): %.sql: $(EXTDIR)/%-$(REGTESTVER).sql
+$(DATA): %.sql: $(EXTDIR)/%-$(MAJORVERSION).sql
 	cp $< $@
 
+# Source tar balls are the same for all target PG versions.
+# This is because rpmbuild requires a tar ball with the same base name
+# with target rpm file.
 $(STARBALLS): $(TARSOURCES)
 	if [ -h $(subst .tar.gz,,$@) ]; then rm $(subst .tar.gz,,$@); fi
 	if [ -e $(subst .tar.gz,,$@) ]; then \
@@ -87,14 +93,6 @@ $(STARBALLS): $(TARSOURCES)
 	tar -chzf $@ $(addprefix $(subst .tar.gz,,$@)/, $^)
 	rm $(subst .tar.gz,,$@)
 
-rpm94: $(STARBALL94)
-	MAKE_ROOT=`pwd` rpmbuild -bb SPECS/pg_dbms_stats94.spec
+$(RPMS): rpm% : SPECS/pg_dbms_stats%.spec pg_dbms_stats%-$(DBMSSTATSVER).tar.gz
+	MAKE_ROOT=`pwd` rpmbuild -bb $<
 
-rpm93: $(STARBALL93)
-	MAKE_ROOT=`pwd` rpmbuild -bb SPECS/pg_dbms_stats93.spec
-
-rpm92: $(STARBALL92)
-	MAKE_ROOT=`pwd` rpmbuild -bb SPECS/pg_dbms_stats92.spec
-
-rpm91: $(STARBALL91)
-	MAKE_ROOT=`pwd` rpmbuild -bb SPECS/pg_dbms_stats91.spec

@@ -60,8 +60,7 @@ include $(top_builddir)/src/Makefile.global
 include $(top_srcdir)/contrib/contrib-global.mk
 endif
 
-# 9.5 has no difference from 9.4 in regard to regression test
-REGTESTVER = $(if $(IS_PRE_95),$(MAJORVERSION),9.4)
+REGTESTVER = $(MAJORVERSION)
 
 TARSOURCES = Makefile *.c  *.h \
 	$(EXTDIR)/pg_dbms_stats--*-9.*.sql \

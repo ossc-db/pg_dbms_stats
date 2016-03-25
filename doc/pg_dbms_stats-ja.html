@@ -8,7 +8,7 @@
 </head>
 
 <body>
-<h1 id="pg_dbms_stats">pg_dbms_stats 1.3.1</h1>
+<h1 id="pg_dbms_stats">pg_dbms_stats 1.3.7</h1>
 <div class="navigation">
   <a href="pg_dbms_stats-ja.html">pg_dbms_stats</a>
 </div>
@@ -30,10 +30,10 @@
 </ol>
 </div>
 
-<h2 id="name">名前</h2>
+<h2 id="name">1. 名前</h2>
 <p>pg_dbms_stats -- 統計情報の管理を行い、間接的に実行計画を制御します。</p>
 
-<h2 id="synopsis">概要</h2>
+<h2 id="synopsis">2. 概要</h2>
 <p>PostgreSQL は ANALYZE コマンドによりテーブルやインデックスからサンプリングした値を集計して統計情報として保持しています。
 クエリ・オプティマイザは、この統計情報を利用してクエリのコストを計算し、最もコストの低い実行計画を選択します。このため、データの量や特性が変化したり、統計情報の精度が不十分であったりした場合には、選択される実行計画が変化する場合があります。</p>
 <p>pg_dbms_stats パッケージはこのような予期せぬ実行計画の変化を防ぐための機能拡張です。プランナの処理に割り込んで、プランナが参照する統計情報を事前に作成したダミー統計情報に差し替えることで、選択される統計情報を固定します。「実行計画が運用中に急に変化し、システムの性能が低下する」というリスクを抑えたい場合に有効です。</p>
@@ -45,10 +45,10 @@
 <li>マテリアライズドビュー</li>
 </ul>
 
-<h2 id="description">機能説明</h2>
+<h2 id="description">3. 機能説明</h2>
 <p>pg_dbms_statsには、プランナが使用する統計情報を操作する機能として以下の8つがあります。なお、エクスポートを除く各機能は、SQL関数経由で利用します。各関数の詳細は<a href="objects-ja.html">オブジェクト一覧</a>を参照してください。</p>
 
-<h3>バックアップ</h3>
+<h3>3.1. バックアップ</h3>
 <dl>
 <dt>概要</dt>
 <dd>現在選択されている実行計画を将来的に再現するために、現在プランナが見ている統計情報をバックアップとして保存します。</dd>
@@ -63,7 +63,7 @@
 </dd>
 </dl>
 
-<h3>リストア</h3>
+<h3>3.2. リストア</h3>
 <dl>
 <dt>概要</dt>
 <dd>バックアップ時点で選択されていた実行計画が再び選択されるように、バックアップした統計情報を復元して固定します。</dd>
@@ -86,7 +86,7 @@
 </dl>
 </p>
 
-<h3>パージ</h3>
+<h3>3.3. パージ</h3>
 <dl>
 <dt>概要</dt>
 <dd>不要になった統計情報バックアップを一括削除する機能で、指定したバックアップID以前のバックアップを削除します。</dd>
@@ -98,7 +98,7 @@
 </dd>
 </dl>
 
-<h3>ロック</h3>
+<h3>3.4 ロック</h3>
 <dl>
 <dt>概要</dt>
 <dd>ANALYZEを実行して統計情報が変化しても現在選択されている実行計画が選択され続けるように、プランナが参照する統計情報を固定します。</dd>
@@ -110,7 +110,7 @@
 </dd>
 </dl>
 
-<h3>ロック解除</h3>
+<h3>3.5. ロック解除</h3>
 <dl>
 <dt>概要</dt>
 <dd>PostgreSQL本来の実行計画選択基準に戻すために、統計情報の固定状態を解除します。</dd>
@@ -123,7 +123,7 @@
 </dd>
 </dl>
 
-<h3>クリーンアップ</h3>
+<h3>3.6. クリーンアップ</h3>
 <dl>
 <dt>概要</dt>
 <dd>PostgreSQL本来の実行計画選択基準に戻すために、統計情報の固定状態を解除します。</dd>
@@ -136,7 +136,7 @@
 </dd>
 </dl>
 
-<h3>エクスポート</h3>
+<h3>3.7. エクスポート</h3>
 <dl>
 <dt>概要</dt>
 <dd>現在の統計情報を外部ファイルに出力します。</dd>
@@ -156,7 +156,7 @@
 </dd>
 </dl>
 
-<h3>インポート</h3>
+<h3>3.8. インポート</h3>
 <dl>
 <dt>概要</dt>
 <dd>エクスポート機能で作成した外部ファイルから統計情報を読み込み、プランナが参照する統計情報として固定します。</dd>
@@ -168,10 +168,10 @@
 </dd>
 </dl>
 
-<h2 id="install">インストール</h2>
+<h2 id="install">4. インストール</h2>
 <p>pg_dbms_stats のインストール方法は、標準の拡張(EXTENSION)と同様です。</p>
 
-<h3>ビルド</h3>
+<h3>4.1, ビルド</h3>
 <p>make を使ってビルドできます。PostgreSQLをインストールしたOSユーザでインストールしてください。
 このとき、pg_config でビルドに必要な情報を収集しますので、複数バージョンがインストールされた環境では PATH 環境変数に注意して下さい。</p>
 <pre>$ cd pg_dbms_stats
@@ -179,14 +179,14 @@ $ make
 $ su
 # make install</pre>
 
-<h3 id="create_extension">データベースへの登録</h3>
+<h3 id="create_extension">4.2. データベースへの登録</h3>
 <p>pg_dbms_stats は PostgreSQL の拡張(EXTENSION)ですので、この機能を利用するデータベースにスーパーユーザで接続して CREATE EXTENSION コマンド を実行してください。</p>
 <p>コマンドの例を以下に示します。
 <i>dbname</i>は対象となるデータベース名を意味します。</p>
 <pre>$ psql -d <i>dbname</i> -c "CREATE EXTENSION pg_dbms_stats"</pre>
 <p>登録解除は DROP EXTENSION コマンドで可能です。登録を解除しても dbms_stats スキーマはそのまま残りますので、必要に応じて削除して下さい。</p>
 
-<h3>pg_dbms_statsのロード</h3>
+<h3>4.3. pg_dbms_statsのロード</h3>
 <p>pg_dbms_statsを有効にするには、以下の例のようにpg_dbms_statsの共有ライブラリをロードしてください。
 全てのセッションでpg_dbms_statsを有効にするには、postgresql.confのshared_preload_libraries GUCパラメータに'pg_dbms_stats'を追加してからサーバを再起動して下さい。
 <pre>postgres=# LOAD 'pg_dbms_stats';
@@ -195,7 +195,7 @@ postgres=#</pre>
 </p>
 
 <p><strong>注意</strong>:
-pg_dbms_stats を<a href="#create_extension">データベースに登録</a>せずに、ロード後にSQL文を実行すると以下に示す例のようなエラーとなります。
+pg_dbms_stats を<a href="#create_extension">データベースに登録</a>せずに、モジュールだけをロードしている場合は、任意のSQL文の実行の際に以下に示す例のようなエラーとなります。
 pg_dbms_stats を使うときは、データベースへの登録を忘れないように注意してください。
 <pre>test=# SELECT * FROM test;
 ERROR:  schema "dbms_stats" does not exist
@@ -205,7 +205,7 @@ QUERY:  SELECT relpages, reltuples, curpages  FROM dbms_stats.relation_stats_loc
 test=#</pre>
 </p>
 
-<h3>pg_dbms_statsの無効化</h3>
+<h3>4.4. pg_dbms_statsの無効化</h3>
 <p>pg_dbms_statsをロードしたうえで無効にしたい場合は、以下の例のようにpg_dbms_stats.use_locked_statsをoffに設定してください。
 <pre>test=# SET pg_dbms_stats.use_locked_stats TO off;
 SET
@@ -227,7 +227,7 @@ pg_dbms_stats.use_locked_stats = off</pre>
 PostgreSQL 9.2以降ではcustom_variable_classesは廃止されているため、pg_dbms_stats.use_locked_statsを標準のGUCパラメータと同様に記述することができます。
 </p>
 
-<h2 id="uninstall">アンインストール</h2>
+<h2 id="uninstall">5. アンインストール</h2>
 <p>
 pg_dbms_stats をアンインストールするときは、以下の手順を実行してください。
 <i>dbname</I>は対象となるデータベース名を意味します。
@@ -243,12 +243,12 @@ $ su
 </ol>
 </p>
 
-<h2 id="examples">使用例</h2>
+<h2 id="examples">6. 使用例</h2>
 <p>大きく分けて「バックアップ主体」「ロック主体」「エクスポート主体」の3つの運用方法があります。
 どの運用方法が適しているか判断できない場合には、まず「バックアップ主体」で運用することをお奨めします。
 </p>
 
-<h3>統計情報をバックアップする運用</h3>
+<h3>6.1. 統計情報をバックアップする運用</h3>
 <p>サービス運用中に統計情報を日々バックアップし、問題が生じたらリストアする場合には backup_xxx() と restore_xxx() 関数を使用します。
 特に問題がない限り、データベース単位でバックアップしてください。</p>
 <p>統計情報をリストアする方法は、バックアップ世代を表すバックアップIDを指定する方法と、どの時点の統計情報に復元するかを表すタイムスタンプを指定する方法の2種類です。
@@ -295,7 +295,7 @@ test=# SELECT dbms_stats.restore_database_stats('2012-01-03 00:00:00+09');
 
 test=#</pre>
 
-<h3>統計情報をロックする運用</h3>
+<h3>6.2. 統計情報をロックする運用</h3>
 <p>サービス開始時に統計情報をロックして、そのまま運用する場合には、lock_xxx() 関数を使用します。</p>
 <pre>test=# SELECT dbms_stats.lock_database_stats();
  lock_database_stats
@@ -307,7 +307,7 @@ test=#</pre>
 test=#
 </pre>
 
-<h3>統計情報をエクスポートする運用</h3>
+<h3>6.3. 統計情報をエクスポートする運用</h3>
 <p>サービス運用中の統計情報をエクスポートし、他のデータベースにインポートすることで実行計画を再現したい場合には、export_xxx_stats-<PGバージョン>.sql_sampleファイルを参考に作成したCOPY文でエクスポートし、import_xxx()関数でインポートします。</p>
 <pre>$ cd pg_dbms_stats
 $ psql -d test -f export_effective_stats-9.1.sql
@@ -334,7 +334,7 @@ ERROR:  relative path not allowed for dbms_stats_export to file
 test=#</pre>
 <p>また、エクスポートファイルにはCOPYのバイナリフォーマットを利用しているため、エクスポート元とインポート先でアーキテクチャやPostgreSQLバージョンに差がある場合は正常に動作しない場合があります。詳しくは、<a href="http://www.postgresql.jp/document/current/html/sql-copy.html">COPYコマンドのドキュメント</a>を参照して下さい。</p>
 
-<h2 id="restrictions">使用上の注意と制約</h2>
+<h2 id="restrictions">7. 使用上の注意と制約</h2>
 <p>pg_dbms_stats を使用する際には、以下の使用上の注意と制約があります。</p>
 
 <dl>
@@ -390,8 +390,8 @@ pg_dbms_statsは、列単位の統計情報をユーザ定義テーブルで保�
 <dd>テーブルや列などのオブジェクトを削除する場合は、ロック解除機能やパージ機能を使ってpg_dbms_stats独自の統計情報を先に削除してください。オブジェクトを先に削除した場合は、削除したオブジェクトのpg_dbms_stats独自の統計情報をクリーンアップ機能を使って削除してください。なお、ロック以外にも、リストアやインポートを実行した場合もpg_dbms_stats独自の統計情報が作成されます。</dd>
 </dl>
 
-<h2 id="details">詳細</h2>
-<h3>全体構成</h3>
+<h2 id="details">8. 詳細</h2>
+<h3>8.1. 全体構成</h3>
 <p>pg_dbms_statsは、ANALYZEで作成された統計情報の代わりに pg_dbms_stats が保持する独自の統計情報を PostgreSQL に使わせることで実行計画を制御します。使用する統計情報は、以下のいずれかの方法で選択できます。
 <ul>
 <li>現在の統計情報でロックする</li>
@@ -412,10 +412,10 @@ pg_dbms_statsは、列単位の統計情報をユーザ定義テーブルで保�
 <p>なお、pg_dbms_stats が提供するいずれの機能も、PostgreSQL が元々使用してる統計情報 (pg_catalog.pg_classやpg_catalog.pg_statistic) を変更しません。</p>
 <img src="pg_dbms_stats-ja.png" />
 
-<h3>pg_dbms_statsのユーザインターフェース</h3>
+<h3>8.2. pg_dbms_statsのユーザインターフェース</h3>
 <p>pg_dbms_statsの各機能は、前節で説明した独自の統計情報テーブルの内容をSQL文で更新することで実現されています。ただし、ユーザが直接SQL文を実行すると操作ミスによる削除やデータ不整合などが起こりうるため、ユーザインターフェースとして各機能に対応するSQL関数を提供しており、これらを使っての操作が強く推奨されています。</p>
 
-<h3>autovacuum による ANALYZE の無効化について</h3>
+<h3>8.3. autovacuum による ANALYZE の無効化について</h3>
 <p>pg_dbms_stats は ANALYZE を無効化も禁止もしません。
 ANALYZE は pg_statistic システムカタログを変更しますが、最終的に pg_dbms_stats の独自統計情報で値を隠されます。
 効果の無い ANALYZE を繰り返すのは資源の無駄と考えるのであれば、autovacuum による ANALYZE を無効化してください。
@@ -433,7 +433,7 @@ autovacuum_analyze_scale_factor = 100
   autovacuum_analyze_threshold = 100000,
   autovacuum_analyze_scale_factor = 100);</pre>
 
-<h3>ロックする統計情報について</h3>
+<h3>8.3. ロックする統計情報について</h3>
 <p>実行計画を作成する際、クエリ・オプティマイザは以下の統計情報または実際のデータの状態に基づいてコストを計算します。pg_dbms_stats は、これら全ての情報をロックすることができます。実際のファイルサイズが変化しても、ロックしたときのファイルサイズを継続して参照します。</p>
 <ul>
 <li>ANALYZE でサンプリングした行の値 (pg_catalog.pg_statistic)</li>
@@ -442,21 +442,55 @@ autovacuum_analyze_scale_factor = 100
 <li>実行計画作成時のファイルサイズ</li>
 </ul>
 
-<h2 id="requirement">動作環境</h2>
+<h3>8.4. 統計情報の手動操作について</h3>
+
+<p>ダミー統計情報のうち、一部のカラムは anyarray 型となっていて、SQLからの操作はできません。バージョン1.3.7より、これらのカラムに任意の値を注入する機能を追加してます。この機能は統計情報の詳細についての知識を前提としており一切の防護措置を行っておりません。使用方法を誤ると実行計画の間違いが起こるだけではなく比較的簡単にサーバークラッシュにもつながりますので慎重なご利用をお願いします。</p>
+<h4>使用方法</h4>
+<p>統計情報の注入は以下の3段階で行います
+<ul>
+<li>操作したい統計情報値を格納する anyarray 型の基本型の確認
+<p> anyarray_basetype() 関数にcolumn_stats_locked テーブルの目的の統計情報カラム名を与えることで基本型を確認することができます</p>
+<pre>=# SELECT dbms_stats.anyarray_basetype(stavalues1)
+   FROM dbms_stats.column_stats_locked
+   WHERE starelid = xxxx AND staattnum = x;
+ anyarray_basetype
+ -------------------
+  float4
+ (1 row)
+</pre>
+
+<li>対象となる基本型の配列をダミー統計情報として注入するための準備
+<p> prepare_statstweak() 関数に対象となる形名を文字列として与えることで、ダミー統計情報を注入するための補助関数およびキャストを定義します。これらの定義は drop_statstweak() 関数で削除できます。</p>
+<pre>=# SELECT dbms_stats.prepare_statstweak('float4');
+    -----------------------------------------------------------------------------------
+     (func dbms_stats._realary_anyarray(real[]), cast (real[] AS dbms_stats.anyarray))
+    (1 row)
+</pre>
+<li>統計情報の注入
+<p>これでダミー統計情報をSQLで更新することができるようになります。</p>
+<pre>=# UPDATE dbms_stats.column_stats_locked
+    SET stavalues1 = '{1.1,2.2,3.3}'::float4[]
+    WHERE starelid = xxxx AND staattnum = x;
+ UPDATE 1
+</pre>
+</ul>
+</p>
+
+<h2 id="requirement">9. 動作環境</h2>
 <dl>
 <dt>PostgreSQLバージョン</dt>
-<dd>PostgreSQL 9.1, 9.2, 9.3</dd>
+<dd>PostgreSQL 9.1-9.5</dd>
 <dt>OS</dt>
-<dd>RHEL 6.1</dd>
+<dd>RHEL 6, 7</dd>
 </dl>
 
-<h2 id="seealso">関連項目</h2>
+<h2 id="seealso">10. 関連項目</h2>
 <a href="http://www.postgresql.jp/document/current/html/app-psql.html">psql</a>,
 <a href="http://www.postgresql.jp/document/current/html/app-vacuumdb.html">vacuumdb</a>
 <a href="http://www.postgresql.jp/document/current/html/sql-copy.html">COPY</a>
 
 <hr />
-<p class="footer">Copyright (c) 2009-2014, NIPPON TELEGRAPH AND TELEPHONE CORPORATION</p>
+<p class="footer">Copyright (c) 2009-2016, NIPPON TELEGRAPH AND TELEPHONE CORPORATION</p>
 
 </body>
 </html>

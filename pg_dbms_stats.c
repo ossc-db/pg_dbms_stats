@@ -16,6 +16,7 @@
 #include "executor/spi.h"
 #include "funcapi.h"
 #include "optimizer/plancat.h"
+#include "parser/parse_oper.h"
 #include "storage/bufmgr.h"
 #include "utils/builtins.h"
 #include "utils/elog.h"
@@ -127,12 +128,18 @@ PG_FUNCTION_INFO_V1(dbms_stats_invalidate_relation_cache);
 PG_FUNCTION_INFO_V1(dbms_stats_invalidate_column_cache);
 PG_FUNCTION_INFO_V1(dbms_stats_is_system_schema);
 PG_FUNCTION_INFO_V1(dbms_stats_is_system_catalog);
+PG_FUNCTION_INFO_V1(dbms_stats_anyary_anyary);
+PG_FUNCTION_INFO_V1(dbms_stats_type_is_analyzable);
+PG_FUNCTION_INFO_V1(dbms_stats_anyarray_basetype);
 
 extern Datum dbms_stats_merge(PG_FUNCTION_ARGS);
 extern Datum dbms_stats_invalidate_relation_cache(PG_FUNCTION_ARGS);
 extern Datum dbms_stats_invalidate_column_cache(PG_FUNCTION_ARGS);
 extern Datum dbms_stats_is_system_schema(PG_FUNCTION_ARGS);
 extern Datum dbms_stats_is_system_catalog(PG_FUNCTION_ARGS);
+extern Datum dbms_stats_anyary_anyary(PG_FUNCTION_ARGS);
+extern Datum dbms_stats_type_is_analyzable(PG_FUNCTION_ARGS);
+extern Datum dbms_stats_anyarray_basetype(PG_FUNCTION_ARGS);
 
 static HeapTuple dbms_stats_merge_internal(HeapTuple lhs, HeapTuple rhs,
 	TupleDesc tupledesc);
@@ -252,6 +259,64 @@ _PG_fini(void)
 	get_index_stats_hook = prev_get_index_stats;
 
 	/* A function to unregister callback for relcache is NOT provided. */
+}
+
+/*
+ * Function to convert from any array from dbms_stats.anyarray.
+ */
+Datum
+dbms_stats_anyary_anyary(PG_FUNCTION_ARGS)
+{
+  ArrayType *arr = PG_GETARG_ARRAYTYPE_P(0);
+  if (ARR_NDIM(arr) != 1)
+	  elog(ERROR, "array must be one-dimentional.");
+
+  PG_RETURN_ARRAYTYPE_P(arr);
+}
+
+/*
+ * Function to check if the type can have statistics.
+ */
+Datum
+dbms_stats_type_is_analyzable(PG_FUNCTION_ARGS)
+{
+	Oid typid = PG_GETARG_OID(0);
+	Oid	eqopr;
+
+	if (!OidIsValid(typid))
+		PG_RETURN_BOOL(false);
+
+	get_sort_group_operators(typid, false, false, false,
+							 NULL, &eqopr, NULL,
+							 NULL);
+	PG_RETURN_BOOL(OidIsValid(eqopr));
+}
+
+/*
+ * Function to get base type of the value of the type dbms_stats.anyarray.
+ */
+Datum
+dbms_stats_anyarray_basetype(PG_FUNCTION_ARGS)
+{
+	ArrayType  *arr = PG_GETARG_ARRAYTYPE_P(0);
+	Oid			elemtype = arr->elemtype;
+	HeapTuple	tp;
+	Form_pg_type typtup;
+	Name		result;
+
+	if (!OidIsValid(elemtype))
+		elog(ERROR, "invalid base type oid: %u", elemtype);
+
+	tp = SearchSysCache1(TYPEOID, ObjectIdGetDatum(elemtype));
+	if (!HeapTupleIsValid(tp))  /* I trust you. */
+		elog(ERROR, "invalid base type oid: %u", elemtype);
+
+	typtup = (Form_pg_type) GETSTRUCT(tp);
+	result = (Name) palloc0(NAMEDATALEN);
+	StrNCpy(NameStr(*result), NameStr(typtup->typname), NAMEDATALEN);
+
+	ReleaseSysCache(tp);
+	PG_RETURN_NAME(result);
 }
 
 /*

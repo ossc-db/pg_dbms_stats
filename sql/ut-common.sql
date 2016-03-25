@@ -1171,3 +1171,65 @@ ALTER TABLE dbms_stats.relation_stats_locked OWNER TO super_user;
 
 SELECT dbms_stats.unlock('s0.st4');
 DROP TABLE s0.st4 CASCADE;
+
+/*
+ * No.21 anyarray stuffs
+ */
+CREATE TABLE st_ary (i int, f float, d timestamp without time zone);
+INSERT INTO st_ary
+ (SELECT a, random(), '2016-3-25 00:00:00'::date + (a || 'day')::interval
+  FROM generate_series(0, 9999) a);
+ANALYZE st_ary;
+SELECT dbms_stats.lock('st_ary');
+
+/* Identifying the base type of the target anyarray */
+SELECT staattnum, dbms_stats.anyarray_basetype(stavalues1)
+FROM dbms_stats.column_stats_locked
+WHERE starelid = 'st_ary'::regclass
+ORDER BY staattnum;
+
+/* Generating subsidiary functions and casts */
+SELECT staattnum,
+	    dbms_stats.prepare_statstweak(
+			dbms_stats.anyarray_basetype(stavalues1)::regtype)
+FROM dbms_stats.column_stats_locked
+WHERE starelid = 'st_ary'::regclass
+ORDER BY staattnum;
+
+/* Tweaking stats */
+UPDATE dbms_stats.column_stats_locked
+SET stavalues1 = '{1,2,3,4,5}'::int[]
+WHERE starelid = 'st_ary'::regclass AND staattnum = 1;
+UPDATE dbms_stats.column_stats_locked
+SET stavalues1 = '{1.1,2.2,3.3,4.4,5.5}'::float8[]
+WHERE starelid = 'st_ary'::regclass AND staattnum = 2;
+UPDATE dbms_stats.column_stats_locked
+SET stavalues1 =
+  (SELECT ARRAY(SELECT '2016-1-1 0:0:0'::timestamp without time zone +
+                (i || 'day')::interval
+                FROM generate_series(0, 10) i))
+WHERE starelid = 'st_ary'::regclass AND staattnum = 3;
+
+SELECT staattnum, stavalues1 FROM dbms_stats.column_stats_locked
+WHERE starelid = 'st_ary'::regclass
+ORDER BY staattnum;
+
+/* Dropping tweak stuff */
+SELECT proname FROM pg_proc p JOIN pg_namespace n ON n.oid = p.pronamespace
+WHERE n.nspname = 'dbms_stats' AND p.proname LIKE '\_%\_anyarray'
+ORDER BY proname;
+
+SELECT staattnum,
+	    dbms_stats.drop_statstweak(
+			dbms_stats.anyarray_basetype(stavalues1)::regtype)
+FROM dbms_stats.column_stats_locked
+WHERE starelid = 'st_ary'::regclass
+ORDER BY staattnum;
+
+SELECT proname FROM pg_proc p JOIN pg_namespace n ON n.oid = p.pronamespace
+WHERE n.nspname = 'dbms_stats' AND p.proname LIKE '\_%\_anyarray'
+ORDER BY proname;
+
+/* Immediately unlock for safety */
+SELECT dbms_stats.unlock('st_ary');
+DROP TABLE st_ary;

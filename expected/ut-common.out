@@ -2752,3 +2752,105 @@ SELECT dbms_stats.unlock('s0.st4');
 
 DROP TABLE s0.st4 CASCADE;
 NOTICE:  drop cascades to view s0.vst4
+/*
+ * No.21 anyarray stuffs
+ */
+CREATE TABLE st_ary (i int, f float, d timestamp without time zone);
+INSERT INTO st_ary
+ (SELECT a, random(), '2016-3-25 00:00:00'::date + (a || 'day')::interval
+  FROM generate_series(0, 9999) a);
+ANALYZE st_ary;
+SELECT dbms_stats.lock('st_ary');
+  lock  
+--------
+ st_ary
+(1 row)
+
+/* Identifying the base type of the target anyarray */
+SELECT staattnum, dbms_stats.anyarray_basetype(stavalues1)
+FROM dbms_stats.column_stats_locked
+WHERE starelid = 'st_ary'::regclass
+ORDER BY staattnum;
+ staattnum | anyarray_basetype 
+-----------+-------------------
+         1 | int4
+         2 | float8
+         3 | timestamp
+(3 rows)
+
+/* Generating subsidiary functions and casts */
+SELECT staattnum,
+	    dbms_stats.prepare_statstweak(
+			dbms_stats.anyarray_basetype(stavalues1)::regtype)
+FROM dbms_stats.column_stats_locked
+WHERE starelid = 'st_ary'::regclass
+ORDER BY staattnum;
+ staattnum |                                                                   prepare_statstweak                                                                    
+-----------+---------------------------------------------------------------------------------------------------------------------------------------------------------
+         1 | (func dbms_stats._integer_ary_anyarray(integer[]), cast (integer[] AS dbms_stats.anyarray))
+         2 | (func dbms_stats._double_precision_ary_anyarray(double precision[]), cast (double precision[] AS dbms_stats.anyarray))
+         3 | (func dbms_stats._timestamp_without_time_zone_ary_anyarray(timestamp without time zone[]), cast (timestamp without time zone[] AS dbms_stats.anyarray))
+(3 rows)
+
+/* Tweaking stats */
+UPDATE dbms_stats.column_stats_locked
+SET stavalues1 = '{1,2,3,4,5}'::int[]
+WHERE starelid = 'st_ary'::regclass AND staattnum = 1;
+UPDATE dbms_stats.column_stats_locked
+SET stavalues1 = '{1.1,2.2,3.3,4.4,5.5}'::float8[]
+WHERE starelid = 'st_ary'::regclass AND staattnum = 2;
+UPDATE dbms_stats.column_stats_locked
+SET stavalues1 =
+  (SELECT ARRAY(SELECT '2016-1-1 0:0:0'::timestamp without time zone +
+                (i || 'day')::interval
+                FROM generate_series(0, 10) i))
+WHERE starelid = 'st_ary'::regclass AND staattnum = 3;
+SELECT staattnum, stavalues1 FROM dbms_stats.column_stats_locked
+WHERE starelid = 'st_ary'::regclass
+ORDER BY staattnum;
+ staattnum |                                                                                                                                                 stavalues1                                                                                                                                                 
+-----------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+         1 | {1,2,3,4,5}
+         2 | {1.1,2.2,3.3,4.4,5.5}
+         3 | {"Fri Jan 01 00:00:00 2016","Sat Jan 02 00:00:00 2016","Sun Jan 03 00:00:00 2016","Mon Jan 04 00:00:00 2016","Tue Jan 05 00:00:00 2016","Wed Jan 06 00:00:00 2016","Thu Jan 07 00:00:00 2016","Fri Jan 08 00:00:00 2016","Sat Jan 09 00:00:00 2016","Sun Jan 10 00:00:00 2016","Mon Jan 11 00:00:00 2016"}
+(3 rows)
+
+/* Dropping tweak stuff */
+SELECT proname FROM pg_proc p JOIN pg_namespace n ON n.oid = p.pronamespace
+WHERE n.nspname = 'dbms_stats' AND p.proname LIKE '\_%\_anyarray'
+ORDER BY proname;
+                  proname                  
+-------------------------------------------
+ _double_precision_ary_anyarray
+ _integer_ary_anyarray
+ _timestamp_without_time_zone_ary_anyarray
+(3 rows)
+
+SELECT staattnum,
+	    dbms_stats.drop_statstweak(
+			dbms_stats.anyarray_basetype(stavalues1)::regtype)
+FROM dbms_stats.column_stats_locked
+WHERE starelid = 'st_ary'::regclass
+ORDER BY staattnum;
+ staattnum |                                                                     drop_statstweak                                                                     
+-----------+---------------------------------------------------------------------------------------------------------------------------------------------------------
+         1 | (func dbms_stats._integer_ary_anyarray(integer[]), cast (integer[] AS dbms_stats.anyarray))
+         2 | (func dbms_stats._double_precision_ary_anyarray(double precision[]), cast (double precision[] AS dbms_stats.anyarray))
+         3 | (func dbms_stats._timestamp_without_time_zone_ary_anyarray(timestamp without time zone[]), cast (timestamp without time zone[] AS dbms_stats.anyarray))
+(3 rows)
+
+SELECT proname FROM pg_proc p JOIN pg_namespace n ON n.oid = p.pronamespace
+WHERE n.nspname = 'dbms_stats' AND p.proname LIKE '\_%\_anyarray'
+ORDER BY proname;
+ proname 
+---------
+(0 rows)
+
+/* Immediately unlock for safety */
+SELECT dbms_stats.unlock('st_ary');
+ unlock 
+--------
+ st_ary
+(1 row)
+
+DROP TABLE st_ary;

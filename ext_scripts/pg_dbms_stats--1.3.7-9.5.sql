@@ -206,11 +206,11 @@ CREATE VIEW dbms_stats.column_stats_effective AS
 --
 -- Note: This view is copied from pg_stats in
 -- src/backend/catalog/system_views.sql in core source tree of version
--- 9.4, and customized for pg_dbms_stats.  Changes from orignal one are:
+-- 9.5, and customized for pg_dbms_stats.  Changes from orignal one are:
 --   - rename from pg_stats to dbms_stats.stats by a view name.
 --   - changed the table name from pg_statistic to dbms_stats.column_stats_effective.
 --
-CREATE VIEW dbms_stats.stats AS
+CREATE VIEW dbms_stats.stats with (security_barrier) AS
     SELECT
         nspname AS schemaname,
         relname AS tablename,
@@ -271,7 +271,9 @@ CREATE VIEW dbms_stats.stats AS
     FROM dbms_stats.column_stats_effective s JOIN pg_class c ON (c.oid = s.starelid)
          JOIN pg_attribute a ON (c.oid = attrelid AND attnum = s.staattnum)
          LEFT JOIN pg_namespace n ON (n.oid = c.relnamespace)
-    WHERE NOT attisdropped AND has_column_privilege(c.oid, a.attnum, 'select');
+    WHERE NOT attisdropped
+	AND has_column_privilege(c.oid, a.attnum, 'select')
+	AND (c.relrowsecurity = false OR NOT row_security_active(c.oid));
 
 --
 -- Utility functions
@@ -1505,3 +1507,73 @@ END
 $$
 LANGUAGE plpgsql;
 --
+/*
+ * Stuff for manipulating statistics
+ */
+
+/* Primitive functions for tweaking statistics */
+CREATE FUNCTION dbms_stats.anyarray_basetype(dbms_stats.anyarray)
+	RETURNS name
+	AS 'MODULE_PATHNAME', 'dbms_stats_anyarray_basetype'
+	LANGUAGE C STABLE;
+
+CREATE FUNCTION dbms_stats.type_is_analyzable(oid) returns bool
+	AS 'MODULE_PATHNAME', 'dbms_stats_type_is_analyzable'
+	LANGUAGE C STRICT STABLE;
+
+/*
+ * Create and drop a cast necessary to set column values of dbms_stats.anyarray
+ * type.
+ */
+CREATE OR REPLACE FUNCTION dbms_stats.prepare_statstweak(regtype)
+RETURNS text AS $$
+DECLARE
+  srctypname varchar;
+  funcname varchar;
+  funcdef varchar;
+  castdef varchar;
+BEGIN
+  srctypname := $1 || '[]';
+  funcname := 'dbms_stats._' || replace($1::text, ' ', '_') || '_ary_anyarray';
+  funcdef := funcname || '(' || srctypname || ')';
+  castdef := '(' || srctypname || ' AS dbms_stats.anyarray)';
+
+  IF (NOT dbms_stats.type_is_analyzable($1::regtype)) THEN
+    RAISE 'the type can not have statistics';
+  END IF;
+
+  EXECUTE 'CREATE FUNCTION ' || funcdef || 
+          ' RETURNS dbms_stats.anyarray ' ||
+          ' AS ''pg_dbms_stats'', ''dbms_stats_anyary_anyary'''||
+          ' LANGUAGE C STRICT IMMUTABLE';
+  EXECUTE 'CREATE CAST '|| castdef ||
+	      ' WITH FUNCTION ' || funcdef ||
+	      ' AS ASSIGNMENT';
+  RETURN '(func ' || funcdef || ', cast ' || castdef || ')';
+EXCEPTION
+  WHEN duplicate_function THEN
+    RAISE 'run dbms_stats.drop_statstweak() for the type before this';
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION dbms_stats.drop_statstweak(regtype)
+RETURNS text AS $$
+DECLARE
+  srctypname varchar;
+  funcname varchar;
+  funcdef varchar;
+  castdef varchar;
+BEGIN
+  srctypname := $1 || '[]';
+  funcname := 'dbms_stats._' || replace($1::text, ' ', '_') || '_ary_anyarray';
+  funcdef := funcname || '(' || srctypname || ')';
+  castdef := '(' || srctypname || ' AS dbms_stats.anyarray)';
+
+  EXECUTE 'DROP CAST ' || castdef;
+  EXECUTE 'DROP FUNCTION ' || funcdef;
+  RETURN '(func ' || funcdef || ', cast ' || castdef || ')';
+EXCEPTION
+  WHEN undefined_function OR undefined_object THEN
+    RAISE 'function % or cast % does not exist', funcdef, castdef;
+END;
+$$ LANGUAGE plpgsql;

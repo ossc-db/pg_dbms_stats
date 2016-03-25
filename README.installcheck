@@ -12,7 +12,7 @@ Preparation for make installcheck
   be done for RPM installed server by installing postgresql##-contrib
   using yum after installing additional repository.
 
-  # yum install postgresql93-contrib
+  # yum install postgresql95-contrib
 
 3. Edit postgresql.conf so that pg_dbms stats will be automatically
    loaded.

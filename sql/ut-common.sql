@@ -1,5 +1,5 @@
 \pset null '(null)'
-
+\set SHOW_CONTEXT never
 /*
  * No.2-3 dbms_stats.backup_history_id_seq
  */
@@ -845,6 +845,7 @@ LANGUAGE plpgsql;
 /*
  * No.10-3 dbms_stats.restore_table_stats(regclass, as_of_timestamp)
  */
+\set VERBOSITY terse
 -- No.10-3-1
 SELECT dbms_stats.restore_table_stats('s0.st0', '2012-02-29 23:59:57');
 -- No.10-3-2
@@ -856,6 +857,7 @@ SELECT dbms_stats.restore_table_stats('s0.st0', '2012-01-01 00:00:00');
 SELECT dbms_stats.restore_table_stats('s0.st0', '2012-02-29 23:59:57');
 -- No.10-3-6
 SELECT dbms_stats.restore_table_stats('st0', '2012-02-29 23:59:57');
+\set VERBOSITY default
 -- No.10-3-7
 SELECT dbms_stats.restore_table_stats('s00.s0', '2012-02-29 23:59:57');
 /*
@@ -880,6 +882,7 @@ LANGUAGE plpgsql;
 /*
  * No.10-4 dbms_stats.restore_table_stats(schemaname, tablename, as_of_timestamp)
  */
+\set VERBOSITY terse
 -- No.10-4-1
 SELECT dbms_stats.restore_table_stats('s0', 'st0', '2012-02-29 23:59:57');
 DROP FUNCTION dbms_stats.restore_table_stats(regclass,
@@ -902,6 +905,7 @@ SELECT dbms_stats.restore_column_stats('s0.st0', 'id', '2012-01-01 00:00:00');
 SELECT dbms_stats.restore_column_stats('s0.st0', 'id', '2012-02-29 23:59:57');
 -- No.10-5-6
 SELECT dbms_stats.restore_column_stats('st0', 'id', '2012-02-29 23:59:57');
+\set VERBOSITY default
 -- No.10-5-7
 SELECT dbms_stats.restore_column_stats('s00.s0', 'id', '2012-02-29 23:59:57');
 
@@ -910,8 +914,9 @@ SELECT dbms_stats.restore_column_stats('s00.s0', 'id', '2012-02-29 23:59:57');
  *        schemaname, tablename, attname, as_of_timestamp)
  */
 -- No.10-6-1
+\set VERBOSITY terse
 SELECT dbms_stats.restore_column_stats('s0', 'st0', 'id', '2012-02-29 23:59:57');
-
+\set VERBOSITY default
 /*
  * No.15-1 dbms_stats.purge_stats
  */
@@ -1034,10 +1039,11 @@ SELECT dbms_stats.restore_database_stats('2012-02-29 23:59:57');
 -- No.10-2-4
 SELECT dbms_stats.restore_schema_stats('s0', '2012-02-29 23:59:57');
 -- No.10-3-4
+\set VERBOSITY terse
 SELECT dbms_stats.restore_table_stats('s0.st0', '2012-02-29 23:59:57');
 -- No.10-5-4
 SELECT dbms_stats.restore_column_stats('s0.st0', 'id', '2012-02-29 23:59:57');
-
+\set VERBOSITY default
 /*
  * Delete stab function dbms_stats.restore
  */

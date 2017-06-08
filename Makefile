@@ -1,8 +1,8 @@
 # pg_dbms_stats/Makefile
 
 DBMSSTATSVER = 1.3.7
-PGVERS = 91 92 93 94 95 96
-IS_PRE_95 = $(filter 0,$(shell test "$(MAJORVERSION)" \< "9.5"; echo $$?))
+PGVERS = 91 92 93 94 95 96 10
+IS_PRE_95 = $(filter 0,$(shell test "`echo "$(MAJORVERSION2)" | cut -c 1`" == "9" -a "$(MAJORVERSION2)" \< "9.5"; echo $$?))
 
 MODULE_big = pg_dbms_stats
 OBJS = pg_dbms_stats.o dump.o import.o

@@ -671,7 +671,24 @@ import_stats_from_file(char *filename, char *nspname, char *relname,
 
 	/* Execute COPY FROM command. */
 	parsetree_list = pg_parse_query(buf.data);
-#if PG_VERSION_NUM >= 90300
+
+#if PG_VERSION_NUM >= 100000
+	{
+		/* 
+		 * parsetree_list is a list with one RawStmt since Pg10. Extract
+		 * CopyStmt to feed to DoCopy.
+		 */
+		ParseState	*pstate = make_parsestate(NULL);
+		RawStmt *rstmt = (RawStmt *)linitial (parsetree_list);
+		CopyStmt *stmt = (CopyStmt *)rstmt->stmt;
+
+		Assert(IsA(stmt, CopyStmt));
+
+		pstate->p_sourcetext = pstrdup(buf.data);
+		DoCopy(pstate, stmt, rstmt->stmt_location, rstmt->stmt_len, &processed);
+		free_parsestate(pstate);
+	}
+#elif PG_VERSION_NUM >= 90300
 	DoCopy((CopyStmt *)linitial(parsetree_list), buf.data, &processed);
 #else
 	processed = DoCopy((CopyStmt *)linitial(parsetree_list), buf.data);

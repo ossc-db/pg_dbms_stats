@@ -33,6 +33,9 @@
 #include "access/htup_details.h"
 #include "utils/catcache.h"
 #endif
+#if PG_VERSION_NUM >= 100000
+#include <math.h>
+#endif
 
 #include "pg_dbms_stats.h"
 

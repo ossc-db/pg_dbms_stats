@@ -26,9 +26,7 @@
 #include "utils/selfuncs.h"
 #include "utils/syscache.h"
 #include "miscadmin.h"
-#if PG_VERSION_NUM >= 90200
 #include "utils/rel.h"
-#endif
 #if PG_VERSION_NUM >= 90300
 #include "access/htup_details.h"
 #include "utils/catcache.h"
@@ -90,10 +88,7 @@ get_index_stats_hook_type		prev_get_index_stats = NULL;
 
 /* rows_query(oid) RETURNS int4, float4, int4 */
 static const char  *rows_query =
-	"SELECT relpages, reltuples, curpages"
-#if PG_VERSION_NUM >= 90200
-	", relallvisible"
-#endif
+	"SELECT relpages, reltuples, curpages, relallvisible"
 	"  FROM " NSPNAME "." RELSTAT_TBLNAME
 	" WHERE relid = $1";
 static SPIPlanPtr	rows_plan = NULL;
@@ -187,15 +182,6 @@ static int32 dbms_stats_get_rel_data_width(Relation rel, int32 *attr_widths);
 extern void test_import(int *passed, int *total);
 extern void test_dump(int *passed, int *total);
 extern void test_pg_dbms_stats(int *passed, int *total);
-#endif
-
-/* SPI_keepplan() is since 9.2  */
-#if PG_VERSION_NUM < 90200
-#define SPI_keepplan(pplan) {\
-SPIPlanPtr tp = *plan;\
-	*plan = SPI_saveplan(tp);\
-	SPI_freeplan(tp);\
-}
 #endif
 
 /*
@@ -826,15 +812,8 @@ dbms_stats_get_relation_info(PlannerInfo *root,
 	 * calculation.
 	 */
 	if (!inhparent)
-	{
-#if PG_VERSION_NUM >= 90200
 		get_merged_relation_stats(relid, &rel->pages, &rel->tuples,
 								  &rel->allvisfrac, true);
-#else
-		get_merged_relation_stats(relid, &rel->pages, &rel->tuples,
-								  &allvisfrac, true);
-#endif
-	}
 	else
 		return;
 
@@ -1053,11 +1032,9 @@ get_merged_relation_stats(Oid relid, BlockNumber *pages, double *tuples,
 				val = get_binary_datum(3, &isnull);
 				entry->curpages = isnull ? InvalidBlockNumber :
 					(BlockNumber) DatumGetInt32(val);
-#if PG_VERSION_NUM >= 90200
 				val = get_binary_datum(4, &isnull);
 				entry->relallvisible = isnull ? form->relallvisible :
 					(BlockNumber) DatumGetInt32(val);
-#endif
 
 				ReleaseSysCache(tuple);
 			}
@@ -1095,9 +1072,7 @@ get_merged_relation_stats(Oid relid, BlockNumber *pages, double *tuples,
 	rel = relation_open(relid, NoLock);
 	rel->rd_rel->relpages = entry->relpages;
 	rel->rd_rel->reltuples = entry->reltuples;
-#if PG_VERSION_NUM >= 90200
 	rel->rd_rel->relallvisible = entry->relallvisible;
-#endif
 	dbms_stats_estimate_rel_size(rel, NULL, pages, tuples, allvisfrac,
 								 entry->curpages);
 	relation_close(rel, NoLock);
@@ -1554,11 +1529,8 @@ dbms_stats_estimate_rel_size(Relation rel, int32 *attr_widths,
 			/* coerce values in pg_class to more desirable types */
 			relpages = (BlockNumber) rel->rd_rel->relpages;
 			reltuples = (double) rel->rd_rel->reltuples;
-#if PG_VERSION_NUM >= 90200
 			relallvisible = (BlockNumber) rel->rd_rel->relallvisible;
-#else
-			relallvisible = 0;
-#endif
+
 			/*
 			 * If it's an index, discount the metapage while estimating the
 			 * number of tuples.  This is a kluge because it assumes more than

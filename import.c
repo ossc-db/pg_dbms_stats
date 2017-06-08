@@ -16,20 +16,14 @@
 #include "utils/builtins.h"
 #include "utils/lsyscache.h"
 #include "utils/syscache.h"
-#if PG_VERSION_NUM >= 90200
 #include "catalog/pg_class.h"
-#endif
 #if PG_VERSION_NUM >= 90300
 #include "access/htup_details.h"
 #endif
 
 #include "pg_dbms_stats.h"
 
-#if PG_VERSION_NUM >= 90200
 #define RELATION_PARAM_NUM	9
-#else
-#define RELATION_PARAM_NUM	8
-#endif
 
 extern PGDLLIMPORT bool standard_conforming_strings;
 
@@ -103,9 +97,7 @@ dbms_stats_import(PG_FUNCTION_ARGS)
 					 "relname          name   NOT NULL,"
 					 "relpages         int4   NOT NULL,"
 					 "reltuples        float4 NOT NULL,"
-#if PG_VERSION_NUM >= 90200
 					 "relallvisible    int4   NOT NULL,"
-#endif
 					 "curpages         int4   NOT NULL,"
 					 "last_analyze     timestamp with time zone,"
 					 "last_autoanalyze timestamp with time zone,"
@@ -121,30 +113,22 @@ dbms_stats_import(PG_FUNCTION_ARGS)
 					 "stakind2         int2,"
 					 "stakind3         int2,"
 					 "stakind4         int2,"
-#if PG_VERSION_NUM >= 90200
 					 "stakind5         int2,"
-#endif
 					 "staop1           oid,"
 					 "staop2           oid,"
 					 "staop3           oid,"
 					 "staop4           oid,"
-#if PG_VERSION_NUM >= 90200
 					 "staop5           oid,"
-#endif
 					 "stanumbers1      float4[],"
 					 "stanumbers2      float4[],"
 					 "stanumbers3      float4[],"
 					 "stanumbers4      float4[],"
-#if PG_VERSION_NUM >= 90200
 					 "stanumbers5      float4[],"
-#endif
 					 "stavalues1       dbms_stats.anyarray,"
 					 "stavalues2       dbms_stats.anyarray,"
 					 "stavalues3       dbms_stats.anyarray,"
 					 "stavalues4       dbms_stats.anyarray"
-#if PG_VERSION_NUM >= 90200
 					",stavalues5       dbms_stats.anyarray"
-#endif
 					 ")");
 
 	/* load the statistics from export file to the temp table */
@@ -154,9 +138,7 @@ dbms_stats_import(PG_FUNCTION_ARGS)
 	ret = SPI_execute("SELECT DISTINCT w.nspname, w.relname, c.oid, "
 							 "w.relpages, w.reltuples, "
 							 "w.curpages, w.last_analyze, w.last_autoanalyze "
-#if PG_VERSION_NUM >= 90200
 							 ",w.relallvisible "
-#endif
 						"FROM pg_catalog.pg_class c "
 						"JOIN pg_catalog.pg_namespace n "
 						  "ON (c.relnamespace = n.oid) "
@@ -222,10 +204,7 @@ dbms_stats_import(PG_FUNCTION_ARGS)
 		 */
 		spi_exec_query("UPDATE dbms_stats.relation_stats_locked SET "
 				"relname = quote_ident($1) || '.' || quote_ident($2), "
-				"relpages = $3, reltuples = $4, "
-#if PG_VERSION_NUM >= 90200
-				"relallvisible = $9, "
-#endif
+				"relpages = $3, reltuples = $4, relallvisible = $9, "
 				"curpages = $5, last_analyze = $6, last_autoanalyze = $7 "
 				"WHERE relid = $8",
 				RELATION_PARAM_NUM, r_types, &r_upd_plan, values, nulls,
@@ -234,16 +213,9 @@ dbms_stats_import(PG_FUNCTION_ARGS)
 		{
 			spi_exec_query("INSERT INTO dbms_stats.relation_stats_locked "
 					"(relname, relpages, reltuples, curpages, "
-					"last_analyze, last_autoanalyze, relid"
-#if PG_VERSION_NUM >= 90200
-					", relallvisible"
-#endif
+					"last_analyze, last_autoanalyze, relid, relallvisible"
 					") VALUES (quote_ident($1) || '.' || quote_ident($2), "
-					"$3, $4, $5, $6, $7, $8"
-#if PG_VERSION_NUM >= 90200
-					", $9"
-#endif
-					")",
+					"$3, $4, $5, $6, $7, $8, $9)",
 					RELATION_PARAM_NUM, r_types, &r_ins_plan, values, nulls,
 					SPI_OK_INSERT);
 			/*  If we failed to insert, we can't proceed. */
@@ -377,22 +349,11 @@ dbms_stats_import(PG_FUNCTION_ARGS)
 			spi_exec_query("INSERT INTO dbms_stats.column_stats_locked "
 				"SELECT $1, $2, "
 				"stainherit, stanullfrac, stawidth, stadistinct, "
-				"stakind1, stakind2, stakind3, stakind4, "
-#if PG_VERSION_NUM >= 90200
-				"stakind5, "
-#endif
-				"staop1, staop2, staop3, staop4, "
-#if PG_VERSION_NUM >= 90200
-				"staop5, "
-#endif
+				"stakind1, stakind2, stakind3, stakind4, stakind5, "
+				"staop1, staop2, staop3, staop4, staop5, "
 				"stanumbers1, stanumbers2, stanumbers3, stanumbers4, "
-#if PG_VERSION_NUM >= 90200
 				"stanumbers5, "
-#endif
-				"stavalues1, stavalues2, stavalues3, stavalues4 "
-#if PG_VERSION_NUM >= 90200
-				", stavalues5 "
-#endif
+				"stavalues1, stavalues2, stavalues3, stavalues4 , stavalues5 "
 				"FROM dbms_stats_work_stats "
 				"WHERE nspname = $3 AND relname = $4 "
 				"AND attname = $5 "
@@ -577,9 +538,7 @@ get_args(FunctionCallInfo fcinfo, char **nspname, char **relname,
 		ReleaseSysCache(tp);
 
 		if (relkind != RELKIND_RELATION && relkind != RELKIND_INDEX
-#if PG_VERSION_NUM >= 90200
 			&& relkind != RELKIND_FOREIGN_TABLE
-#endif
 #if PG_VERSION_NUM >= 90300
 			&& relkind != RELKIND_MATVIEW
 #endif

@@ -63,7 +63,7 @@ endif
 REGTESTVER = $(MAJORVERSION)
 
 TARSOURCES = Makefile *.c  *.h \
-	$(EXTDIR)/pg_dbms_stats--*-9.*.sql \
+	$(EXTDIR)/pg_dbms_stats--*.sql \
 	pg_dbms_stats.control COPYRIGHT ChangeLog ChangeLog.ja \
 	README.installcheck regress.conf \
 	doc/* expected/init-*.out expected/ut-*.out \

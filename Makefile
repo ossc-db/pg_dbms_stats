@@ -70,6 +70,8 @@ TARSOURCES = Makefile *.c  *.h \
 	sql/init-*.sql sql/ut-*.sql \
 	input/*.source input/*.csv output/*.source SPECS/*.spec
 
+LDFLAGS+=-Wl,--build-id
+
 all: $(DATA) $(DOCS)
 
 rpms: $(RPMS)

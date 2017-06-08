@@ -51,9 +51,8 @@ CREATE TYPE complex AS (
 
 -- updating relation_stats_locked leads to merged stats caches
 -- See StatsCacheRelCallback() in pg_dbms_stats.c for details.
-CREATE FUNCTION reset_stat_and_cache() RETURNS void AS $$
+CREATE FUNCTION load_merged_stats() RETURNS void AS $$
   UPDATE dbms_stats.relation_stats_locked SET relpages = relpages;
-  SELECT pg_stat_reset();
 $$
 LANGUAGE sql;
 

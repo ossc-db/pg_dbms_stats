@@ -647,9 +647,15 @@ SELECT pg_sleep(0.7);
  
 (1 row)
 
-SELECT reset_stat_and_cache();
- reset_stat_and_cache 
-----------------------
+SELECT load_merged_stats();
+ load_merged_stats 
+-------------------
+ (null)
+(1 row)
+
+SELECT pg_stat_reset();
+ pg_stat_reset 
+---------------
  
 (1 row)
 
@@ -669,9 +675,15 @@ SELECT * FROM lockd_io;
  column_stats_locked   | t
 (2 rows)
 
-SELECT reset_stat_and_cache();
- reset_stat_and_cache 
-----------------------
+SELECT load_merged_stats();
+ load_merged_stats 
+-------------------
+ (null)
+(1 row)
+
+SELECT pg_stat_reset();
+ pg_stat_reset 
+---------------
  
 (1 row)
 
@@ -812,9 +824,15 @@ SELECT pg_sleep(0.7);
  
 (1 row)
 
-SELECT reset_stat_and_cache();
- reset_stat_and_cache 
-----------------------
+SELECT load_merged_stats();
+ load_merged_stats 
+-------------------
+ (null)
+(1 row)
+
+SELECT pg_stat_reset();
+ pg_stat_reset 
+---------------
  
 (1 row)
 
@@ -832,9 +850,15 @@ SELECT * FROM lockd_io;
  column_stats_locked   | f
 (2 rows)
 
-SELECT reset_stat_and_cache();
- reset_stat_and_cache 
-----------------------
+SELECT load_merged_stats();
+ load_merged_stats 
+-------------------
+ (null)
+(1 row)
+
+SELECT pg_stat_reset();
+ pg_stat_reset 
+---------------
  
 (1 row)
 
@@ -874,9 +898,15 @@ SELECT pg_sleep(0.7);
  
 (1 row)
 
-SELECT reset_stat_and_cache();
- reset_stat_and_cache 
-----------------------
+SELECT load_merged_stats();
+ load_merged_stats 
+-------------------
+ (null)
+(1 row)
+
+SELECT pg_stat_reset();
+ pg_stat_reset 
+---------------
  
 (1 row)
 
@@ -894,9 +924,15 @@ SELECT * FROM lockd_io;
  column_stats_locked   | f
 (2 rows)
 
-SELECT reset_stat_and_cache();
- reset_stat_and_cache 
-----------------------
+SELECT load_merged_stats();
+ load_merged_stats 
+-------------------
+ (null)
+(1 row)
+
+SELECT pg_stat_reset();
+ pg_stat_reset 
+---------------
  
 (1 row)
 
@@ -936,9 +972,15 @@ SELECT pg_sleep(0.7);
  
 (1 row)
 
-SELECT reset_stat_and_cache();
- reset_stat_and_cache 
-----------------------
+SELECT load_merged_stats();
+ load_merged_stats 
+-------------------
+ (null)
+(1 row)
+
+SELECT pg_stat_reset();
+ pg_stat_reset 
+---------------
  
 (1 row)
 
@@ -956,9 +998,15 @@ SELECT * FROM lockd_io;
  column_stats_locked   | f
 (2 rows)
 
-SELECT reset_stat_and_cache();
- reset_stat_and_cache 
-----------------------
+SELECT load_merged_stats();
+ load_merged_stats 
+-------------------
+ (null)
+(1 row)
+
+SELECT pg_stat_reset();
+ pg_stat_reset 
+---------------
  
 (1 row)
 
@@ -998,9 +1046,15 @@ SELECT pg_sleep(0.7);
  
 (1 row)
 
-SELECT reset_stat_and_cache();
- reset_stat_and_cache 
-----------------------
+SELECT load_merged_stats();
+ load_merged_stats 
+-------------------
+ (null)
+(1 row)
+
+SELECT pg_stat_reset();
+ pg_stat_reset 
+---------------
  
 (1 row)
 
@@ -1018,9 +1072,15 @@ SELECT * FROM lockd_io;
  column_stats_locked   | t
 (2 rows)
 
-SELECT reset_stat_and_cache();
- reset_stat_and_cache 
-----------------------
+SELECT load_merged_stats();
+ load_merged_stats 
+-------------------
+ (null)
+(1 row)
+
+SELECT pg_stat_reset();
+ pg_stat_reset 
+---------------
  
 (1 row)
 
@@ -2438,7 +2498,7 @@ SELECT count(*) FROM dbms_stats.column_stats_locked;
      2
 (1 row)
 
-SELECT dbms_stats.clean_up_stats();
+SELECT dbms_stats.clean_up_stats() ORDER BY 1;
  clean_up_stats 
 ----------------
 (0 rows)
@@ -2470,7 +2530,7 @@ SELECT count(*) FROM dbms_stats.column_stats_locked;
      0
 (1 row)
 
-SELECT dbms_stats.clean_up_stats();
+SELECT dbms_stats.clean_up_stats() ORDER BY 1;
  clean_up_stats 
 ----------------
 (0 rows)
@@ -2501,12 +2561,12 @@ SELECT count(*) FROM dbms_stats.relation_stats_locked;
      1
 (1 row)
 
-SELECT dbms_stats.clean_up_stats();
+SELECT dbms_stats.clean_up_stats() ORDER BY 1;
     clean_up_stats    
 ----------------------
+ public.clean_test,
  public.clean_test, 1
  public.clean_test, 2
- public.clean_test,
 (3 rows)
 
 SELECT count(*) FROM dbms_stats.relation_stats_locked;
@@ -2523,7 +2583,7 @@ SELECT count(*) FROM dbms_stats.relation_stats_locked;
      0
 (1 row)
 
-SELECT dbms_stats.clean_up_stats();
+SELECT dbms_stats.clean_up_stats() ORDER BY 1;
  clean_up_stats 
 ----------------
 (0 rows)
@@ -2565,7 +2625,7 @@ SELECT count(*) FROM dbms_stats.column_stats_locked
      2
 (1 row)
 
-SELECT dbms_stats.clean_up_stats();
+SELECT dbms_stats.clean_up_stats() ORDER BY 1;
  clean_up_stats 
 ----------------
 (0 rows)
@@ -2595,7 +2655,7 @@ SELECT count(*) FROM dbms_stats.column_stats_locked
      1
 (1 row)
 
-SELECT dbms_stats.clean_up_stats();
+SELECT dbms_stats.clean_up_stats() ORDER BY 1;
  clean_up_stats 
 ----------------
 (0 rows)
@@ -2623,7 +2683,7 @@ SELECT count(*) FROM dbms_stats.column_stats_locked
      2
 (1 row)
 
-SELECT dbms_stats.clean_up_stats();
+SELECT dbms_stats.clean_up_stats() ORDER BY 1;
     clean_up_stats    
 ----------------------
  public.clean_test, 3
@@ -2647,7 +2707,7 @@ SELECT count(*) FROM dbms_stats.column_stats_locked
      1
 (1 row)
 
-SELECT dbms_stats.clean_up_stats();
+SELECT dbms_stats.clean_up_stats() ORDER BY 1;
  clean_up_stats 
 ----------------
 (0 rows)

@@ -320,13 +320,15 @@ SELECT dbms_stats.lock_table_stats('st1');
 SELECT relname, curpages FROM dbms_stats.relation_stats_locked
  WHERE relid = 'st1'::regclass;
 SELECT pg_sleep(0.7);
-SELECT reset_stat_and_cache();
+SELECT load_merged_stats();
+SELECT pg_stat_reset();
 VACUUM ANALYZE;
 UPDATE dbms_stats.relation_stats_locked SET curpages = 1000
  WHERE relid = 'st1_exp'::regclass;
 SELECT pg_sleep(0.7);
 SELECT * FROM lockd_io;
-SELECT reset_stat_and_cache();
+SELECT load_merged_stats();
+SELECT pg_stat_reset();
 SELECT relname, curpages FROM dbms_stats.relation_stats_locked
  WHERE relid = 'st1'::regclass;
 SELECT pg_sleep(0.7);
@@ -372,11 +374,13 @@ VACUUM ANALYZE;
 SELECT * FROM s0.droptest
  WHERE id = 1;
 SELECT pg_sleep(0.7);
-SELECT reset_stat_and_cache();
+SELECT load_merged_stats();
+SELECT pg_stat_reset();
 ALTER TABLE s0.droptest RENAME TO test;
 SELECT pg_sleep(0.7);
 SELECT * FROM lockd_io;
-SELECT reset_stat_and_cache();
+SELECT load_merged_stats();
+SELECT pg_stat_reset();
 SELECT * FROM s0.test
  WHERE id = 1;
 SELECT pg_sleep(0.7);
@@ -388,11 +392,13 @@ VACUUM ANALYZE;
 SELECT * FROM s0.droptest
  WHERE id = 1;
 SELECT pg_sleep(0.7);
-SELECT reset_stat_and_cache();
+SELECT load_merged_stats();
+SELECT pg_stat_reset();
 ALTER TABLE s0.droptest RENAME id TO test;
 SELECT pg_sleep(0.7);
 SELECT * FROM lockd_io;
-SELECT reset_stat_and_cache();
+SELECT load_merged_stats();
+SELECT pg_stat_reset();
 SELECT * FROM s0.droptest
  WHERE test = 1;
 SELECT pg_sleep(0.7);
@@ -404,11 +410,13 @@ INSERT INTO s0.droptest VALUES (4);
 SELECT * FROM s0.droptest
  WHERE id = 1;
 SELECT pg_sleep(0.7);
-SELECT reset_stat_and_cache();
+SELECT load_merged_stats();
+SELECT pg_stat_reset();
 ANALYZE;
 SELECT pg_sleep(0.7);
 SELECT * FROM lockd_io;
-SELECT reset_stat_and_cache();
+SELECT load_merged_stats();
+SELECT pg_stat_reset();
 SELECT * FROM s0.droptest
  WHERE id = 1;
 SELECT pg_sleep(1.0);
@@ -420,11 +428,13 @@ INSERT INTO s0.droptest VALUES (4),(5);
 SELECT * FROM s0.droptest
  WHERE id = 4;
 SELECT pg_sleep(0.7);
-SELECT reset_stat_and_cache();
+SELECT load_merged_stats();
+SELECT pg_stat_reset();
 VACUUM ANALYZE;
 SELECT pg_sleep(0.7);
 SELECT * FROM lockd_io;
-SELECT reset_stat_and_cache();
+SELECT load_merged_stats();
+SELECT pg_stat_reset();
 SELECT * FROM s0.droptest
  WHERE id = 4;
 SELECT pg_sleep(0.7);
@@ -1062,7 +1072,7 @@ ANALYZE clean_test;
 SELECT dbms_stats.lock_table_stats('clean_test');
 SELECT count(*) FROM dbms_stats.relation_stats_locked;
 SELECT count(*) FROM dbms_stats.column_stats_locked;
-SELECT dbms_stats.clean_up_stats();
+SELECT dbms_stats.clean_up_stats() ORDER BY 1;
 SELECT count(*) FROM dbms_stats.relation_stats_locked;
 SELECT count(*) FROM dbms_stats.column_stats_locked;
 -- No.18-1-2
@@ -1070,19 +1080,19 @@ SELECT count(*) FROM dbms_stats.column_stats_locked;
 DELETE FROM dbms_stats.relation_stats_locked;
 SELECT count(*) FROM dbms_stats.relation_stats_locked;
 SELECT count(*) FROM dbms_stats.column_stats_locked;
-SELECT dbms_stats.clean_up_stats();
+SELECT dbms_stats.clean_up_stats() ORDER BY 1;
 SELECT count(*) FROM dbms_stats.relation_stats_locked;
 SELECT count(*) FROM dbms_stats.column_stats_locked;
 -- No.18-1-3
 SELECT dbms_stats.lock_table_stats('clean_test');
 DROP TABLE clean_test;
 SELECT count(*) FROM dbms_stats.relation_stats_locked;
-SELECT dbms_stats.clean_up_stats();
+SELECT dbms_stats.clean_up_stats() ORDER BY 1;
 SELECT count(*) FROM dbms_stats.relation_stats_locked;
 -- No.18-1-4
 DELETE FROM dbms_stats.relation_stats_locked;
 SELECT count(*) FROM dbms_stats.relation_stats_locked;
-SELECT dbms_stats.clean_up_stats();
+SELECT dbms_stats.clean_up_stats() ORDER BY 1;
 SELECT count(*) FROM dbms_stats.relation_stats_locked;
 -- No.18-1-6
 CREATE TABLE clean_test(id integer, num integer);
@@ -1100,7 +1110,7 @@ SELECT count(*) FROM pg_statistic
  WHERE starelid = 'clean_test'::regclass;
 SELECT count(*) FROM dbms_stats.column_stats_locked
  WHERE starelid = 'clean_test'::regclass;
-SELECT dbms_stats.clean_up_stats();
+SELECT dbms_stats.clean_up_stats() ORDER BY 1;
 SELECT count(*) FROM dbms_stats.column_stats_locked
  WHERE starelid = 'clean_test'::regclass;
 -- No.18-1-8
@@ -1111,7 +1121,7 @@ SELECT count(*) FROM pg_statistic
  WHERE starelid = 'clean_test'::regclass;
 SELECT count(*) FROM dbms_stats.column_stats_locked
  WHERE starelid = 'clean_test'::regclass;
-SELECT dbms_stats.clean_up_stats();
+SELECT dbms_stats.clean_up_stats() ORDER BY 1;
 SELECT count(*) FROM dbms_stats.column_stats_locked
  WHERE starelid = 'clean_test'::regclass;
 -- No.18-1-9
@@ -1120,7 +1130,7 @@ SELECT dbms_stats.lock_table_stats('clean_test');
 ALTER TABLE clean_test DROP COLUMN num;
 SELECT count(*) FROM dbms_stats.column_stats_locked
  WHERE starelid = 'clean_test'::regclass;
-SELECT dbms_stats.clean_up_stats();
+SELECT dbms_stats.clean_up_stats() ORDER BY 1;
 SELECT count(*) FROM dbms_stats.column_stats_locked
  WHERE starelid = 'clean_test'::regclass;
 -- No.18-1-10
@@ -1129,7 +1139,7 @@ DELETE FROM dbms_stats.column_stats_locked
    AND staattnum = 3;
 SELECT count(*) FROM dbms_stats.column_stats_locked
  WHERE starelid = 'clean_test'::regclass;
-SELECT dbms_stats.clean_up_stats();
+SELECT dbms_stats.clean_up_stats() ORDER BY 1;
 SELECT count(*) FROM dbms_stats.column_stats_locked
  WHERE starelid = 'clean_test'::regclass;
 DELETE FROM dbms_stats.relation_stats_locked;

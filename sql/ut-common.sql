@@ -935,16 +935,22 @@ SELECT * FROM dbms_stats.backup_history;
 BEGIN;
 SELECT relation::regclass, mode
   FROM pg_locks
-  WHERE relation::regclass::text LIKE 'dbms_stats.\_%\_locked'
+  WHERE
+  	(relation::regclass::text LIKE 'dbms_stats.\_%\_locked'
      OR relation::regclass::text LIKE 'dbms_stats.backup_history'
-     OR relation::regclass::text LIKE 'dbms_stats.%\_backup'
+     OR relation::regclass::text LIKE 'dbms_stats.%\_backup')
+  AND
+    mode <> 'ShareUpdateExclusiveLock'
   ORDER BY relation::regclass::text, mode;
 SELECT id, unit, comment FROM dbms_stats.purge_stats(2);
 SELECT relation::regclass, mode
   FROM pg_locks
-  WHERE relation::regclass::text LIKE 'dbms_stats.\_%\_locked'
+  WHERE
+  	(relation::regclass::text LIKE 'dbms_stats.\_%\_locked'
      OR relation::regclass::text LIKE 'dbms_stats.backup_history'
-     OR relation::regclass::text LIKE 'dbms_stats.%\_backup'
+     OR relation::regclass::text LIKE 'dbms_stats.%\_backup')
+  AND
+    mode <> 'ShareUpdateExclusiveLock'
   ORDER BY relation::regclass::text, mode;
 COMMIT;
 SELECT * FROM dbms_stats.backup_history;

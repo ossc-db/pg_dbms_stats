@@ -14,7 +14,7 @@
 ## Set general information for pg_dbms_stats.
 Summary:    Plan Stabilizer for PostgreSQL 10
 Name:       pg_dbms_stats10
-Version:    1.3.7
+Version:    1.3.8
 Release:    1%{?dist}
 License:    BSD
 Group:      Applications/Databases
@@ -56,7 +56,7 @@ rm -rf %{buildroot}
 install -d %{buildroot}%{_libdir}
 install -m 755 pg_dbms_stats.so %{buildroot}%{_libdir}/pg_dbms_stats.so
 install -d %{buildroot}%{_datadir}/extension
-install -m 644 pg_dbms_stats--1.3.7.sql %{buildroot}%{_datadir}/extension/pg_dbms_stats--1.3.7.sql
+install -m 644 pg_dbms_stats--1.3.8.sql %{buildroot}%{_datadir}/extension/pg_dbms_stats--1.3.8.sql
 install -m 644 pg_dbms_stats.control %{buildroot}%{_datadir}/extension/pg_dbms_stats.control
 install -d %{buildroot}%{_docdir}/extension
 install -m 644 doc/export_effective_stats-10.sql.sample %{buildroot}%{_docdir}/extension/export_effective_stats-10.sql.sample
@@ -69,13 +69,13 @@ rm -rf %{buildroot}
 %defattr(0755,root,root)
 %{_libdir}/pg_dbms_stats.so
 %defattr(0644,root,root)
-%{_datadir}/extension/pg_dbms_stats--1.3.7.sql
+%{_datadir}/extension/pg_dbms_stats--1.3.8.sql
 %{_datadir}/extension/pg_dbms_stats.control
 %{_docdir}/extension/export_effective_stats-10.sql.sample
 %{_docdir}/extension/export_plain_stats-10.sql.sample
 
 # History of pg_dbms_stats.
 %changelog
-* Thu Jun 08 2017 Kyotaro Horiguchi
-- pg_dbms_stats10 v1.3.7 release
+* Tue Oct 10 2017 Kyotaro Horiguchi
+- pg_dbms_stats10 v1.3.8 release
 

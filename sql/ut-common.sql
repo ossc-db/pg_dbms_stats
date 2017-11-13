@@ -1195,7 +1195,7 @@ SELECT dbms_stats.unlock('s0.st4');
 DROP TABLE s0.st4 CASCADE;
 
 /*
- * No.21 anyarray stuffs
+ * No.21 anyarray stuff
  */
 CREATE TABLE st_ary (i int, f float, d timestamp without time zone);
 INSERT INTO st_ary

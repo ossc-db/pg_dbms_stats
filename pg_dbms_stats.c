@@ -68,6 +68,13 @@ PG_MODULE_MAGIC;
 static	bool set_acl_ok = false;
 #endif
 
+/* FormData_pg_attribute is modifed at PG11 */
+#if PG_VERSION_NUM >= 110000
+#define get_attrs(pgatt_attrs) (&(pgatt_attrs))
+#else
+#define get_attrs(pgatt_attrs) (pgatt_attrs)
+#endif
+
 /* Relation statistics cache entry */
 typedef struct StatsRelationEntry
 {
@@ -502,7 +509,7 @@ dbms_stats_merge_internal(HeapTuple lhs, HeapTuple rhs, TupleDesc tupdesc)
 						(errmsg("pg_dbms_stats: bad statistics"),
 						 errdetail("column \"%s\" should not be null",
 							get_attname(StatisticRelationId,
-										tupdesc->attrs[i]->attnum))));
+									get_attrs(tupdesc->attrs[i])->attnum))));
 					return NULL;	/* should not be null */
 				}
 			}
@@ -529,7 +536,7 @@ dbms_stats_merge_internal(HeapTuple lhs, HeapTuple rhs, TupleDesc tupdesc)
 							(errmsg("pg_dbms_stats: bad statistics"),
 							 errdetail("column \"%s\" should not be null",
 								get_attname(StatisticRelationId,
-											tupdesc->attrs[i]->attnum))));
+									get_attrs(tupdesc->attrs[i])->attnum))));
 						return NULL;	/* should not be null */
 					}
 				}
@@ -1744,7 +1751,7 @@ dbms_stats_get_rel_data_width(Relation rel, int32 *attr_widths)
 
 	for (i = 1; i <= RelationGetNumberOfAttributes(rel); i++)
 	{
-		Form_pg_attribute att = rel->rd_att->attrs[i - 1];
+		Form_pg_attribute att = get_attrs(rel->rd_att->attrs[i - 1]);
 		int32		item_width;
 
 		if (att->attisdropped)

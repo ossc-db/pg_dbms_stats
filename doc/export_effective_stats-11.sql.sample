@@ -1,0 +1,68 @@
+/*
+ * If you want the statistics of per-relation or per-column, please modify
+ * nspname, relname, and attname in 'WHERE' clause.
+ */
+
+BEGIN TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+/*
+ * If you want to chage the output file name, please modify the following name.
+ */
+\o export_stats.dmp
+
+COPY (SELECT n2.nspname,
+             cl.relname,
+             r.relpages,
+             r.reltuples,
+             r.relallvisible,
+             r.curpages,
+             r.last_analyze,
+             r.last_autoanalyze,
+             COALESCE(a.attname, ''),
+             n1.nspname AS schemaname_of_atttype,
+             t.typname,
+             a.atttypmod,
+             co.stainherit,
+             co.stanullfrac,
+             co.stawidth,
+             co.stadistinct,
+             co.stakind1,
+             co.stakind2,
+             co.stakind3,
+             co.stakind4,
+             co.stakind5,
+             co.staop1,
+             co.staop2,
+             co.staop3,
+             co.staop4,
+             co.staop5,
+             co.stanumbers1,
+             co.stanumbers2,
+             co.stanumbers3,
+             co.stanumbers4,
+             co.stanumbers5,
+             co.stavalues1,
+             co.stavalues2,
+             co.stavalues3,
+             co.stavalues4,
+             co.stavalues5
+        FROM dbms_stats.column_stats_effective co
+        JOIN pg_attribute a
+          ON (co.starelid = a.attrelid AND co.staattnum = a.attnum)
+        JOIN pg_type t
+          ON a.atttypid = t.oid
+        JOIN pg_namespace n1
+          ON t.typnamespace = n1.oid
+       RIGHT JOIN dbms_stats.relation_stats_effective r
+          ON co.starelid = r.relid
+        JOIN pg_catalog.pg_class cl
+          ON r.relid = cl.oid
+        JOIN pg_catalog.pg_namespace n2
+          ON cl.relnamespace = n2.oid
+       -- WHERE n2.nspname = 'public'
+       -- AND cl.relname = 'test'
+       -- AND a.attname = 'id'
+       ORDER BY starelid, staattnum)
+TO STDOUT
+(FORMAT 'binary');
+\o
+COMMIT;

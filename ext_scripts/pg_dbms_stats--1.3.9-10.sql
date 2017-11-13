@@ -1,4 +1,4 @@
-/* pg_dbms_stats/pg_dbms_stats--1.3.7.sql */
+/* pg_dbms_stats/pg_dbms_stats--1.3.9.sql */
 
 -- complain if script is sourced in psql, rather than via CREATE EXTENSION
 \echo Use "CREATE EXTENSION pg_dbms_stats" to load this file. \quit
@@ -152,7 +152,7 @@ LANGUAGE C STABLE;
 
 CREATE FUNCTION dbms_stats.is_target_relkind(relkind "char")
 RETURNS boolean AS
-$$SELECT $1 IN ('r', 'i', 'f')$$
+$$SELECT $1 IN ('r', 'i', 'f', 'm')$$
 LANGUAGE sql STABLE;
 
 CREATE FUNCTION dbms_stats.merge(
@@ -206,11 +206,11 @@ CREATE VIEW dbms_stats.column_stats_effective AS
 --
 -- Note: This view is copied from pg_stats in
 -- src/backend/catalog/system_views.sql in core source tree of version
--- 9.2, and customized for pg_dbms_stats.  Changes from orignal one are:
+-- 9.5, and customized for pg_dbms_stats.  Changes from orignal one are:
 --   - rename from pg_stats to dbms_stats.stats by a view name.
 --   - changed the table name from pg_statistic to dbms_stats.column_stats_effective.
 --
-CREATE VIEW dbms_stats.stats AS
+CREATE VIEW dbms_stats.stats with (security_barrier) AS
     SELECT
         nspname AS schemaname,
         relname AS tablename,
@@ -271,7 +271,9 @@ CREATE VIEW dbms_stats.stats AS
     FROM dbms_stats.column_stats_effective s JOIN pg_class c ON (c.oid = s.starelid)
          JOIN pg_attribute a ON (c.oid = attrelid AND attnum = s.staattnum)
          LEFT JOIN pg_namespace n ON (n.oid = c.relnamespace)
-    WHERE NOT attisdropped AND has_column_privilege(c.oid, a.attnum, 'select');
+    WHERE NOT attisdropped
+	AND has_column_privilege(c.oid, a.attnum, 'select')
+	AND (c.relrowsecurity = false OR NOT row_security_active(c.oid));
 
 --
 -- Utility functions
@@ -364,7 +366,7 @@ BEGIN
         IF NOT dbms_stats.is_target_relkind(backup_relkind) THEN
             RAISE EXCEPTION 'relation of relkind "%" cannot have statistics to backup: "%"',
 				backup_relkind, $1
-				USING HINT = 'Only tables(r), foreign tables(f) and indexes(i) are allowed.';
+				USING HINT = 'Only tables(r), materialized views(m), foreign tables(f) and indexes(i) are allowed.';
         END IF;
         IF dbms_stats.is_system_catalog($1) THEN
             RAISE EXCEPTION 'backing up statistics is inhibited for system catalogs: "%"', $1;
@@ -970,7 +972,7 @@ BEGIN
     END IF;
     IF NOT dbms_stats.is_target_relkind(lock_relkind) THEN
         RAISE EXCEPTION 'locking statistics is not allowed for relations with relkind "%": "%"', lock_relkind, $1
-			USING HINT = 'Only tables(r, f) and indexes(i) are lockable.';
+			USING HINT = 'Only tables(r, m, f) and indexes(i) are lockable.';
     END IF;
     IF dbms_stats.is_system_catalog($1) THEN
 		RAISE EXCEPTION 'locking statistics is not allowed for system catalogs: "%"', $1;

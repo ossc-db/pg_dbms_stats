@@ -10113,7 +10113,101 @@ SELECT relid::regclass FROM dbms_stats.relation_stats_locked
  s1.st0
 (16 rows)
 
--- No.15 error description. -- abnormal case.
+-- No.15 Make sure that the stats given by pg_dbms_stats doesn't
+-- ignored by ACL check
+CREATE FUNCTION testfunc() RETURNS TEXT AS $$
+DECLARE
+  ret text;
+  v text;
+BEGIN
+  ret = '';
+  FOR v IN EXPLAIN SELECT * FROM s0.st4 WHERE a < '000' LOOP
+    -- mask unnecessary values
+    v = regexp_replace(v, '(cost|width)=[0-9.]+', E'\\1=xxx', 'g');
+    ret = ret || v || E'\n';
+  END LOOP;    
+  RETURN ret;
+END;
+$$ LANGUAGE plpgsql;
+SET pg_dbms_stats.use_locked_stats TO on;
+CREATE TABLE s0.st4 (a text);
+INSERT INTO s0.st4 SELECT '1' || md5(g::text) FROM generate_series(1, 10000) as g;
+VACUUM ANALYZE s0.st4;
+-- should estimate that rows = 1, not 5000
+SELECT testfunc();
+                   testfunc                   
+----------------------------------------------
+ Seq Scan on st4  (cost=xxx rows=1 width=xxx)+
+   Filter: (a < '000'::text)                 +
+ 
+(1 row)
+
+SET pg_dbms_stats.use_locked_stats TO off;
+SELECT dbms_stats.lock_table_stats('s0.st4');
+ lock_table_stats 
+------------------
+ s0.st4
+(1 row)
+
+SET pg_dbms_stats.use_locked_stats TO on;
+-- should estimate that rows = 1, not 5000
+SELECT testfunc();
+                   testfunc                   
+----------------------------------------------
+ Seq Scan on st4  (cost=xxx rows=1 width=xxx)+
+   Filter: (a < '000'::text)                 +
+ 
+(1 row)
+
+DROP TABLE s0.st4;
+SELECT dbms_stats.clean_up_stats();
+ clean_up_stats 
+----------------
+ s0.st4, 1
+ s0.st4,
+(2 rows)
+
+/*
+ * No.15-2 Ditto for index stats
+ */
+CREATE TABLE s0.st4 (a double precision);
+CREATE INDEX on s0.st4 (floor(log(a)));
+SELECT dbms_stats.lock_table_stats('s0.st4');
+ lock_table_stats 
+------------------
+ s0.st4
+(1 row)
+
+INSERT INTO s0.st4 (SELECT a from GENERATE_SERIES(1, 99999) a);
+ANALYZE t1;
+ERROR:  relation "t1" does not exist
+SET pg_dbms_stats.use_locked_stats TO off;
+SELECT testfunc();
+                     testfunc                     
+--------------------------------------------------
+ Seq Scan on st4  (cost=xxx rows=31601 width=xxx)+
+   Filter: (a < 0::double precision)             +
+ 
+(1 row)
+
+SET pg_dbms_stats.use_locked_stats TO on;
+SELECT testfunc();
+                    testfunc                    
+------------------------------------------------
+ Seq Scan on st4  (cost=xxx rows=713 width=xxx)+
+   Filter: (a < 0::double precision)           +
+ 
+(1 row)
+
+DROP TABLE s0.st4;
+DROP FUNCTION testfunc();
+SELECT dbms_stats.clean_up_stats();
+ clean_up_stats 
+----------------
+ s0.st4,
+(1 row)
+
+-- No.16 error description. -- abnormal case.
 RESET SESSION AUTHORIZATION;
 CREATE TABLE s0.st4 (a int, b text);
 CREATE VIEW s0.vst4 AS select * FROM s0.st4;

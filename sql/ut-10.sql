@@ -2734,7 +2734,54 @@ SELECT relid::regclass FROM dbms_stats.relation_stats_locked
  GROUP BY relid
  ORDER BY relid;
 
--- No.15 error description. -- abnormal case.
+-- No.15 Make sure that the stats given by pg_dbms_stats doesn't
+-- ignored by ACL check
+CREATE FUNCTION testfunc() RETURNS TEXT AS $$
+DECLARE
+  ret text;
+  v text;
+BEGIN
+  ret = '';
+  FOR v IN EXPLAIN SELECT * FROM s0.st4 WHERE a < '000' LOOP
+    -- mask unnecessary values
+    v = regexp_replace(v, '(cost|width)=[0-9.]+', E'\\1=xxx', 'g');
+    ret = ret || v || E'\n';
+  END LOOP;    
+  RETURN ret;
+END;
+$$ LANGUAGE plpgsql;
+
+SET pg_dbms_stats.use_locked_stats TO on;
+CREATE TABLE s0.st4 (a text);
+INSERT INTO s0.st4 SELECT '1' || md5(g::text) FROM generate_series(1, 10000) as g;
+VACUUM ANALYZE s0.st4;
+-- should estimate that rows = 1, not 5000
+SELECT testfunc();
+SET pg_dbms_stats.use_locked_stats TO off;
+SELECT dbms_stats.lock_table_stats('s0.st4');
+SET pg_dbms_stats.use_locked_stats TO on;
+-- should estimate that rows = 1, not 5000
+SELECT testfunc();
+DROP TABLE s0.st4;
+SELECT dbms_stats.clean_up_stats();
+
+/*
+ * No.15-2 Ditto for index stats
+ */
+CREATE TABLE s0.st4 (a double precision);
+CREATE INDEX on s0.st4 (floor(log(a)));
+SELECT dbms_stats.lock_table_stats('s0.st4');
+INSERT INTO s0.st4 (SELECT a from GENERATE_SERIES(1, 99999) a);
+ANALYZE t1;
+SET pg_dbms_stats.use_locked_stats TO off;
+SELECT testfunc();
+SET pg_dbms_stats.use_locked_stats TO on;
+SELECT testfunc();
+DROP TABLE s0.st4;
+DROP FUNCTION testfunc();
+SELECT dbms_stats.clean_up_stats();
+
+-- No.16 error description. -- abnormal case.
 RESET SESSION AUTHORIZATION;
 CREATE TABLE s0.st4 (a int, b text);
 CREATE VIEW s0.vst4 AS select * FROM s0.st4;

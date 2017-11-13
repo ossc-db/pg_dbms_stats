@@ -7,7 +7,9 @@
  */
 #include "postgres.h"
 
+#include "access/sysattr.h"
 #include "access/transam.h"
+#include "catalog/pg_index.h"
 #include "catalog/pg_statistic.h"
 #include "catalog/pg_type.h"
 #include "catalog/namespace.h"
@@ -17,9 +19,12 @@
 #include "funcapi.h"
 #include "optimizer/plancat.h"
 #include "parser/parse_oper.h"
+#include "parser/parsetree.h"
 #include "storage/bufmgr.h"
+#include "utils/acl.h"
 #include "utils/builtins.h"
 #include "utils/elog.h"
+#include "utils/fmgroids.h"
 #include "utils/guc.h"
 #include "utils/inval.h"
 #include "utils/lsyscache.h"
@@ -44,6 +49,24 @@ PG_MODULE_MAGIC;
 #define ELEVEL_BADSTATS		LOG		/* log level for invalid statistics */
 
 #define MAX_REL_CACHE		50		/* expected max # of rel stats entries */
+
+/* acl_ok must be set after the fix for CVE-2017-7484 */
+#if PG_VERSION_NUM >= 100000 || \
+	(PG_VERSION_NUM >=  90603 && PG_VERSION_NUM < 100000) ||	\
+	(PG_VERSION_NUM >=  90507 && PG_VERSION_NUM <  90600) ||	\
+	(PG_VERSION_NUM >=  90412 && PG_VERSION_NUM <  90500) ||	\
+	(PG_VERSION_NUM >=  90317 && PG_VERSION_NUM <  90400) ||	\
+	(PG_VERSION_NUM >=  90221 && PG_VERSION_NUM <  90300)
+#define PGDS_HAVE_ACL_OK
+/*
+ * acl_ok of the returning VariableStatData must be set if set_acl_okk is
+ * true. The code is compiled only if the compile target PG version is match
+ * the above conditions. Conversely, acl_ok is added to the end of
+ * VariableStatData so we can safely omit setting it when the PG version
+ * pg_dbms_stats is loaded onto is out of the conditions.
+ */
+static	bool set_acl_ok = false;
+#endif
 
 /* Relation statistics cache entry */
 typedef struct StatsRelationEntry
@@ -201,6 +224,25 @@ _PG_init(void)
 		test_pg_dbms_stats(&passed, &total);
 
 		elog(WARNING, "TOTAL %d/%d passed", passed, total);
+	}
+#endif
+
+#ifdef PGDS_HAVE_ACL_OK
+	{
+		/*
+		 * Check the PG version this module loaded onto. This aid is required
+		 * for binary backward compatibility within a major PG version.
+		 */
+		int major_version = PG_VERSION_NUM / 100;
+		int minor_version = PG_VERSION_NUM % 100;
+
+		if (major_version >= 1000 ||
+			(major_version == 906 && minor_version >= 3) ||
+			(major_version == 905 && minor_version >= 7) ||
+			(major_version == 904 && minor_version >= 12) ||
+			(major_version == 903 && minor_version >= 17) ||
+			(major_version == 902 && minor_version >= 21))
+			set_acl_ok = true;
 	}
 #endif
 
@@ -885,9 +927,24 @@ dbms_stats_get_relation_stats(PlannerInfo *root,
 
 		tuple = get_merged_column_stats(rte->relid, attnum, rte->inh);
 		vardata->statsTuple = tuple;
-		if (tuple != NULL)
+		if (HeapTupleIsValid(tuple))
 		{
 			vardata->freefunc = FreeHeapTuple;
+
+#ifdef PGDS_HAVE_ACL_OK
+			/*
+			 * set acl_ok if required. See the definition of set_acl_ok for
+			 * details.
+			 */
+			if (set_acl_ok)
+			 {
+				 vardata->acl_ok =
+					 (pg_class_aclcheck(rte->relid, GetUserId(),
+										ACL_SELECT) == ACLCHECK_OK) ||
+					 (pg_attribute_aclcheck(rte->relid, attnum, GetUserId(),
+											ACL_SELECT) == ACLCHECK_OK);
+			 }
+#endif
 			return true;
 		}
 	}
@@ -910,19 +967,74 @@ dbms_stats_get_index_stats(PlannerInfo *root,
 						   AttrNumber indexattnum,
 						   VariableStatData *vardata)
 {
-	if (pg_dbms_stats_use_locked_stats)
-	{
-		HeapTuple	tuple;
+	HeapTuple	tuple;
 
-		tuple = get_merged_column_stats(indexOid, indexattnum, false);
-		vardata->statsTuple = tuple;
-		if (tuple != NULL)
+	if (!pg_dbms_stats_use_locked_stats)
+		goto next_plugin;
+
+	tuple = get_merged_column_stats(indexOid, indexattnum, false);
+	vardata->statsTuple = tuple;
+	if (tuple == NULL)
+		goto next_plugin;
+
+	vardata->freefunc = FreeHeapTuple;
+			
+#ifdef PGDS_HAVE_ACL_OK
+	/*
+	 * set acl_ok if required. See the definition of set_acl_ok for details.
+	 */
+	if (set_acl_ok)
+	{
+		/*
+		 * XXX: we had to scan the whole the rel array since we got
+		 * only the oid of the index.
+		 */
+		int i;
+
+		/* don't stop by this misassumption */
+		if (root->simple_rel_array == NULL)
 		{
-			vardata->freefunc = FreeHeapTuple;
-			return true;
+			elog(WARNING, "pg_dbms_stats internal error. relation has not been set up. index %d ignored", indexOid);
+			goto next_plugin;
+		}
+
+		/*
+		 * scan over simple_rel_array_size to find the owner relation of the
+		 * index that its oid is indexOid
+		 */
+		for (i = 1 ; i < root->simple_rel_array_size ; i++)
+		{
+			ListCell *lc;
+
+			foreach (lc, root->simple_rel_array[i]->indexlist)
+			{
+				IndexOptInfo *index = (IndexOptInfo *) lfirst(lc);
+				RangeTblEntry *rte;
+
+				if (index->indexoid != indexOid)
+					continue;
+
+				/* This relation is the owner of the given index, go ahead */
+				rte = planner_rt_fetch(index->rel->relid, root);
+
+				/* don't stop by this error */
+				if (rte->rtekind != RTE_RELATION)
+				{
+					elog(WARNING, "pg_dbms_stats internal error. index %d is owned by a non-relation", indexOid);
+					goto next_plugin;
+				}
+
+				vardata->acl_ok =
+					(pg_class_aclcheck(rte->relid, GetUserId(),
+									   ACL_SELECT) == ACLCHECK_OK);
+				break;
+			}
 		}
 	}
+#endif
+	return true;
 
+next_plugin:
 	if (prev_get_index_stats)
 		return prev_get_index_stats(root, indexOid, indexattnum, vardata);
 	else

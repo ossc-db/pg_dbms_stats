@@ -1,0 +1,243 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD html 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>pg_dbms_stats</title>
+<link rel="home" title="pg_dbms_stats" href="index.html">
+<link rel="stylesheet" TYPE="text/css"href="style.css">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+</head>
+
+<body>
+<h1 id="pg_dbms_stats">pg_dbms_stats-1.3.9</h1>
+<div class="navigation">
+  <a href="pg_dbms_stats-en.html">pg_dbms_stats</a> &gt;
+  <a href="objects-en.html">Appendix A. List of objects</a>
+</div>
+
+<div class="index">
+<ol>
+<li><a href="#functions">Functions</a></li>
+<li><a href="#table">Tables</a></li>
+<li><a href="#view">Views</a></li>
+</ol>
+</div>
+
+<h2 id="functions">Functions</h2>
+<p>
+pg_dbms_stats provies the following functions.
+<table>
+<thead>
+<tr>
+<tr><th>Operation</th><th>Function</th><th>Parameters</th><th>Target unit</th><th>Return</th></tr>
+</tr>
+</thead>
+<tbody>
+<tr><td rowspan="6" nowrap>Backup</td>
+  <td nowrap>dbms_stats.backup_database_stats</td>
+  <td nowrap>comment</td>
+  <td nowrap>Database</td>
+  <td rowspan="6">int8</td></tr>
+<tr><td nowrap>dbms_stats.backup_schema_stats</td>
+  <td nowrap>schemaname、comment</td>
+  <td>Schema</td></tr>
+<tr><td rowspan="2" nowrap>dbms_stats.backup_table_stats</td>
+  <td nowrap>relname、comment</td>
+  <td rowspan="2">Table</td></tr>
+<tr><td nowrap>schemaname、tablename、comment</td></tr>
+<tr><td rowspan="2" nowrap>dbms_stats.backup_column_stats</td>
+  <td nowrap>relname、attname、comment</td>
+  <td rowspan="2">Column</td></tr>
+<tr><td nowrap>schemaname、tablename、attname、comment</td></tr>
+<tr><td rowspan="7" nowrap>Restore</td>
+  <td nowrap>dbms_stats.restore_database_stats</td>
+  <td nowrap>timestamp</td>
+  <td nowrap>Database</td>
+  <td rowspan="7">regclass</td></tr>
+<tr><td nowrap>dbms_stats.restore_schema_stats</td>
+  <td nowrap>schemaname、timestamp</td>
+  <td>Schema</td></tr>
+<tr><td rowspan="2" nowrap>dbms_stats.restore_table_stats</td>
+  <td nowrap>relname、timestamp</td>
+  <td rowspan="2">Table</td></tr>
+<tr><td nowrap>schemaname、tablename、timestamp</td></tr>
+<tr><td rowspan="2" nowrap>dbms_stats.restore_column_stats</td>
+  <td nowrap>relname、attname、timestamp</td>
+  <td rowspan="2">Column</td></tr>
+<tr><td nowrap>schemaname、tablename、attname、timestamp</td></tr>
+<tr><td nowrap>dbms_stats.restore_stats</td>
+  <td nowrap>backup_id</td>
+  <td>Backup</td></tr>
+<tr><td rowspan="6" nowrap>Lock</td>
+  <td nowrap>dbms_stats.lock_database_stats</td>
+  <td nowrap>(None)</td>
+  <td nowrap>Database</td>
+  <td rowspan="6">regclass</td></tr>
+<tr><td nowrap>dbms_stats.lock_schema_stats</td>
+  <td nowrap>schemaname</td>
+  <td>Schema</td></tr>
+<tr><td rowspan="2" nowrap>dbms_stats.lock_table_stats</td>
+  <td nowrap>relname</td>
+  <td rowspan="2">Table</td></tr>
+<tr><td nowrap>schemaname、tablename</td></tr>
+<tr><td rowspan="2" nowrap>dbms_stats.lock_column_stats</td>
+  <td nowrap>relname、attname</td>
+  <td rowspan="2">Column</td></tr>
+<tr><td nowrap>schemaname、tablename、attname</td></tr>
+<tr><td rowspan="6" nowrap>Unlock</td>
+  <td nowrap>dbms_stats.unlock_database_stats</td>
+  <td nowrap>(None)</td>
+  <td nowrap>Database</td>
+  <td rowspan="6">regclass</td></tr>
+<tr><td nowrap>dbms_stats.unlock_schema_stats</td>
+  <td nowrap>schemaname</td>
+  <td>Schema</td></tr>
+<tr><td rowspan="2" nowrap>dbms_stats.unlock_table_stats</td>
+  <td nowrap>relname</td>
+  <td rowspan="2">Table</td></tr>
+<tr><td nowrap>schemaname、tablename</td></tr>
+<tr><td rowspan="2" nowrap>dbms_stats.unlock_column_stats</td>
+  <td nowrap>relname、attname</td>
+  <td rowspan="2">Column</td></tr>
+<tr><td nowrap>schemaname、tablename、attname</td></tr>
+<tr><td rowspan="6" nowrap>Import</td>
+  <td nowrap>dbms_stats.import_database_stats</td>
+  <td nowrap>src</td>
+  <td nowrap>Database</td>
+  <td rowspan="6">void</td></tr>
+<tr><td nowrap>dbms_stats.import_schema_stats</td>
+  <td nowrap>schemaname、src</td>
+  <td>Schema</td></tr>
+<tr><td rowspan="2" nowrap>dbms_stats.import_table_stats</td>
+  <td nowrap>relname、src</td>
+  <td rowspan="2">Table</td></tr>
+<tr><td nowrap>schemaname、tablename、src</td></tr>
+<tr><td rowspan="2" nowrap>dbms_stats.import_column_stats</td>
+  <td nowrap>relname、attname、src</td>
+  <td rowspan="2">Column</td></tr>
+<tr><td nowrap>schemaname、tablename、attname、src</td></tr>
+<tr><td nowrap>Purge</td>
+  <td nowrap>dbms_stats.purge_stats</td>
+  <td nowrap>backup_id、force</td>
+  <td>Backup</td>
+  <td>dbms_stats.backup_history</td></tr>
+<tr><td nowrap>Cleanup</td>
+  <td nowrap>dbms_stats.clean_up_stats</td>
+  <td nowrap>(Nnne)</td>
+  <td nowrap>Database</td>
+  <td>text</td></tr>
+</tbody>
+</table>
+
+<p>The parameter name in the above table are below.</p>
+<table>
+<thead>
+<tr>
+<tr><th>Parameter</th><th>Data type</th><th>Description</th></tr>
+</tr>
+</thead>
+<tbody>
+<tr><td nowrap>schemaname</td>
+  <td nowrap>text</td>
+  <td>The name of the target schema</td></tr>
+<tr><td nowrap>relname</td>
+  <td nowrap>regclass</td>
+  <td>The name of the target table, prefixed by a schema name.</td></tr>
+<tr><td nowrap>tablename</td>
+  <td nowrap>text</td>
+  <td>The name of the target tble.</td></tr>
+<tr><td nowrap>attname</td>
+  <td nowrap>text</td>
+  <td>The name of the target column.</td></tr>
+<tr><td nowrap>comment</td>
+  <td nowrap>text</td>
+  <td>The comment to identify the backup.</td></tr>
+<tr><td nowrap>as_of_timestamp</td>
+  <td nowrap>timestamptz</td>
+  <td>The timestamp of the target time. The functions restore the latest backups before the target time. Does nothing if no appropriate backup for the object is found.</td></tr>
+<tr><td nowrap>src</td>
+  <td nowrap>text</td>
+  <td>The absolute path of the file to be imported.</td></tr>
+<tr><td nowrap>backup_id</td>
+  <td nowrap>bigint</td>
+  <td>The backup ID that identifies the target of restore or purge operations. Restores the backup identified by the id, or purges the identified backup and all backups older than it.
+</td></tr>
+<tr><td nowrap>force</td>
+  <td nowrap>bool</td>
+  <td>Set true to purge the all matching backups even if no backup will be left.
+    Leave the oldest database-wise backup and warn if false. Defaults to false.
+</td></tr>
+</tbody>
+</table>
+<p>The export function is in the shape of SQL file.
+<br>
+Following are the description on each SQL files. The default name for the output file is export_stats.dmp.</p>
+<table>
+<thead>
+<tr>
+<tr><th>File name</th><th>Output statictics</th><th>Description</th></tr>
+</tr>
+</thead>
+<tbody>
+<tr><td nowrap>export_effective_stats.&lt;PG ver&gt;.sql.sample</td>
+  <td nowrap>Statistics that planner actually sees</td>
+  <td>-</td></tr>
+<tr>
+  <td nowrap>export_plain_stats-&lt;PG ver&gt;.sql.sample</td>
+  <td nowrap>The real statistics</td>
+  <td>works without pg_dbms_stats installed</td></tr>
+</tbody>
+</table>
+
+<h2 id="table">Tables</h2>
+<p>pg_dbms_stats uses the following tables.</p>
+<table>
+<thead>
+<tr>
+<tr><th>Table name</th><th>Column name</th><th>Data type</th><th>Description</th></tr>
+</tr>
+</thead>
+<tbody>
+<tr><td rowspan="4" nowrap>dbms_stats.backup_history</td>
+  <td nowrap>id</td>
+  <td nowrap>int8</td>
+  <td>An ID given on taking the backup.</td></tr>
+<tr><td nowrap>time</td>
+  <td nowrap>timestamptz</td>
+  <td>The time of taking the backup</td></tr>
+<tr><td nowrap>unit</td>
+  <td nowrap>char(1)</td>
+  <td>Specified unit of the backup<br>
+d:database、s:schema、t:table、c:column</td></tr>
+<tr><td nowrap>comment</td>
+  <td nowrap>text</td>
+  <td>The comment given on taking the backup</td></tr>
+</tbody>
+</table>
+
+<h2 id="view">Views</h2>
+<p>pg_dbms_stats defines and uses the following views.</p>
+<table>
+<thead>
+<tr>
+<tr><th>View name</th><th>Description</th></tr>
+</tr>
+</thead>
+<tbody>
+<tr><td nowrap>dbms_stats.relation_stats_effective</td>
+  <td>The view used to internally retrieve table statistics passed to planner. Corresponds to pg_class catalog of PostgreSQL.</td></tr>
+<tr><td nowrap>dbms_stats.column_stats_effective</td>
+  <td>The view used to internally retrieve column statistics passed to planner. Corresponds to pg_statistic catalog of PostgreSQL.</td></tr>
+<tr><td nowrap>dbms_stats.stats</td>
+  <td>The view for users to see column statistics for planner. Corresponds to pg_stats view of PostgreSQL.</td></tr>
+</tbody>
+</table>
+
+<h2 id="seealso">関連項目</h2>
+<a href="http://www.postgresql.jp/document/current/html/app-psql.html">psql</a>,
+<a href="http://www.postgresql.jp/document/current/html/app-vacuumdb.html">vacuumdb</a>
+
+<hr />
+<p class="footer">Copyright (c) 2009-2017, NIPPON TELEGRAPH AND TELEPHONE CORPORATION</p>
+
+</body>
+</html>

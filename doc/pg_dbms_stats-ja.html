@@ -8,7 +8,7 @@
 </head>
 
 <body>
-<h1 id="pg_dbms_stats">pg_dbms_stats 1.3.7</h1>
+<h1 id="pg_dbms_stats">pg_dbms_stats 1.3.9</h1>
 <div class="navigation">
   <a href="pg_dbms_stats-ja.html">pg_dbms_stats</a>
 </div>
@@ -126,7 +126,7 @@
 <h3>3.6. クリーンアップ</h3>
 <dl>
 <dt>概要</dt>
-<dd>PostgreSQL本来の実行計画選択基準に戻すために、統計情報の固定状態を解除します。</dd>
+<dd>すでに存在しないオブジェクトの統計情報を削除します。</dd>
 <dt>利用方法</dt>
 <dd>clean_up_stats()というSQL関数を実行</dd>
 <dt>詳細</dt>
@@ -188,7 +188,7 @@ $ su
 
 <h3>4.3. pg_dbms_statsのロード</h3>
 <p>pg_dbms_statsを有効にするには、以下の例のようにpg_dbms_statsの共有ライブラリをロードしてください。
-全てのセッションでpg_dbms_statsを有効にするには、postgresql.confのshared_preload_libraries GUCパラメータに'pg_dbms_stats'を追加してからサーバを再起動して下さい。
+全てのセッションでpg_dbms_statsを有効にするには、postgresql.confのshared_preload_libraries GUCパラメータに'pg_dbms_stats'を追加してから設定をリロードして下さい。
 <pre>postgres=# LOAD 'pg_dbms_stats';
 LOAD
 postgres=#</pre>
@@ -218,13 +218,7 @@ test=# SELECT * FROM test; -- ダミー統計情報でプランを作成
 </pre>
 </p>
 
-<p>全てのセッションでpg_dbms_statsを無効にするには、postgresql.confでpg_dbms_stats.use_locked_statsをoffに設定してからサーバを再起動して下さい。
-PostgreSQL 9.1の環境でpg_dbms_stats.use_locked_statsをpostgresql.confファイルで設定するためには<a href="http://www.postgresql.jp/document/9.1/html/runtime-config-custom.html#GUC-CUSTOM-VARIABLE-CLASSES">custom_variable_classes</a>にpg_dbms_statsを加える必要があります。
-<pre># postgresql.conf
-shared_preload_libraries = 'pg_dbms_stats'
-custom_variable_classes = 'pg_dbms_stats'	# 9.2以降は廃止されたため記述不要
-pg_dbms_stats.use_locked_stats = off</pre>
-PostgreSQL 9.2以降ではcustom_variable_classesは廃止されているため、pg_dbms_stats.use_locked_statsを標準のGUCパラメータと同様に記述することができます。
+<p>全てのセッションでpg_dbms_statsを無効にするには、postgresql.confでpg_dbms_stats.use_locked_statsをoffに設定してから設定をリロードしてください。PG9.4以降では ALTER SYSTEM が利用可能です。
 </p>
 
 <h2 id="uninstall">5. アンインストール</h2>
@@ -346,24 +340,20 @@ test=#</pre>
 <dt>統計情報のバックアップ契機</dt>
 <dd>ANALYZEコマンドや統計情報の書き換えをトリガとして統計情報をバックアップすることはできません。
 ジョブ管理ツールから定期的に統計情報をバックアップするか、autovacuum の ANALYZE を無効化し、統計情報のバックアップと取得をセットのジョブとして実行してください。</dd>
-<dt>ツールの用途</dt>
-<dd>このモジュールは過去の統計情報を再現するものであり、新しい実行計画を試すチューニングには利用できません。</dd>
-<dt>GUCパラメータの影響</dt>
-<dd>このツールは、実行計画に影響する要素のうち統計情報のみを保存するため、実行計画の生成に関する<a href="http://www.postgresql.jp/document/current/html/runtime-config-query.html">GUCパラメータ</a>が変更された場合は、統計情報を固定していても実行計画が変化する場合があります。</dd>
-<dt>フック関数を使うツールとの競合</dt>
-<dd>pg_dbms_statsでは、以下のフック関数を使用しています。
+<dt>実行計画が変化する他の要因</dt>
+<dd>このツールは、実行計画に影響する要素のうち統計情報のみを保存するため、実行計画の生成に関する<a href="http://www.postgresql.jp/document/current/html/runtime-config-query.html">GUCパラメータ</a>の変更やテーブルの行密度の大きな変化などにより、統計情報を固定していても実行計画が変化する場合があります。</dd>
+<dt>フックを使うツールとの競合</dt>
+<dd>pg_dbms_statsでは、以下のフックを使用しているため、同じフックを使用する他のツールと競合する可能性があります。
 <ul>
-<li>get_relation_info_hook: 既存のフック関数を呼び出した後に独自処理</li>
-<li>get_attavgwidth_hook: 既存のフック関数を呼び出さずに独自処理</li>
-<li>get_relation_stats_hook: 既存のフック関数を呼び出さずに独自処理</li>
-<li>get_index_stats_hook: 既存のフック関数を呼び出さずに独自処理</li>
+<li>get_relation_info_hook</li>
+<li>get_attavgwidth_hook</li>
+<li>get_relation_stats_hook</li>
+<li>get_index_stats_hook</li>
 </ul>
-get_relation_info_hookを使用するツールについては、pg_dbms_statsを後からロードすることで併用可能ですが、残りの三つのフック関数を使用している外部ツールは併用しないでください。
-なお、フック関数とはプランナやエグゼキュータ等のPostgreSQL本体の処理に外部ツールが割り込むために使用する関数です。
 </dd>
 <dt>ダンプ・リストア時の注意点</dt>
 <dd>
-pg_dbms_statsは、列単位の統計情報をユーザ定義テーブルで保持する列に独自に定義したanyarray型を使用しています。この列の値をテキスト形式でダンプするとデータ型の情報が失われるため、リストア時にエラーが発生します。リストア時にエラーが発生します。pg_dbms_statsのオブジェクトを含むダンプ/リストアは、以下の手順で実施してください。
+pg_dbms_statsは、列単位の統計情報をユーザ定義テーブルで保持する列に独自に定義したanyarray型を使用しています。この列の値をテキスト形式でダンプするとデータ型の情報が失われるため、リストア時にエラーが発生します。pg_dbms_statsのオブジェクトを含むダンプ/リストアは、以下の手順で実施してください。
 <ol>
 <li>「COPY &ltdbms_statsスキーマが持つテーブル名&gt TO '&ltファイル名&gt' FORMAT binary;」 でpg_dbms_stats が管理している統計情報を &ltファイル名&gtにバイナリ形式で保存します。</li>
 <li>「pgdump --exclude-schema 'dbms_stats' &lt旧データベース名&gt  &gt &ltダンプファイル名&gt」 で dbms_stats スキーマを除いてダンプします。</li>
@@ -372,24 +362,6 @@ pg_dbms_statsは、列単位の統計情報をユーザ定義テーブルで保�
 <li>「COPY &ltdbms_statsスキーマが持つテーブル名&gt FROM '&ltファイル名&gt' FORMAT binary;」 で&ltファイル名&gtに保存されている統計情報をdbms_statsスキーマが持つテーブルに保存します。</li>
 </ol>
 </dd>
-<dt>同時実行が不可能な機能</dt>
-<dd>以下の機能は、ダミー統計情報の格納テーブルをテーブルロックします。そのため、先に実行した処理を終了する前に別の処理を実行した場合、先に実行した処理の終了を待ってから残りの処理を開始します。
-<ul>
-<li>リストア</li>
-<li>ロック</li>
-<li>ロック解除</li>
-<li>インポート</li>
-<li>クリーンアップ</li>
-</ul>
-また、以下の機能は、統計情報バックアップの格納テーブルをテーブルロックします。そのため、先に実行した処理が終了する前に次の機能を実行した場合、先に実行した処理の終了を待ってから残りの処理を開始します。
-<ul>
-<li>パージ</li>
-</ul>
-</dd>
-<dt>オブジェクト削除時の注意点</dt>
-<dd>テーブルや列などのオブジェクトを削除する場合は、ロック解除機能やパージ機能を使ってpg_dbms_stats独自の統計情報を先に削除してください。オブジェクトを先に削除した場合は、削除したオブジェクトのpg_dbms_stats独自の統計情報をクリーンアップ機能を使って削除してください。なお、ロック以外にも、リストアやインポートを実行した場合もpg_dbms_stats独自の統計情報が作成されます。</dd>
-</dl>
-
 <h2 id="details">8. 詳細</h2>
 <h3>8.1. 全体構成</h3>
 <p>pg_dbms_statsは、ANALYZEで作成された統計情報の代わりに pg_dbms_stats が保持する独自の統計情報を PostgreSQL に使わせることで実行計画を制御します。使用する統計情報は、以下のいずれかの方法で選択できます。
@@ -414,24 +386,6 @@ pg_dbms_statsは、列単位の統計情報をユーザ定義テーブルで保�
 
 <h3>8.2. pg_dbms_statsのユーザインターフェース</h3>
 <p>pg_dbms_statsの各機能は、前節で説明した独自の統計情報テーブルの内容をSQL文で更新することで実現されています。ただし、ユーザが直接SQL文を実行すると操作ミスによる削除やデータ不整合などが起こりうるため、ユーザインターフェースとして各機能に対応するSQL関数を提供しており、これらを使っての操作が強く推奨されています。</p>
-
-<h3>8.3. autovacuum による ANALYZE の無効化について</h3>
-<p>pg_dbms_stats は ANALYZE を無効化も禁止もしません。
-ANALYZE は pg_statistic システムカタログを変更しますが、最終的に pg_dbms_stats の独自統計情報で値を隠されます。
-効果の無い ANALYZE を繰り返すのは資源の無駄と考えるのであれば、autovacuum による ANALYZE を無効化してください。
-無効化は、下記のように ANALYZE の必要性判定の閾値を上げることで行います。
-ただし、無効化しなくても異常な動作をすることはありません。</p>
-
-<p>全体設定の場合</p>
-<pre># postgresql.conf
-autovacuum_analyze_threshold = 100000
-autovacuum_analyze_scale_factor = 100
-</pre>
-
-<p>個別設定の場合</p>
-<pre>test=# ALTER TABLE tbl SET (
-  autovacuum_analyze_threshold = 100000,
-  autovacuum_analyze_scale_factor = 100);</pre>
 
 <h3>8.3. ロックする統計情報について</h3>
 <p>実行計画を作成する際、クエリ・オプティマイザは以下の統計情報または実際のデータの状態に基づいてコストを計算します。pg_dbms_stats は、これら全ての情報をロックすることができます。実際のファイルサイズが変化しても、ロックしたときのファイルサイズを継続して参照します。</p>

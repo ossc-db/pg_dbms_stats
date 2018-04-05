@@ -18,6 +18,7 @@
 #include "executor/spi.h"
 #include "funcapi.h"
 #include "optimizer/plancat.h"
+#include "optimizer/planner.h"
 #include "parser/parse_oper.h"
 #include "parser/parsetree.h"
 #include "storage/bufmgr.h"
@@ -79,15 +80,14 @@ static	bool set_acl_ok = false;
 typedef struct StatsRelationEntry
 {
 	Oid					relid;		/* hash key must be at the head */
-
 	bool				valid;		/* T if the entry has valid stats */
-
+	bool				invalidated; /* T if this relation has been
+									  * invalidated */
 	BlockNumber			relpages;	/* # of pages as of last ANALYZE */
 	double				reltuples;	/* # of tuples as of last ANALYZE */
 	BlockNumber			relallvisible;	/* # of all-visible pages as of last
 										 * ANALYZE */
 	BlockNumber			curpages;	/* # of pages as of lock/restore */
-
 	List			   *col_stats;	/* list of StatsColumnEntry, each element
 									   of which is pg_statistic record of this
 									   relation. */
@@ -110,6 +110,7 @@ get_relation_info_hook_type		prev_get_relation_info = NULL;
 get_attavgwidth_hook_type		prev_get_attavgwidth = NULL;
 get_relation_stats_hook_type	prev_get_relation_stats = NULL;
 get_index_stats_hook_type		prev_get_index_stats = NULL;
+planner_hook_type				prev_planner_hook = NULL;
 
 /* namings */
 #define NSPNAME "dbms_stats"
@@ -140,8 +141,10 @@ static int			nested_level = 0;
 
 /*
  * The relation_stats_effective statistic cache is stored in hash table.
+ * rel_invalidated is set true if the hash has invalidated entries.
  */
 static HTAB	   *rel_stats;
+static bool		rel_invalidated = false;
 
 /*
  * The owner of pg_dbms_stats statistic tables.
@@ -179,6 +182,7 @@ static void dbms_stats_invalidate_cache_internal(Oid relid, bool sta_col);
 void	_PG_init(void);
 void	_PG_fini(void);
 
+/* hook functions */
 static void dbms_stats_get_relation_info(PlannerInfo *root, Oid relid,
 	bool inhparent, RelOptInfo *rel);
 static int32 dbms_stats_get_attavgwidth(Oid relid, AttrNumber attnum);
@@ -186,7 +190,10 @@ static bool dbms_stats_get_relation_stats(PlannerInfo *root, RangeTblEntry *rte,
 	AttrNumber attnum, VariableStatData *vardata);
 static bool dbms_stats_get_index_stats(PlannerInfo *root, Oid indexOid,
 	AttrNumber indexattnum, VariableStatData *vardata);
+static PlannedStmt *dbms_stats_planner(Query *parse, int cursorOptions,
+									   ParamListInfo boundParams);
 
+/* internal functions */
 static void get_merged_relation_stats(Oid relid, BlockNumber *pages,
 	double *tuples, double *allvisfrac, bool estimate);
 static int32 get_merged_avgwidth(Oid relid, AttrNumber attnum);
@@ -198,9 +205,11 @@ static HeapTuple column_cache_enter(Oid relid, int32 attnum, bool inh,
 									HeapTuple tuple);
 static bool execute_plan(SPIPlanPtr *plan, const char *query, Oid relid,
 	const AttrNumber *attnum, bool inh);
-static void StatsCacheRelCallback(Datum arg, Oid relid);
+static void statscache_rel_callback(Datum arg, Oid relid);
+static void cleanup_invalidated_cache(void);
 static void init_rel_stats(void);
 static void init_rel_stats_entry(StatsRelationEntry *entry, Oid relid);
+
 /* copied from PG core source tree */
 static void dbms_stats_estimate_rel_size(Relation rel, int32 *attr_widths,
 				  BlockNumber *pages, double *tuples, double *allvisfrac,
@@ -276,12 +285,14 @@ _PG_init(void)
 	get_relation_stats_hook = dbms_stats_get_relation_stats;
 	prev_get_index_stats = get_index_stats_hook;
 	get_index_stats_hook = dbms_stats_get_index_stats;
+	prev_planner_hook = planner_hook;
+	planner_hook = dbms_stats_planner;
 
 	/* Initialize hash table for statistics caching. */
 	init_rel_stats();
 
 	/* Also set up a callback for relcache SI invalidations */
-	CacheRegisterRelcacheCallback(StatsCacheRelCallback, (Datum) 0);
+	CacheRegisterRelcacheCallback(statscache_rel_callback, (Datum) 0);
 }
 
 /*
@@ -295,6 +306,7 @@ _PG_fini(void)
 	get_attavgwidth_hook = prev_get_attavgwidth;
 	get_relation_stats_hook = prev_get_relation_stats;
 	get_index_stats_hook = prev_get_index_stats;
+	planner_hook = prev_planner_hook;
 
 	/* A function to unregister callback for relcache is NOT provided. */
 }
@@ -1007,7 +1019,7 @@ dbms_stats_get_index_stats(PlannerInfo *root,
 
 		/*
 		 * scan over simple_rel_array_size to find the owner relation of the
-		 * index that its oid is indexOid
+		 * index with the oid
 		 */
 		for (i = 1 ; i < root->simple_rel_array_size ; i++)
 		{
@@ -1047,6 +1059,29 @@ next_plugin:
 	else
 		return false;
 }
+
+
+/*
+ * dbms_stats_planner
+ *   Hook function for planner_hook which cleans up invalidated statistics.
+ */
+static PlannedStmt *
+dbms_stats_planner(Query *parse, int cursorOptions, ParamListInfo boundParams)
+{
+	PlannedStmt *ret;
+
+	cleanup_invalidated_cache();
+
+	if (prev_planner_hook)
+		ret = (*prev_planner_hook) (parse, cursorOptions, boundParams);
+	else
+		ret = standard_planner(parse, cursorOptions, boundParams);
+
+	cleanup_invalidated_cache();
+
+	return ret;
+}
+
 
 /*
  * Extract binary value from given column.
@@ -1476,46 +1511,91 @@ execute_plan(SPIPlanPtr *plan,
 }
 
 /*
- * StatsCacheRelCallback
+ * statscache_rel_callback
  *		Relcache inval callback function
  *
- * Invalidate cached statistic info of the given relid, or all cached statistic
- * info if relid == InvalidOid.  We don't complain even when we don't have such
- * statistics.
- *
- * Note: arg is not used.
+ * Invalidates cached statistics of the given relid, or all cached statistics
+ * if relid == InvalidOid. The statsTuple in the hash entries are directly
+ * passed to planner so we cannot remove them until planner ends. Just mark
+ * here then cleanup after planner finishes work.
  */
 static void
-StatsCacheRelCallback(Datum arg, Oid relid)
+statscache_rel_callback(Datum arg, Oid relid)
+{
+	StatsRelationEntry *entry;
+
+	if (relid != InvalidOid)
+	{
+		bool found;
+
+		/*
+		 * invalidate the entry for the specfied relation. Don't mind if found.
+		 */
+		entry = hash_search(rel_stats, &relid, HASH_FIND, &found);
+		if (found)
+		{
+			entry->invalidated = true;
+			rel_invalidated = true;
+		}
+	}
+	else
+	{
+		/* invalidate all the entries of the hash */
+		HASH_SEQ_STATUS		status;
+
+		hash_seq_init(&status, rel_stats);
+		while ((entry = hash_seq_search(&status)) != NULL)
+		{
+			entry->invalidated = true;
+			rel_invalidated = true;
+		}
+	}
+}
+
+/*
+ * cleanup_invalidated_cache()
+ *		Cleanup invalidated stats cache
+ *
+ * removes invalidated cache entries.
+ */
+static void
+cleanup_invalidated_cache(void)
 {
 	HASH_SEQ_STATUS		status;
 	StatsRelationEntry *entry;
 
+	/* Return immediately if nothing to do */
+	if (!rel_invalidated)
+		return;
+
+	/*
+	 * Reset rel_invalidated first so that we don't lose invalidations that
+	 * happens during this round of cleanup.
+	 */
+	rel_invalidated = false;
+
 	hash_seq_init(&status, rel_stats);
 	while ((entry = hash_seq_search(&status)) != NULL)
 	{
-		if (relid == InvalidOid || relid == entry->relid)
+		ListCell	*lc;
+
+		if (!entry->invalidated)
+			continue;
+
+		/* Discard every column statistics */
+		foreach (lc, entry->col_stats)
 		{
-			ListCell *lc;
+			StatsColumnEntry *ent = (StatsColumnEntry*) lfirst(lc);
 
-			/* Mark the relation entry as INVALID */
-			entry->valid = false;
-
-			/* Discard every column statistics */
-			foreach (lc, entry->col_stats)
-			{
-				StatsColumnEntry *ent = (StatsColumnEntry*) lfirst(lc);
-
-				if (!ent->negative)
-					pfree(ent->tuple);
-				pfree(ent);
-			}
-			list_free(entry->col_stats);
-			entry->col_stats = NIL;
+			if (!ent->negative)
+				pfree(ent->tuple);
+			pfree(ent);
 		}
-	}
+		list_free(entry->col_stats);
 
-	/* We always check throughout the list, so hash_seq_term is not necessary */
+		/* Finally remove the hash entry. */
+		hash_search(rel_stats, &entry->relid, HASH_REMOVE, NULL);
+	}
 }
 
 /*
@@ -1552,6 +1632,7 @@ init_rel_stats_entry(StatsRelationEntry *entry, Oid relid)
 {
 	entry->relid = relid;
 	entry->valid = false;
+	entry->invalidated = false;
 	entry->relpages = InvalidBlockNumber;
 	entry->reltuples = 0.0;
 	entry->relallvisible = InvalidBlockNumber;

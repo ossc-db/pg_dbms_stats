@@ -1,7 +1,7 @@
 /*
  * dump.c
  *
- * Copyright (c) 2009-2017, NIPPON TELEGRAPH AND TELEPHONE CORPORATION
+ * Copyright (c) 2009-2018, NIPPON TELEGRAPH AND TELEPHONE CORPORATION
  * Portions Copyright (c) 1996-2013, PostgreSQL Global Development Group
  * Portions Copyright (c) 1994, Regents of the University of California
  */

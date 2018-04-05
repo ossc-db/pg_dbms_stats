@@ -1,3 +1,5 @@
+(This file is obsolete. Please see commit messages instead.)
+
 2014-11-13 Kyotaro Horiguchi <horiguchi.kyotaro@lab.ntt.co.jp>
 	* pg_dbms_stats.c: Fixed a bug that locked statistics won't be
 	effective when accessing tables without select privilege via

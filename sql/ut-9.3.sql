@@ -1264,7 +1264,7 @@ DROP TABLE s1.st0;
 
 SELECT count(*) FROM dbms_stats.relation_stats_locked;
 SELECT count(*) FROM dbms_stats.column_stats_locked;
-CREATE TABLE s1.st0(id integer, num integer);
+CREATE TABLE s1.st0(id integer, num integer) WITH (autovacuum_enabled = 'false');
 INSERT INTO s1.st0 VALUES (1, 15), (2, 25), (3, 35), (4, 45);
 VACUUM ANALYZE;
 -- No.9-1-16
@@ -2752,7 +2752,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 SET pg_dbms_stats.use_locked_stats TO on;
-CREATE TABLE s0.st4 (a text);
+CREATE TABLE s0.st4 (a text) WITH (autovacuum_enabled = 'false');
 INSERT INTO s0.st4 SELECT '1' || md5(g::text) FROM generate_series(1, 10000) as g;
 VACUUM ANALYZE s0.st4;
 -- should estimate that rows = 1, not 5000
@@ -2768,7 +2768,7 @@ SELECT dbms_stats.clean_up_stats();
 /*
  * No.15-2 Ditto for index stats
  */
-CREATE TABLE s0.st4 (a double precision);
+CREATE TABLE s0.st4 (a double precision) WITH (autovacuum_enabled = 'false');
 CREATE INDEX on s0.st4 (floor(log(a)));
 SELECT dbms_stats.lock_table_stats('s0.st4');
 INSERT INTO s0.st4 (SELECT a from GENERATE_SERIES(1, 99999) a);
@@ -2783,7 +2783,7 @@ SELECT dbms_stats.clean_up_stats();
 
 -- No.16 error description. -- abnormal case.
 RESET SESSION AUTHORIZATION;
-CREATE TABLE s0.st4 (a int, b text);
+CREATE TABLE s0.st4 (a int, b text) WITH (autovacuum_enabled = 'false');
 CREATE VIEW s0.vst4 AS select * FROM s0.st4;
 GRANT SELECT ON s0.vst4 TO regular_user;
 
@@ -2801,7 +2801,7 @@ DROP TABLE s0.st4 CASCADE;
  * No.20-1 confirm change at 1.3.5. Moved from ut-common.sql at 1.3.11
  */
 SELECT CURRENT_USER;
-CREATE TABLE s0.st4 (a int, b text);
+CREATE TABLE s0.st4 (a int, b text) WITH (autovacuum_enabled = 'false');
 CREATE INDEX i_st4_a on s0.st4 (a);
 CREATE VIEW s0.vst4 AS select * FROM s0.st4;
 GRANT SELECT ON s0.vst4 TO regular_user;

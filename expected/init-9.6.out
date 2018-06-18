@@ -99,7 +99,7 @@ CREATE TABLE dbms_stats.work (
   stavalues3       dbms_stats.anyarray,
   stavalues4       dbms_stats.anyarray
  ,stavalues5       dbms_stats.anyarray
-);
+) WITH (autovacuum_enabled = 'false');
 CREATE VIEW work_v AS
 SELECT nspname, relname, relpages, reltuples, relallvisible,
        curpages, attname, nspname_of_typename, typname, atttypmod,

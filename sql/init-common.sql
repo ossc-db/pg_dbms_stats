@@ -17,18 +17,18 @@ DROP ROLE IF EXISTS super_user;
 CREATE ROLE super_user SUPERUSER CREATEDB CREATEROLE INHERIT LOGIN;
 
 -- create object
-CREATE TABLE pt0(id integer, day date);
+CREATE TABLE pt0(id integer, day date) WITH (autovacuum_enabled = 'false');
 CREATE INDEX pt0_idx ON pt0(id);
-CREATE TABLE st0(id integer, name char(5));
+CREATE TABLE st0(id integer, name char(5)) WITH (autovacuum_enabled = 'false');
 CREATE INDEX st0_idx ON st0(id);
-CREATE TABLE st1(val integer, str text);
+CREATE TABLE st1(val integer, str text) WITH (autovacuum_enabled = 'false');
 
 CREATE SCHEMA s0;
-CREATE TABLE s0.st0(id integer, num integer);
+CREATE TABLE s0.st0(id integer, num integer) WITH (autovacuum_enabled = 'false');
 CREATE INDEX st0_idx ON s0.st0(id);
-CREATE TABLE s0.st1() INHERITS(s0.st0);
+CREATE TABLE s0.st1() INHERITS(s0.st0) WITH (autovacuum_enabled = 'false');
 CREATE INDEX st1_idx ON s0.st1(id);
-CREATE TABLE s0.st2(id integer, txt text);
+CREATE TABLE s0.st2(id integer, txt text) WITH (autovacuum_enabled = 'false');
 CREATE INDEX st2_idx ON s0.st2(id);
 CREATE VIEW sv0 AS
     SELECT st0.id, st0.num, st2.txt
@@ -38,7 +38,7 @@ CREATE TYPE s0.sc0 AS (num integer, txt text);
 CREATE SEQUENCE s0.ss0 START 1;
 
 CREATE SCHEMA s1;
-CREATE TABLE s1.st0(id integer, num integer);
+CREATE TABLE s1.st0(id integer, num integer) WITH (autovacuum_enabled = 'false');
 CREATE SCHEMA s2;
 
 GRANT USAGE ON SCHEMA s0 TO regular_user;

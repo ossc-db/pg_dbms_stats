@@ -51,7 +51,8 @@ DELETE FROM dbms_stats.relation_stats_locked;
 /*
  * No.4-1 DATA TYPE dbms_stats.anyarray
  */
-CREATE TABLE st3(id integer, name char(1000), num_arr char(5)[]);
+CREATE TABLE st3(id integer, name char(1000), num_arr char(5)[])
+ WITH (autovacuum_enabled = 'false');
 INSERT INTO st3 SELECT i, i , ARRAY[i::char, 'a'] FROM generate_series(1,10) g(i);
 ANALYZE st3;
 SELECT staattnum, stavalues1 FROM pg_statistic
@@ -59,7 +60,8 @@ SELECT staattnum, stavalues1 FROM pg_statistic
  ORDER BY staattnum;
 \copy (SELECT stavalues1::dbms_stats.anyarray FROM dbms_stats.column_stats_effective WHERE starelid = 'st3'::regclass ORDER BY staattnum) TO 'results/anyarray_test.cp' binary
 SET client_min_messages TO WARNING;
-CREATE TABLE st4 (arr dbms_stats.anyarray, ord serial);
+CREATE TABLE st4 (arr dbms_stats.anyarray, ord serial)
+ WITH (autovacuum_enabled = 'false');
 SET client_min_messages TO DEFAULT;
 
 SELECT t.typname, n.nspname,
@@ -368,7 +370,7 @@ EXPLAIN (costs false) SELECT * FROM st1 WHERE val IS NULL;
 SELECT dbms_stats.unlock_database_stats();
 
 -- No.5-4-5
-CREATE TABLE s0.droptest(id integer);
+CREATE TABLE s0.droptest(id integer) WITH (autovacuum_enabled = 'false');
 INSERT INTO s0.droptest VALUES (1),(2),(3);
 VACUUM ANALYZE;
 SELECT * FROM s0.droptest
@@ -1070,7 +1072,8 @@ ALTER FUNCTION dbms_stats.truth_func_restore(int8, regclass, text)
 /*
  * No.18-1 dbms_stats.clean_up_stats
  */
-CREATE TABLE clean_test(id integer, num integer);
+CREATE TABLE clean_test(id integer, num integer)
+ WITH (autovacuum_enabled = 'false');
 INSERT INTO clean_test SELECT i, i FROM generate_series(1,10) t(i);
 ANALYZE clean_test;
 -- No.18-1-1
@@ -1101,7 +1104,8 @@ SELECT count(*) FROM dbms_stats.relation_stats_locked;
 SELECT dbms_stats.clean_up_stats() ORDER BY 1;
 SELECT count(*) FROM dbms_stats.relation_stats_locked;
 -- No.18-1-6
-CREATE TABLE clean_test(id integer, num integer);
+CREATE TABLE clean_test(id integer, num integer)
+ WITH (autovacuum_enabled = 'false');
 INSERT INTO clean_test SELECT i, i FROM generate_series(1,10) t(i);
 ANALYZE clean_test;
 SELECT dbms_stats.lock_table_stats('clean_test');
@@ -1168,7 +1172,8 @@ RESET SESSION AUTHORIZATION;
 /*
  * No.21 anyarray stuff
  */
-CREATE TABLE st_ary (i int, f float, d timestamp without time zone);
+CREATE TABLE st_ary (i int, f float, d timestamp without time zone)
+ WITH (autovacuum_enabled = 'false');
 INSERT INTO st_ary
  (SELECT a, random(), '2016-3-25 00:00:00'::date + (a || 'day')::interval
   FROM generate_series(0, 9999) a);

@@ -2796,3 +2796,34 @@ EXPLAIN (COSTS OFF) SELECT * FROM s0.vst4 WHERE a = 1;
 \c - super_user
 ALTER TABLE dbms_stats.relation_stats_locked OWNER TO super_user;
 DROP TABLE s0.st4 CASCADE;
+
+/*
+ * No.20-1 confirm change at 1.3.5. Moved from ut-common.sql at 1.3.11
+ */
+SELECT CURRENT_USER;
+CREATE TABLE s0.st4 (a int, b text);
+CREATE INDEX i_st4_a on s0.st4 (a);
+CREATE VIEW s0.vst4 AS select * FROM s0.st4;
+GRANT SELECT ON s0.vst4 TO regular_user;
+INSERT INTO s0.st4 (SELECT a, a::text FROM generate_series(0, 999) a);
+ANALYZE s0.st4;
+SELECT dbms_stats.lock('s0.st4');
+DELETE FROM s0.st4;
+INSERT INTO s0.st4 (SELECT 1, a::text FROM generate_series(0, 999) a);
+ANALYZE s0.st4;
+
+EXPLAIN (COSTS OFF) SELECT * FROM s0.vst4 WHERE a = 1;
+EXPLAIN (COSTS OFF) SELECT * FROM s0.st4  WHERE a = 1;
+
+SET SESSION AUTHORIZATION regular_user;
+
+EXPLAIN (COSTS OFF) SELECT * FROM s0.st4  WHERE a = 1;
+EXPLAIN (COSTS OFF) SELECT * FROM s0.vst4 WHERE a = 1;
+
+SET pg_dbms_stats.use_locked_stats TO off;
+EXPLAIN (COSTS OFF) SELECT * FROM s0.vst4 WHERE a = 1;
+\c - super_user
+ALTER TABLE dbms_stats.relation_stats_locked OWNER TO super_user;
+
+SELECT dbms_stats.unlock('s0.st4');
+DROP TABLE s0.st4 CASCADE;

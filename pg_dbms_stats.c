@@ -76,6 +76,18 @@ static	bool set_acl_ok = false;
 #define get_attrs(pgatt_attrs) (pgatt_attrs)
 #endif
 
+/*
+ * get_attrs and heap_attisnull are modifed as of PG11. They behave in the same
+ * way beyond the modification as long as nullok == true and desc == NULL
+ * respectively.
+ */
+#if PG_VERSION_NUM < 110000
+#define get_attname(rid, attnum, nullok) \
+	(AssertMacro((nullok) == true), get_attname((rid), (attnum)))
+#define heap_attisnull(tup, attnum, desc) \
+	(AssertMacro((desc) == NULL), heap_attisnull((tup), (attnum)))
+#endif
+
 /* Relation statistics cache entry */
 typedef struct StatsRelationEntry
 {
@@ -521,7 +533,8 @@ dbms_stats_merge_internal(HeapTuple lhs, HeapTuple rhs, TupleDesc tupdesc)
 						(errmsg("pg_dbms_stats: bad statistics"),
 						 errdetail("column \"%s\" should not be null",
 							get_attname(StatisticRelationId,
-									get_attrs(tupdesc->attrs[i])->attnum))));
+										get_attrs(tupdesc->attrs[i])->attnum,
+										true))));
 					return NULL;	/* should not be null */
 				}
 			}
@@ -548,7 +561,8 @@ dbms_stats_merge_internal(HeapTuple lhs, HeapTuple rhs, TupleDesc tupdesc)
 							(errmsg("pg_dbms_stats: bad statistics"),
 							 errdetail("column \"%s\" should not be null",
 								get_attname(StatisticRelationId,
-									get_attrs(tupdesc->attrs[i])->attnum))));
+									get_attrs(tupdesc->attrs[i])->attnum,
+									true))));
 						return NULL;	/* should not be null */
 					}
 				}
@@ -589,7 +603,7 @@ dbms_stats_merge_internal(HeapTuple lhs, HeapTuple rhs, TupleDesc tupdesc)
 					values[Anum_pg_statistic_stavalues1 + i - 1]);
 			if (arr == NULL || arr->elemtype != atttype)
 			{
-				const char	   *attname = get_attname(relid, attnum);
+				const char	   *attname = get_attname(relid, attnum, true);
 
 				/*
 				 * relid and attnum must be valid here because valid atttype
@@ -719,7 +733,7 @@ dbms_stats_invalidate_cache_internal(Oid relid, bool sta_col)
 		if (sta_col &&
 			rel->rd_rel->relkind == RELKIND_INDEX &&
 			(rel->rd_indextuple == NULL ||
-			 heap_attisnull(rel->rd_indextuple, Anum_pg_index_indexprs)))
+			 heap_attisnull(rel->rd_indextuple, Anum_pg_index_indexprs, NULL)))
 			ereport(ERROR,
 					(errcode(ERRCODE_WRONG_OBJECT_TYPE),
 					 errmsg("\"%s\" is an index except an index expression",
@@ -1407,7 +1421,7 @@ column_cache_enter(Oid relid, int32 attnum, bool inh, HeapTuple tuple)
 	StatsRelationEntry *entry;
 	bool			found;
 
-	Assert(tuple == NULL || !heap_attisnull(tuple, 1));
+	Assert(tuple == NULL || !heap_attisnull(tuple, 1, NULL));
 
 	entry = hash_search(rel_stats, &relid, HASH_ENTER, &found);
 	if (!found)

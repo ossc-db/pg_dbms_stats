@@ -1457,7 +1457,6 @@ execute_plan(SPIPlanPtr *plan,
 	Oid		argtypes[3] = { OIDOID, INT2OID, BOOLOID };
 	int		nargs;
 	Datum	values[3];
-	bool	nulls[3] = { false, false, false };
 	Oid			save_userid;
 	int			save_sec_context;
 
@@ -1490,7 +1489,7 @@ execute_plan(SPIPlanPtr *plan,
 		values[1] = Int16GetDatum(attnum ? *attnum : 0);
 		values[2] = BoolGetDatum(inh);
 
-		ret = SPI_execute_plan(*plan, values, nulls, true, 1);
+		ret = SPI_execute_plan(*plan, values, NULL, true, 1);
 	}
 	PG_CATCH();
 	{

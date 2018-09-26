@@ -1038,8 +1038,13 @@ dbms_stats_get_index_stats(PlannerInfo *root,
 		for (i = 1 ; i < root->simple_rel_array_size ; i++)
 		{
 			ListCell *lc;
+			RelOptInfo *rel = root->simple_rel_array[i];
 
-			foreach (lc, root->simple_rel_array[i]->indexlist)
+			/* there may be empty slots corresponding to non-baserel RTEs  */
+			if (rel == NULL)
+				continue;
+
+			foreach (lc, rel->indexlist)
 			{
 				IndexOptInfo *index = (IndexOptInfo *) lfirst(lc);
 				RangeTblEntry *rte;

@@ -1167,6 +1167,21 @@ SELECT count(*) FROM dbms_stats.column_stats_locked WHERE false;
 SELECT count(*) FROM dbms_stats.stats WHERE false;
 RESET SESSION AUTHORIZATION;
 
+/*
+ * No.19-2 regression for skipping empty simple_rel_array entry
+ */
+CREATE TABLE t1 (a int, b int);
+CREATE TABLE t2 (a int);
+CREATE INDEX t1_a10_idx on t1 ((a % 10));
+INSERT INTO t1 (SELECT a, a FROM generate_series(0, 9999) a);
+INSERT INTO t2 VALUES (1), (3), (7), (8);
+ANALYZE t1;
+SELECT dbms_stats.lock_table_stats('t1');
+EXPLAIN (COSTS off)
+ SELECT * FROM t1 JOIN t2 on (t1.a % 10 = t2.a); -- Don't crash!
+DROP TABLE t1, t2;
+SELECT dbms_stats.clean_up_stats() ORDER BY 1;
+
 -- No.20 has been moved out to ut-xx.sql
 
 /*

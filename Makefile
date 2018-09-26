@@ -1,6 +1,6 @@
 # pg_dbms_stats/Makefile
 
-DBMSSTATSVER = 1.3.10
+DBMSSTATSVER = 1.3.11
 PGVERS = 93 94 95 96 10
 IS_PRE_95 = $(filter 0,$(shell test "`echo "$(MAJORVERSION2)" | cut -c 1`" == "9" -a "$(MAJORVERSION2)" \< "9.5"; echo $$?))
 

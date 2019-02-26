@@ -1,13 +1,11 @@
 # pg_dbms_stats/Makefile
 
-DBMSSTATSVER = 1.3.11
-PGVERS = 93 94 95 96 10
-IS_PRE_95 = $(filter 0,$(shell test "`echo "$(MAJORVERSION2)" | cut -c 1`" == "9" -a "$(MAJORVERSION2)" \< "9.5"; echo $$?))
+DBMSSTATSVER = 1.4.0
+PGVERS = 12
 
 MODULE_big = pg_dbms_stats
 OBJS = pg_dbms_stats.o dump.o import.o
 DOCDIR = doc
-EXTDIR = ext_scripts
 
 ifdef UNIT_TEST
 PG_CPPFLAGS = -DUNIT_TEST
@@ -21,11 +19,10 @@ REGRESS = init-common ut_fdw_init init-$(REGTESTVER) ut-common \
 		  ut-$(REGTESTVER)  ut_imp_exp-$(REGTESTVER)
 EXTRA_INSTALL = contrib/file_fdw
 
-# Before 9.5 needs extra-install flag for pg_regress
-REGRESS_OPTS = --encoding=UTF8 --temp-config=regress.conf $(if $(IS_PRE_95),--extra-install=$(EXTRA_INSTALL))
+REGRESS_OPTS = --encoding=UTF8 --temp-config=regress.conf
 
 # Pick up only the install scripts needed for the PG version.
-DATA = $(subst -$(MAJORVERSION).sql,.sql,$(filter %-$(MAJORVERSION).sql,$(notdir $(wildcard ext_scripts/*.sql))))
+DATA = pg_dbms_stats--$(DBMSSTATSVER).sql
 
 DOCS = $(DOCDIR)/export_effective_stats-$(MAJORVERSION).sql.sample \
 	$(DOCDIR)/export_plain_stats-$(MAJORVERSION).sql.sample
@@ -40,7 +37,7 @@ RPMS = $(foreach v,$(PGVERS),rpm$(v))
 EXTRA_CLEAN = sql/ut_anyarray-*.sql expected/ut_anyarray-*.out \
 	sql/ut_imp_exp-*.sql expected/ut_imp_exp-*.out \
 	sql/ut_fdw_init.sql expected/ut_fdw_init.out \
-	export_stats.dmp ut-fdw.csv $(DATA) $(STARBALLS) RPMS/*/* \
+	export_stats.dmp ut-fdw.csv $(STARBALLS) RPMS/*/* \
 	*~
 
 ifndef USE_PGXS
@@ -63,23 +60,19 @@ endif
 REGTESTVER = $(MAJORVERSION)
 
 TARSOURCES = Makefile *.c  *.h \
-	$(EXTDIR)/pg_dbms_stats--*.sql \
 	pg_dbms_stats.control COPYRIGHT ChangeLog ChangeLog.ja \
-	README.installcheck regress.conf \
+	README.installcheck regress.conf $(DATA) \
 	doc/* expected/init-*.out expected/ut-*.out \
 	sql/init-*.sql sql/ut-*.sql \
 	input/*.source input/*.csv output/*.source SPECS/*.spec
 
 LDFLAGS+=-Wl,--build-id
 
-all: $(DATA) $(DOCS)
+all: $(DOCS)
 
 rpms: $(RPMS)
 
 sourcetar: $(STARBALL)
-
-$(DATA): %.sql: $(EXTDIR)/%-$(MAJORVERSION).sql
-	cp $< $@
 
 # Source tar balls are the same for all target PG versions.
 # This is because rpmbuild requires a tar ball with the same base name

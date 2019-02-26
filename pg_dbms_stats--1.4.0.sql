@@ -58,6 +58,11 @@ CREATE TABLE dbms_stats.column_stats_locked (
     staop3      oid,
     staop4      oid,
     staop5      oid,
+    stacoll1    oid,
+    stacoll2    oid,
+    stacoll3    oid,
+    stacoll4    oid,
+    stacoll5    oid,
     stanumbers1 float4[],
     stanumbers2 float4[],
     stanumbers3 float4[],
@@ -116,6 +121,11 @@ CREATE TABLE dbms_stats.column_stats_backup (
     staop3      oid    NOT NULL,
     staop4      oid    NOT NULL,
     staop5      oid    NOT NULL,
+    stacoll1    oid    NOT NULL,
+    stacoll2    oid    NOT NULL,
+    stacoll3    oid    NOT NULL,
+    stacoll4    oid    NOT NULL,
+    stacoll5    oid    NOT NULL,
     stanumbers1 float4[],
     stanumbers2 float4[],
     stanumbers3 float4[],
@@ -206,11 +216,11 @@ CREATE VIEW dbms_stats.column_stats_effective AS
 --
 -- Note: This view is copied from pg_stats in
 -- src/backend/catalog/system_views.sql in core source tree of version
--- 9.4, and customized for pg_dbms_stats.  Changes from orignal one are:
+-- 9.5, and customized for pg_dbms_stats.  Changes from orignal one are:
 --   - rename from pg_stats to dbms_stats.stats by a view name.
 --   - changed the table name from pg_statistic to dbms_stats.column_stats_effective.
 --
-CREATE VIEW dbms_stats.stats AS
+CREATE VIEW dbms_stats.stats with (security_barrier) AS
     SELECT
         nspname AS schemaname,
         relname AS tablename,
@@ -271,7 +281,9 @@ CREATE VIEW dbms_stats.stats AS
     FROM dbms_stats.column_stats_effective s JOIN pg_class c ON (c.oid = s.starelid)
          JOIN pg_attribute a ON (c.oid = attrelid AND attnum = s.staattnum)
          LEFT JOIN pg_namespace n ON (n.oid = c.relnamespace)
-    WHERE NOT attisdropped AND has_column_privilege(c.oid, a.attnum, 'select');
+    WHERE NOT attisdropped
+	AND has_column_privilege(c.oid, a.attnum, 'select')
+	AND (c.relrowsecurity = false OR NOT row_security_active(c.oid));
 
 --
 -- Utility functions
@@ -612,6 +624,7 @@ BEGIN
                        stanullfrac, stawidth, stadistinct,
                        stakind1, stakind2, stakind3, stakind4, stakind5,
                        staop1, staop2, staop3, staop4, staop5,
+                       stacoll1, stacoll2, stacoll3, stacoll4, stacoll5,
                        stanumbers1, stanumbers2, stanumbers3, stanumbers4, stanumbers5,
                        stavalues1, stavalues2, stavalues3, stavalues4, stavalues5
                   FROM dbms_stats.column_stats_backup
@@ -803,6 +816,7 @@ BEGIN
                        stanullfrac, stawidth, stadistinct,
                        stakind1, stakind2, stakind3, stakind4, stakind5,
                        staop1, staop2, staop3, staop4, staop5,
+                       stacoll1, stacoll2, stacoll3, stacoll4, stacoll5,
                        stanumbers1, stanumbers2, stanumbers3, stanumbers4, stanumbers5,
                        stavalues1, stavalues2, stavalues3, stavalues4, stavalues5
                   FROM dbms_stats.column_stats_backup
@@ -876,6 +890,7 @@ BEGIN
         SELECT stainherit, stanullfrac, stawidth, stadistinct,
                stakind1, stakind2, stakind3, stakind4, stakind5,
                staop1, staop2, staop3, staop4, staop5,
+               stacoll1, stacoll2, stacoll3, stacoll4, stacoll5,
                stanumbers1, stanumbers2, stanumbers3, stanumbers4, stanumbers5,
                stavalues1, stavalues2, stavalues3, stavalues4, stavalues5
           FROM dbms_stats.column_stats_effective
@@ -896,6 +911,11 @@ BEGIN
                staop3 = r.staop3,
                staop4 = r.staop4,
                staop5 = r.staop5,
+               stacoll1 = r.stacoll1,
+               stacoll2 = r.stacoll2,
+               stacoll3 = r.stacoll3,
+               stacoll4 = r.stacoll4,
+               stacoll5 = r.stacoll5,
                stanumbers1 = r.stanumbers1,
                stanumbers2 = r.stanumbers2,
                stanumbers3 = r.stanumbers3,
@@ -928,6 +948,11 @@ BEGIN
                          r.staop3,
                          r.staop4,
                          r.staop5,
+                         r.stacoll1,
+                         r.stacoll2,
+                         r.stacoll3,
+                         r.stacoll4,
+                         r.stacoll5,
                          r.stanumbers1,
                          r.stanumbers2,
                          r.stanumbers3,
@@ -1018,6 +1043,7 @@ BEGIN
                stawidth, stadistinct,
                stakind1, stakind2, stakind3, stakind4, stakind5,
                staop1, staop2, staop3, staop4, staop5,
+               stacoll1, stacoll2, stacoll3, stacoll4, stacoll5,
                stanumbers1, stanumbers2, stanumbers3, stanumbers4, stanumbers5,
                stavalues1, stavalues2, stavalues3, stavalues4, stavalues5
           FROM dbms_stats.column_stats_effective
@@ -1037,6 +1063,11 @@ BEGIN
                staop3 = i.staop3,
                staop4 = i.staop4,
                staop5 = i.staop5,
+               stacoll1 = i.stacoll1,
+               stacoll2 = i.stacoll2,
+               stacoll3 = i.stacoll3,
+               stacoll4 = i.stacoll4,
+               stacoll5 = i.stacoll5,
                stanumbers1 = i.stanumbers1,
                stanumbers2 = i.stanumbers2,
                stanumbers3 = i.stanumbers3,
@@ -1069,6 +1100,11 @@ BEGIN
                          i.staop3,
                          i.staop4,
                          i.staop5,
+                         i.stacoll1,
+                         i.stacoll2,
+                         i.stacoll3,
+                         i.stacoll4,
+                         i.stacoll5,
                          i.stanumbers1,
                          i.stanumbers2,
                          i.stanumbers3,

@@ -4,13 +4,13 @@
  */
 -- No.2-1-1
 \d dbms_stats.backup_history
-                                      Table "dbms_stats.backup_history"
- Column  |           Type           |                               Modifiers                                
----------+--------------------------+------------------------------------------------------------------------
- id      | bigint                   | not null default nextval('dbms_stats.backup_history_id_seq'::regclass)
- time    | timestamp with time zone | not null
- unit    | character(1)             | not null
- comment | text                     | 
+                                         Table "dbms_stats.backup_history"
+ Column  |           Type           | Collation | Nullable |                        Default                        
+---------+--------------------------+-----------+----------+-------------------------------------------------------
+ id      | bigint                   |           | not null | nextval('dbms_stats.backup_history_id_seq'::regclass)
+ time    | timestamp with time zone |           | not null | 
+ unit    | character(1)             |           | not null | 
+ comment | text                     |           |          | 
 Indexes:
     "backup_history_pkey" PRIMARY KEY, btree (id)
 Referenced by:
@@ -19,156 +19,171 @@ Referenced by:
 
 -- No.2-1-2
 \d dbms_stats.column_stats_backup
-    Table "dbms_stats.column_stats_backup"
-   Column    |        Type         | Modifiers 
--------------+---------------------+-----------
- id          | bigint              | not null
- statypid    | oid                 | not null
- starelid    | oid                 | not null
- staattnum   | smallint            | not null
- stainherit  | boolean             | not null
- stanullfrac | real                | not null
- stawidth    | integer             | not null
- stadistinct | real                | not null
- stakind1    | smallint            | not null
- stakind2    | smallint            | not null
- stakind3    | smallint            | not null
- stakind4    | smallint            | not null
- stakind5    | smallint            | not null
- staop1      | oid                 | not null
- staop2      | oid                 | not null
- staop3      | oid                 | not null
- staop4      | oid                 | not null
- staop5      | oid                 | not null
- stanumbers1 | real[]              | 
- stanumbers2 | real[]              | 
- stanumbers3 | real[]              | 
- stanumbers4 | real[]              | 
- stanumbers5 | real[]              | 
- stavalues1  | dbms_stats.anyarray | 
- stavalues2  | dbms_stats.anyarray | 
- stavalues3  | dbms_stats.anyarray | 
- stavalues4  | dbms_stats.anyarray | 
- stavalues5  | dbms_stats.anyarray | 
+               Table "dbms_stats.column_stats_backup"
+   Column    |        Type         | Collation | Nullable | Default 
+-------------+---------------------+-----------+----------+---------
+ id          | bigint              |           | not null | 
+ statypid    | oid                 |           | not null | 
+ starelid    | oid                 |           | not null | 
+ staattnum   | smallint            |           | not null | 
+ stainherit  | boolean             |           | not null | 
+ stanullfrac | real                |           | not null | 
+ stawidth    | integer             |           | not null | 
+ stadistinct | real                |           | not null | 
+ stakind1    | smallint            |           | not null | 
+ stakind2    | smallint            |           | not null | 
+ stakind3    | smallint            |           | not null | 
+ stakind4    | smallint            |           | not null | 
+ stakind5    | smallint            |           | not null | 
+ staop1      | oid                 |           | not null | 
+ staop2      | oid                 |           | not null | 
+ staop3      | oid                 |           | not null | 
+ staop4      | oid                 |           | not null | 
+ staop5      | oid                 |           | not null | 
+ stacoll1    | oid                 |           | not null | 
+ stacoll2    | oid                 |           | not null | 
+ stacoll3    | oid                 |           | not null | 
+ stacoll4    | oid                 |           | not null | 
+ stacoll5    | oid                 |           | not null | 
+ stanumbers1 | real[]              |           |          | 
+ stanumbers2 | real[]              |           |          | 
+ stanumbers3 | real[]              |           |          | 
+ stanumbers4 | real[]              |           |          | 
+ stanumbers5 | real[]              |           |          | 
+ stavalues1  | dbms_stats.anyarray |           |          | 
+ stavalues2  | dbms_stats.anyarray |           |          | 
+ stavalues3  | dbms_stats.anyarray |           |          | 
+ stavalues4  | dbms_stats.anyarray |           |          | 
+ stavalues5  | dbms_stats.anyarray |           |          | 
 Indexes:
     "column_stats_backup_pkey" PRIMARY KEY, btree (id, starelid, staattnum, stainherit)
 Foreign-key constraints:
     "column_stats_backup_id_fkey" FOREIGN KEY (id) REFERENCES dbms_stats.backup_history(id) ON DELETE CASCADE
-    "column_stats_backup_id_fkey1" FOREIGN KEY (id, starelid) REFERENCES dbms_stats.relation_stats_backup(id, relid) ON DELETE CASCADE
+    "column_stats_backup_id_starelid_fkey" FOREIGN KEY (id, starelid) REFERENCES dbms_stats.relation_stats_backup(id, relid) ON DELETE CASCADE
 
 -- No.2-1-3
 \d dbms_stats.column_stats_locked
-    Table "dbms_stats.column_stats_locked"
-   Column    |        Type         | Modifiers 
--------------+---------------------+-----------
- starelid    | oid                 | not null
- staattnum   | smallint            | not null
- stainherit  | boolean             | not null
- stanullfrac | real                | 
- stawidth    | integer             | 
- stadistinct | real                | 
- stakind1    | smallint            | 
- stakind2    | smallint            | 
- stakind3    | smallint            | 
- stakind4    | smallint            | 
- stakind5    | smallint            | 
- staop1      | oid                 | 
- staop2      | oid                 | 
- staop3      | oid                 | 
- staop4      | oid                 | 
- staop5      | oid                 | 
- stanumbers1 | real[]              | 
- stanumbers2 | real[]              | 
- stanumbers3 | real[]              | 
- stanumbers4 | real[]              | 
- stanumbers5 | real[]              | 
- stavalues1  | dbms_stats.anyarray | 
- stavalues2  | dbms_stats.anyarray | 
- stavalues3  | dbms_stats.anyarray | 
- stavalues4  | dbms_stats.anyarray | 
- stavalues5  | dbms_stats.anyarray | 
+               Table "dbms_stats.column_stats_locked"
+   Column    |        Type         | Collation | Nullable | Default 
+-------------+---------------------+-----------+----------+---------
+ starelid    | oid                 |           | not null | 
+ staattnum   | smallint            |           | not null | 
+ stainherit  | boolean             |           | not null | 
+ stanullfrac | real                |           |          | 
+ stawidth    | integer             |           |          | 
+ stadistinct | real                |           |          | 
+ stakind1    | smallint            |           |          | 
+ stakind2    | smallint            |           |          | 
+ stakind3    | smallint            |           |          | 
+ stakind4    | smallint            |           |          | 
+ stakind5    | smallint            |           |          | 
+ staop1      | oid                 |           |          | 
+ staop2      | oid                 |           |          | 
+ staop3      | oid                 |           |          | 
+ staop4      | oid                 |           |          | 
+ staop5      | oid                 |           |          | 
+ stacoll1    | oid                 |           |          | 
+ stacoll2    | oid                 |           |          | 
+ stacoll3    | oid                 |           |          | 
+ stacoll4    | oid                 |           |          | 
+ stacoll5    | oid                 |           |          | 
+ stanumbers1 | real[]              |           |          | 
+ stanumbers2 | real[]              |           |          | 
+ stanumbers3 | real[]              |           |          | 
+ stanumbers4 | real[]              |           |          | 
+ stanumbers5 | real[]              |           |          | 
+ stavalues1  | dbms_stats.anyarray |           |          | 
+ stavalues2  | dbms_stats.anyarray |           |          | 
+ stavalues3  | dbms_stats.anyarray |           |          | 
+ stavalues4  | dbms_stats.anyarray |           |          | 
+ stavalues5  | dbms_stats.anyarray |           |          | 
 Indexes:
     "column_stats_locked_pkey" PRIMARY KEY, btree (starelid, staattnum, stainherit)
 Foreign-key constraints:
     "column_stats_locked_starelid_fkey" FOREIGN KEY (starelid) REFERENCES dbms_stats.relation_stats_locked(relid) ON DELETE CASCADE
 Triggers:
-    invalidate_column_cache BEFORE INSERT OR DELETE OR UPDATE ON dbms_stats.column_stats_locked FOR EACH ROW EXECUTE PROCEDURE dbms_stats.invalidate_column_cache()
+    invalidate_column_cache BEFORE INSERT OR DELETE OR UPDATE ON dbms_stats.column_stats_locked FOR EACH ROW EXECUTE FUNCTION dbms_stats.invalidate_column_cache()
 
 -- No.2-1-4
 \d dbms_stats.relation_stats_backup
-        Table "dbms_stats.relation_stats_backup"
-      Column      |           Type           | Modifiers 
-------------------+--------------------------+-----------
- id               | bigint                   | not null
- relid            | oid                      | not null
- relname          | text                     | not null
- relpages         | integer                  | not null
- reltuples        | real                     | not null
- relallvisible    | integer                  | not null
- curpages         | integer                  | not null
- last_analyze     | timestamp with time zone | 
- last_autoanalyze | timestamp with time zone | 
+                   Table "dbms_stats.relation_stats_backup"
+      Column      |           Type           | Collation | Nullable | Default 
+------------------+--------------------------+-----------+----------+---------
+ id               | bigint                   |           | not null | 
+ relid            | oid                      |           | not null | 
+ relname          | text                     |           | not null | 
+ relpages         | integer                  |           | not null | 
+ reltuples        | real                     |           | not null | 
+ relallvisible    | integer                  |           | not null | 
+ curpages         | integer                  |           | not null | 
+ last_analyze     | timestamp with time zone |           |          | 
+ last_autoanalyze | timestamp with time zone |           |          | 
 Indexes:
     "relation_stats_backup_pkey" PRIMARY KEY, btree (id, relid)
 Foreign-key constraints:
     "relation_stats_backup_id_fkey" FOREIGN KEY (id) REFERENCES dbms_stats.backup_history(id) ON DELETE CASCADE
 Referenced by:
-    TABLE "dbms_stats.column_stats_backup" CONSTRAINT "column_stats_backup_id_fkey1" FOREIGN KEY (id, starelid) REFERENCES dbms_stats.relation_stats_backup(id, relid) ON DELETE CASCADE
+    TABLE "dbms_stats.column_stats_backup" CONSTRAINT "column_stats_backup_id_starelid_fkey" FOREIGN KEY (id, starelid) REFERENCES dbms_stats.relation_stats_backup(id, relid) ON DELETE CASCADE
 
 -- No.2-1-5
 \d dbms_stats.relation_stats_locked
-        Table "dbms_stats.relation_stats_locked"
-      Column      |           Type           | Modifiers 
-------------------+--------------------------+-----------
- relid            | oid                      | not null
- relname          | text                     | not null
- relpages         | integer                  | 
- reltuples        | real                     | 
- relallvisible    | integer                  | 
- curpages         | integer                  | 
- last_analyze     | timestamp with time zone | 
- last_autoanalyze | timestamp with time zone | 
+                   Table "dbms_stats.relation_stats_locked"
+      Column      |           Type           | Collation | Nullable | Default 
+------------------+--------------------------+-----------+----------+---------
+ relid            | oid                      |           | not null | 
+ relname          | text                     |           | not null | 
+ relpages         | integer                  |           |          | 
+ reltuples        | real                     |           |          | 
+ relallvisible    | integer                  |           |          | 
+ curpages         | integer                  |           |          | 
+ last_analyze     | timestamp with time zone |           |          | 
+ last_autoanalyze | timestamp with time zone |           |          | 
 Indexes:
     "relation_stats_locked_pkey" PRIMARY KEY, btree (relid)
 Referenced by:
     TABLE "dbms_stats.column_stats_locked" CONSTRAINT "column_stats_locked_starelid_fkey" FOREIGN KEY (starelid) REFERENCES dbms_stats.relation_stats_locked(relid) ON DELETE CASCADE
 Triggers:
-    invalidate_relation_cache BEFORE INSERT OR DELETE OR UPDATE ON dbms_stats.relation_stats_locked FOR EACH ROW EXECUTE PROCEDURE dbms_stats.invalidate_relation_cache()
+    invalidate_relation_cache BEFORE INSERT OR DELETE OR UPDATE ON dbms_stats.relation_stats_locked FOR EACH ROW EXECUTE FUNCTION dbms_stats.invalidate_relation_cache()
 
 /*
  * No.2-2 view definitions.
  */
 -- No.2-2-1
 \dS+ dbms_stats.column_stats_effective
-                View "dbms_stats.column_stats_effective"
-   Column    |        Type         | Modifiers | Storage  | Description 
--------------+---------------------+-----------+----------+-------------
- starelid    | oid                 |           | plain    | 
- staattnum   | smallint            |           | plain    | 
- stainherit  | boolean             |           | plain    | 
- stanullfrac | real                |           | plain    | 
- stawidth    | integer             |           | plain    | 
- stadistinct | real                |           | plain    | 
- stakind1    | smallint            |           | plain    | 
- stakind2    | smallint            |           | plain    | 
- stakind3    | smallint            |           | plain    | 
- stakind4    | smallint            |           | plain    | 
- stakind5    | smallint            |           | plain    | 
- staop1      | oid                 |           | plain    | 
- staop2      | oid                 |           | plain    | 
- staop3      | oid                 |           | plain    | 
- staop4      | oid                 |           | plain    | 
- staop5      | oid                 |           | plain    | 
- stanumbers1 | real[]              |           | extended | 
- stanumbers2 | real[]              |           | extended | 
- stanumbers3 | real[]              |           | extended | 
- stanumbers4 | real[]              |           | extended | 
- stanumbers5 | real[]              |           | extended | 
- stavalues1  | dbms_stats.anyarray |           | extended | 
- stavalues2  | dbms_stats.anyarray |           | extended | 
- stavalues3  | dbms_stats.anyarray |           | extended | 
- stavalues4  | dbms_stats.anyarray |           | extended | 
- stavalues5  | dbms_stats.anyarray |           | extended | 
+                          View "dbms_stats.column_stats_effective"
+   Column    |        Type         | Collation | Nullable | Default | Storage  | Description 
+-------------+---------------------+-----------+----------+---------+----------+-------------
+ starelid    | oid                 |           |          |         | plain    | 
+ staattnum   | smallint            |           |          |         | plain    | 
+ stainherit  | boolean             |           |          |         | plain    | 
+ stanullfrac | real                |           |          |         | plain    | 
+ stawidth    | integer             |           |          |         | plain    | 
+ stadistinct | real                |           |          |         | plain    | 
+ stakind1    | smallint            |           |          |         | plain    | 
+ stakind2    | smallint            |           |          |         | plain    | 
+ stakind3    | smallint            |           |          |         | plain    | 
+ stakind4    | smallint            |           |          |         | plain    | 
+ stakind5    | smallint            |           |          |         | plain    | 
+ staop1      | oid                 |           |          |         | plain    | 
+ staop2      | oid                 |           |          |         | plain    | 
+ staop3      | oid                 |           |          |         | plain    | 
+ staop4      | oid                 |           |          |         | plain    | 
+ staop5      | oid                 |           |          |         | plain    | 
+ stacoll1    | oid                 |           |          |         | plain    | 
+ stacoll2    | oid                 |           |          |         | plain    | 
+ stacoll3    | oid                 |           |          |         | plain    | 
+ stacoll4    | oid                 |           |          |         | plain    | 
+ stacoll5    | oid                 |           |          |         | plain    | 
+ stanumbers1 | real[]              |           |          |         | extended | 
+ stanumbers2 | real[]              |           |          |         | extended | 
+ stanumbers3 | real[]              |           |          |         | extended | 
+ stanumbers4 | real[]              |           |          |         | extended | 
+ stanumbers5 | real[]              |           |          |         | extended | 
+ stavalues1  | dbms_stats.anyarray |           |          |         | extended | 
+ stavalues2  | dbms_stats.anyarray |           |          |         | extended | 
+ stavalues3  | dbms_stats.anyarray |           |          |         | extended | 
+ stavalues4  | dbms_stats.anyarray |           |          |         | extended | 
+ stavalues5  | dbms_stats.anyarray |           |          |         | extended | 
 View definition:
  SELECT m.starelid,
     m.staattnum,
@@ -186,6 +201,11 @@ View definition:
     m.staop3,
     m.staop4,
     m.staop5,
+    m.stacoll1,
+    m.stacoll2,
+    m.stacoll3,
+    m.stacoll4,
+    m.stacoll5,
     m.stanumbers1,
     m.stanumbers2,
     m.stanumbers3,
@@ -212,6 +232,11 @@ View definition:
             (dbms_stats.merge(v.*, s.*)).staop3 AS staop3,
             (dbms_stats.merge(v.*, s.*)).staop4 AS staop4,
             (dbms_stats.merge(v.*, s.*)).staop5 AS staop5,
+            (dbms_stats.merge(v.*, s.*)).stacoll1 AS stacoll1,
+            (dbms_stats.merge(v.*, s.*)).stacoll2 AS stacoll2,
+            (dbms_stats.merge(v.*, s.*)).stacoll3 AS stacoll3,
+            (dbms_stats.merge(v.*, s.*)).stacoll4 AS stacoll4,
+            (dbms_stats.merge(v.*, s.*)).stacoll5 AS stacoll5,
             (dbms_stats.merge(v.*, s.*)).stanumbers1 AS stanumbers1,
             (dbms_stats.merge(v.*, s.*)).stanumbers2 AS stanumbers2,
             (dbms_stats.merge(v.*, s.*)).stanumbers3 AS stanumbers3,
@@ -224,24 +249,24 @@ View definition:
             (dbms_stats.merge(v.*, s.*)).stavalues5 AS stavalues5
            FROM pg_statistic s
              FULL JOIN dbms_stats.column_stats_locked v USING (starelid, staattnum, stainherit)
-          WHERE NOT dbms_stats.is_system_catalog(starelid::regclass) AND (EXISTS ( SELECT NULL::unknown
+          WHERE NOT dbms_stats.is_system_catalog(starelid::regclass) AND (EXISTS ( SELECT NULL::text
                    FROM pg_attribute a
                   WHERE a.attrelid = starelid AND a.attnum = staattnum AND a.attisdropped = false))) m
   WHERE m.starelid IS NOT NULL;
 
 -- No.2-2-2
 \dS+ dbms_stats.relation_stats_effective
-                    View "dbms_stats.relation_stats_effective"
-      Column      |           Type           | Modifiers | Storage  | Description 
-------------------+--------------------------+-----------+----------+-------------
- relid            | oid                      |           | plain    | 
- relname          | text                     |           | extended | 
- relpages         | integer                  |           | plain    | 
- reltuples        | real                     |           | plain    | 
- relallvisible    | integer                  |           | plain    | 
- curpages         | integer                  |           | plain    | 
- last_analyze     | timestamp with time zone |           | plain    | 
- last_autoanalyze | timestamp with time zone |           | plain    | 
+                              View "dbms_stats.relation_stats_effective"
+      Column      |           Type           | Collation | Nullable | Default | Storage  | Description 
+------------------+--------------------------+-----------+----------+---------+----------+-------------
+ relid            | oid                      |           |          |         | plain    | 
+ relname          | text                     | C         |          |         | extended | 
+ relpages         | integer                  |           |          |         | plain    | 
+ reltuples        | real                     |           |          |         | plain    | 
+ relallvisible    | integer                  |           |          |         | plain    | 
+ curpages         | integer                  |           |          |         | plain    | 
+ last_analyze     | timestamp with time zone |           |          |         | plain    | 
+ last_autoanalyze | timestamp with time zone |           |          |         | plain    | 
 View definition:
  SELECT c.oid AS relid,
     dbms_stats.relname(n.nspname::text, c.relname::text) AS relname,
@@ -258,23 +283,23 @@ View definition:
 
 -- No.2-2-3
 \dS+ dbms_stats.stats
-                              View "dbms_stats.stats"
-         Column         |        Type         | Modifiers | Storage  | Description 
-------------------------+---------------------+-----------+----------+-------------
- schemaname             | name                |           | plain    | 
- tablename              | name                |           | plain    | 
- attname                | name                |           | plain    | 
- inherited              | boolean             |           | plain    | 
- null_frac              | real                |           | plain    | 
- avg_width              | integer             |           | plain    | 
- n_distinct             | real                |           | plain    | 
- most_common_vals       | dbms_stats.anyarray |           | extended | 
- most_common_freqs      | real[]              |           | extended | 
- histogram_bounds       | dbms_stats.anyarray |           | extended | 
- correlation            | real                |           | plain    | 
- most_common_elems      | dbms_stats.anyarray |           | extended | 
- most_common_elem_freqs | real[]              |           | extended | 
- elem_count_histogram   | real[]              |           | extended | 
+                                        View "dbms_stats.stats"
+         Column         |        Type         | Collation | Nullable | Default | Storage  | Description 
+------------------------+---------------------+-----------+----------+---------+----------+-------------
+ schemaname             | name                |           |          |         | plain    | 
+ tablename              | name                |           |          |         | plain    | 
+ attname                | name                |           |          |         | plain    | 
+ inherited              | boolean             |           |          |         | plain    | 
+ null_frac              | real                |           |          |         | plain    | 
+ avg_width              | integer             |           |          |         | plain    | 
+ n_distinct             | real                |           |          |         | plain    | 
+ most_common_vals       | dbms_stats.anyarray |           |          |         | extended | 
+ most_common_freqs      | real[]              |           |          |         | extended | 
+ histogram_bounds       | dbms_stats.anyarray |           |          |         | extended | 
+ correlation            | real                |           |          |         | plain    | 
+ most_common_elems      | dbms_stats.anyarray |           |          |         | extended | 
+ most_common_elem_freqs | real[]              |           |          |         | extended | 
+ elem_count_histogram   | real[]              |           |          |         | extended | 
 View definition:
  SELECT n.nspname AS schemaname,
     c.relname AS tablename,
@@ -348,61 +373,66 @@ Options: security_barrier=true
 
 -- No.2-2-4
 \dS+ dbms_stats.column_stats_locked
-                        Table "dbms_stats.column_stats_locked"
-   Column    |        Type         | Modifiers | Storage  | Stats target | Description 
--------------+---------------------+-----------+----------+--------------+-------------
- starelid    | oid                 | not null  | plain    |              | 
- staattnum   | smallint            | not null  | plain    |              | 
- stainherit  | boolean             | not null  | plain    |              | 
- stanullfrac | real                |           | plain    |              | 
- stawidth    | integer             |           | plain    |              | 
- stadistinct | real                |           | plain    |              | 
- stakind1    | smallint            |           | plain    |              | 
- stakind2    | smallint            |           | plain    |              | 
- stakind3    | smallint            |           | plain    |              | 
- stakind4    | smallint            |           | plain    |              | 
- stakind5    | smallint            |           | plain    |              | 
- staop1      | oid                 |           | plain    |              | 
- staop2      | oid                 |           | plain    |              | 
- staop3      | oid                 |           | plain    |              | 
- staop4      | oid                 |           | plain    |              | 
- staop5      | oid                 |           | plain    |              | 
- stanumbers1 | real[]              |           | extended |              | 
- stanumbers2 | real[]              |           | extended |              | 
- stanumbers3 | real[]              |           | extended |              | 
- stanumbers4 | real[]              |           | extended |              | 
- stanumbers5 | real[]              |           | extended |              | 
- stavalues1  | dbms_stats.anyarray |           | extended |              | 
- stavalues2  | dbms_stats.anyarray |           | extended |              | 
- stavalues3  | dbms_stats.anyarray |           | extended |              | 
- stavalues4  | dbms_stats.anyarray |           | extended |              | 
- stavalues5  | dbms_stats.anyarray |           | extended |              | 
+                                   Table "dbms_stats.column_stats_locked"
+   Column    |        Type         | Collation | Nullable | Default | Storage  | Stats target | Description 
+-------------+---------------------+-----------+----------+---------+----------+--------------+-------------
+ starelid    | oid                 |           | not null |         | plain    |              | 
+ staattnum   | smallint            |           | not null |         | plain    |              | 
+ stainherit  | boolean             |           | not null |         | plain    |              | 
+ stanullfrac | real                |           |          |         | plain    |              | 
+ stawidth    | integer             |           |          |         | plain    |              | 
+ stadistinct | real                |           |          |         | plain    |              | 
+ stakind1    | smallint            |           |          |         | plain    |              | 
+ stakind2    | smallint            |           |          |         | plain    |              | 
+ stakind3    | smallint            |           |          |         | plain    |              | 
+ stakind4    | smallint            |           |          |         | plain    |              | 
+ stakind5    | smallint            |           |          |         | plain    |              | 
+ staop1      | oid                 |           |          |         | plain    |              | 
+ staop2      | oid                 |           |          |         | plain    |              | 
+ staop3      | oid                 |           |          |         | plain    |              | 
+ staop4      | oid                 |           |          |         | plain    |              | 
+ staop5      | oid                 |           |          |         | plain    |              | 
+ stacoll1    | oid                 |           |          |         | plain    |              | 
+ stacoll2    | oid                 |           |          |         | plain    |              | 
+ stacoll3    | oid                 |           |          |         | plain    |              | 
+ stacoll4    | oid                 |           |          |         | plain    |              | 
+ stacoll5    | oid                 |           |          |         | plain    |              | 
+ stanumbers1 | real[]              |           |          |         | extended |              | 
+ stanumbers2 | real[]              |           |          |         | extended |              | 
+ stanumbers3 | real[]              |           |          |         | extended |              | 
+ stanumbers4 | real[]              |           |          |         | extended |              | 
+ stanumbers5 | real[]              |           |          |         | extended |              | 
+ stavalues1  | dbms_stats.anyarray |           |          |         | extended |              | 
+ stavalues2  | dbms_stats.anyarray |           |          |         | extended |              | 
+ stavalues3  | dbms_stats.anyarray |           |          |         | extended |              | 
+ stavalues4  | dbms_stats.anyarray |           |          |         | extended |              | 
+ stavalues5  | dbms_stats.anyarray |           |          |         | extended |              | 
 Indexes:
     "column_stats_locked_pkey" PRIMARY KEY, btree (starelid, staattnum, stainherit)
 Foreign-key constraints:
     "column_stats_locked_starelid_fkey" FOREIGN KEY (starelid) REFERENCES dbms_stats.relation_stats_locked(relid) ON DELETE CASCADE
 Triggers:
-    invalidate_column_cache BEFORE INSERT OR DELETE OR UPDATE ON dbms_stats.column_stats_locked FOR EACH ROW EXECUTE PROCEDURE dbms_stats.invalidate_column_cache()
+    invalidate_column_cache BEFORE INSERT OR DELETE OR UPDATE ON dbms_stats.column_stats_locked FOR EACH ROW EXECUTE FUNCTION dbms_stats.invalidate_column_cache()
 
 -- No.2-2-5
 \dS+ dbms_stats.relation_stats_locked
-                            Table "dbms_stats.relation_stats_locked"
-      Column      |           Type           | Modifiers | Storage  | Stats target | Description 
-------------------+--------------------------+-----------+----------+--------------+-------------
- relid            | oid                      | not null  | plain    |              | 
- relname          | text                     | not null  | extended |              | 
- relpages         | integer                  |           | plain    |              | 
- reltuples        | real                     |           | plain    |              | 
- relallvisible    | integer                  |           | plain    |              | 
- curpages         | integer                  |           | plain    |              | 
- last_analyze     | timestamp with time zone |           | plain    |              | 
- last_autoanalyze | timestamp with time zone |           | plain    |              | 
+                                       Table "dbms_stats.relation_stats_locked"
+      Column      |           Type           | Collation | Nullable | Default | Storage  | Stats target | Description 
+------------------+--------------------------+-----------+----------+---------+----------+--------------+-------------
+ relid            | oid                      |           | not null |         | plain    |              | 
+ relname          | text                     |           | not null |         | extended |              | 
+ relpages         | integer                  |           |          |         | plain    |              | 
+ reltuples        | real                     |           |          |         | plain    |              | 
+ relallvisible    | integer                  |           |          |         | plain    |              | 
+ curpages         | integer                  |           |          |         | plain    |              | 
+ last_analyze     | timestamp with time zone |           |          |         | plain    |              | 
+ last_autoanalyze | timestamp with time zone |           |          |         | plain    |              | 
 Indexes:
     "relation_stats_locked_pkey" PRIMARY KEY, btree (relid)
 Referenced by:
     TABLE "dbms_stats.column_stats_locked" CONSTRAINT "column_stats_locked_starelid_fkey" FOREIGN KEY (starelid) REFERENCES dbms_stats.relation_stats_locked(relid) ON DELETE CASCADE
 Triggers:
-    invalidate_relation_cache BEFORE INSERT OR DELETE OR UPDATE ON dbms_stats.relation_stats_locked FOR EACH ROW EXECUTE PROCEDURE dbms_stats.invalidate_relation_cache()
+    invalidate_relation_cache BEFORE INSERT OR DELETE OR UPDATE ON dbms_stats.relation_stats_locked FOR EACH ROW EXECUTE FUNCTION dbms_stats.invalidate_relation_cache()
 
 /*
  * No.2-4 dbms_stats.anyarray
@@ -440,6 +470,11 @@ UPDATE pg_statistic SET
     staop3 = 12,
     staop4 = 13,
     staop5 = 15,
+    stacoll1 = 24,
+    stacoll2 = 21,
+    stacoll3 = 22,
+    stacoll4 = 23,
+    stacoll5 = 25,
     stanumbers1 = ARRAY[staattnum,4],
     stanumbers2 = ARRAY[staattnum,1],
     stanumbers3 = ARRAY[staattnum,2],
@@ -471,6 +506,11 @@ UPDATE dbms_stats.column_stats_locked SET
     staop3 = 24,
     staop4 = 21,
     staop5 = 25,
+    stacoll1 = 32,
+    stacoll2 = 33,
+    stacoll3 = 34,
+    stacoll4 = 31,
+    stacoll5 = 35,
     stanumbers1 = ARRAY[-staattnum,22],
     stanumbers2 = ARRAY[-staattnum,23],
     stanumbers3 = ARRAY[-staattnum,24],
@@ -525,6 +565,11 @@ SELECT (m.merge).starelid::regclass,
        (m.merge).staop3,
        (m.merge).staop4,
        (m.merge).staop5,
+       (m.merge).stacoll1,
+       (m.merge).stacoll2,
+       (m.merge).stacoll3,
+       (m.merge).stacoll4,
+       (m.merge).stacoll5,
        (m.merge).stanumbers1,
        (m.merge).stanumbers2,
        (m.merge).stanumbers3,
@@ -539,9 +584,9 @@ SELECT (m.merge).starelid::regclass,
          FROM pg_statistic s
         WHERE starelid = 'st0'::regclass
           AND staattnum = '1'::int2) m;
- starelid | staattnum | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 | stavalues1 | stavalues2 |  stavalues3   |    stavalues4     |      stavalues5       
-----------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+-------------+-------------+-------------+-------------+-------------+------------+------------+---------------+-------------------+-----------------------
- st0      |         1 | f          |           1 |        1 |           1 |        4 |        1 |        2 |        3 |        5 |     14 |     11 |     12 |     13 |     15 | {1,4}       | {1,1}       | {1,2}       | {1,3}       | {1,5}       | {1,2}      | {1,2,1,2}  | {1,2,1,2,1,2} | {1,2,1,2,1,2,1,2} | {1,2,1,2,1,2,1,2,1,2}
+ starelid | staattnum | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 | stavalues1 | stavalues2 |  stavalues3   |    stavalues4     |      stavalues5       
+----------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+------------+------------+---------------+-------------------+-----------------------
+ st0      |         1 | f          |           1 |        1 |           1 |        4 |        1 |        2 |        3 |        5 |     14 |     11 |     12 |     13 |     15 |       24 |       21 |       22 |       23 |       25 | {1,4}       | {1,1}       | {1,2}       | {1,3}       | {1,5}       | {1,2}      | {1,2,1,2}  | {1,2,1,2,1,2} | {1,2,1,2,1,2,1,2} | {1,2,1,2,1,2,1,2,1,2}
 (1 row)
 
 -- No.5-1-2
@@ -561,6 +606,11 @@ SELECT (m.merge).starelid::regclass,
        (m.merge).staop3,
        (m.merge).staop4,
        (m.merge).staop5,
+       (m.merge).stacoll1,
+       (m.merge).stacoll2,
+       (m.merge).stacoll3,
+       (m.merge).stacoll4,
+       (m.merge).stacoll5,
        (m.merge).stanumbers1,
        (m.merge).stanumbers2,
        (m.merge).stanumbers3,
@@ -575,9 +625,9 @@ SELECT (m.merge).starelid::regclass,
          FROM dbms_stats.column_stats_locked v
         WHERE starelid = 'st0'::regclass
           AND staattnum = '2'::int2) m;
- starelid | staattnum | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 |        stavalues1         |    stavalues2     | stavalues3 |            stavalues4             |                stavalues5                 
-----------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+-------------+-------------+-------------+-------------+-------------+---------------------------+-------------------+------------+-----------------------------------+-------------------------------------------
- st0      |         2 | t          |          -2 |       -2 |          -2 |        2 |        3 |        4 |        1 |        5 |     22 |     23 |     24 |     21 |     25 | {-2,22}     | {-2,23}     | {-2,24}     | {-2,21}     | {-2,25}     | {"test ","test ","test "} | {"test ","test "} | {"test "}  | {"test ","test ","test ","test "} | {"test ","test ","test ","test ","test "}
+ starelid | staattnum | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 |        stavalues1         |    stavalues2     | stavalues3 |            stavalues4             |                stavalues5                 
+----------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+---------------------------+-------------------+------------+-----------------------------------+-------------------------------------------
+ st0      |         2 | t          |          -2 |       -2 |          -2 |        2 |        3 |        4 |        1 |        5 |     22 |     23 |     24 |     21 |     25 |       32 |       33 |       34 |       31 |       35 | {-2,22}     | {-2,23}     | {-2,24}     | {-2,21}     | {-2,25}     | {"test ","test ","test "} | {"test ","test "} | {"test "}  | {"test ","test ","test ","test "} | {"test ","test ","test ","test ","test "}
 (1 row)
 
 -- No.5-1-3
@@ -604,6 +654,11 @@ SELECT (m.merge).starelid::regclass,
        (m.merge).staop3,
        (m.merge).staop4,
        (m.merge).staop5,
+       (m.merge).stacoll1,
+       (m.merge).stacoll2,
+       (m.merge).stacoll3,
+       (m.merge).stacoll4,
+       (m.merge).stacoll5,
        (m.merge).stanumbers1,
        (m.merge).stanumbers2,
        (m.merge).stanumbers3,
@@ -621,9 +676,9 @@ SELECT (m.merge).starelid::regclass,
           AND v.staattnum = '2'::int2
           AND s.starelid = 'st0'::regclass
           AND s.staattnum = '1'::int2) m;
- starelid | staattnum | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 |        stavalues1         |    stavalues2     | stavalues3 |            stavalues4             |                stavalues5                 
-----------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+-------------+-------------+-------------+-------------+-------------+---------------------------+-------------------+------------+-----------------------------------+-------------------------------------------
- st0      |         2 | t          |          -2 |       -2 |          -2 |        2 |        3 |        4 |        1 |        5 |     22 |     23 |     24 |     21 |     25 | {-2,22}     | {-2,23}     | {-2,24}     | {-2,21}     | {-2,25}     | {"test ","test ","test "} | {"test ","test "} | {"test "}  | {"test ","test ","test ","test "} | {"test ","test ","test ","test ","test "}
+ starelid | staattnum | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 |        stavalues1         |    stavalues2     | stavalues3 |            stavalues4             |                stavalues5                 
+----------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+---------------------------+-------------------+------------+-----------------------------------+-------------------------------------------
+ st0      |         2 | t          |          -2 |       -2 |          -2 |        2 |        3 |        4 |        1 |        5 |     22 |     23 |     24 |     21 |     25 |       32 |       33 |       34 |       31 |       35 | {-2,22}     | {-2,23}     | {-2,24}     | {-2,21}     | {-2,25}     | {"test ","test ","test "} | {"test ","test "} | {"test "}  | {"test ","test ","test ","test "} | {"test ","test ","test ","test ","test "}
 (1 row)
 
 -- No.5-1-5
@@ -643,6 +698,11 @@ SELECT (m.merge).starelid::regclass,
        (m.merge).staop3,
        (m.merge).staop4,
        (m.merge).staop5,
+       (m.merge).stacoll1,
+       (m.merge).stacoll2,
+       (m.merge).stacoll3,
+       (m.merge).stacoll4,
+       (m.merge).stacoll5,
        (m.merge).stanumbers1,
        (m.merge).stanumbers2,
        (m.merge).stanumbers3,
@@ -660,9 +720,9 @@ SELECT (m.merge).starelid::regclass,
           AND v.staattnum = '2'::int2
           AND s.starelid = 'st0'::regclass
           AND s.staattnum = '1'::int2) m;
- starelid | staattnum | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 |        stavalues1         |    stavalues2     | stavalues3 |            stavalues4             |                stavalues5                 
-----------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+-------------+-------------+-------------+-------------+-------------+---------------------------+-------------------+------------+-----------------------------------+-------------------------------------------
- st0      |         2 | t          |          -2 |       -2 |          -2 |        2 |        3 |        4 |        1 |        5 |     22 |     23 |     24 |     21 |     25 | {-2,22}     | {-2,23}     | {-2,24}     | {-2,21}     | {-2,25}     | {"test ","test ","test "} | {"test ","test "} | {"test "}  | {"test ","test ","test ","test "} | {"test ","test ","test ","test ","test "}
+ starelid | staattnum | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 |        stavalues1         |    stavalues2     | stavalues3 |            stavalues4             |                stavalues5                 
+----------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+---------------------------+-------------------+------------+-----------------------------------+-------------------------------------------
+ st0      |         2 | t          |          -2 |       -2 |          -2 |        2 |        3 |        4 |        1 |        5 |     22 |     23 |     24 |     21 |     25 |       32 |       33 |       34 |       31 |       35 | {-2,22}     | {-2,23}     | {-2,24}     | {-2,21}     | {-2,25}     | {"test ","test ","test "} | {"test ","test "} | {"test "}  | {"test ","test ","test ","test "} | {"test ","test ","test ","test ","test "}
 (1 row)
 
 -- No.5-1-6
@@ -678,14 +738,11 @@ ERROR:  return type must be a row type
 SELECT dbms_stats.merge(NULL, (
        s.starelid::regclass, s.staattnum, s.stainherit,
        s.stanullfrac, s.stawidth, s.stadistinct,
-       s.stakind1, s.stakind2, s.stakind3, s.stakind4,
-       s.stakind5,
-       s.staop1, s.staop2, s.staop3,
-       s.staop4,
-       NULL, s.stanumbers1, s.stanumbers2, s.stanumbers3, s.stanumbers4,
-       s.stanumbers5,
-       s.stavalues1, s.stavalues2, s.stavalues3, s.stavalues4
-      ,s.stavalues5
+       s.stakind1, s.stakind2, s.stakind3, s.stakind4, s.stakind5,
+       s.staop1, s.staop2, s.staop3, s.staop4, NULL,
+       s.stacoll1, s.stacoll2, s.stacoll3, s.stacoll4, s.stacoll5,
+	   s.stanumbers1, s.stanumbers2, s.stanumbers3, s.stanumbers4, s.stanumbers5,
+       s.stavalues1, s.stavalues2, s.stavalues3, s.stavalues4 ,s.stavalues5
        ))
   FROM pg_statistic s
  WHERE s.starelid = 'st0'::regclass
@@ -712,6 +769,11 @@ SELECT (m.merge).starelid::regclass,
        (m.merge).staop3,
        (m.merge).staop4,
        (m.merge).staop5,
+       (m.merge).stacoll1,
+       (m.merge).stacoll2,
+       (m.merge).stacoll3,
+       (m.merge).stacoll4,
+       (m.merge).stacoll5,
        (m.merge).stanumbers1,
        (m.merge).stanumbers2,
        (m.merge).stanumbers3,
@@ -725,10 +787,9 @@ SELECT (m.merge).starelid::regclass,
  FROM (SELECT dbms_stats.merge(NULL, (
               s.starelid::regclass, s.staattnum, s.stainherit,
               s.stanullfrac, s.stawidth, s.stadistinct,
-              s.stakind1, s.stakind2, s.stakind3, s.stakind4,
-              s.stakind5,
-              s.staop1, s.staop2, s.staop3, s.staop4,
-              s.staop5,
+              s.stakind1, s.stakind2, s.stakind3, s.stakind4, s.stakind5,
+              s.staop1, s.staop2, s.staop3, s.staop4, s.staop5,
+              s.stacoll1, s.stacoll2, s.stacoll3, s.stacoll4, s.stacoll5,
               NULL, s.stanumbers2, s.stanumbers3, s.stanumbers4,
               s.stanumbers5,
               s.stavalues1, s.stavalues2, s.stavalues3, s.stavalues4
@@ -737,9 +798,9 @@ SELECT (m.merge).starelid::regclass,
          FROM pg_statistic s
         WHERE s.starelid = 'st0'::regclass
           AND s.staattnum = '1'::int2) m;
- starelid | staattnum | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 | stavalues1 | stavalues2 |  stavalues3   |    stavalues4     |      stavalues5       
-----------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+-------------+-------------+-------------+-------------+-------------+------------+------------+---------------+-------------------+-----------------------
- st0      |         1 | f          |           1 |        1 |           1 |        4 |        1 |        2 |        3 |        5 |     14 |     11 |     12 |     13 |     15 | (null)      | {1,1}       | {1,2}       | {1,3}       | {1,5}       | {1,2}      | {1,2,1,2}  | {1,2,1,2,1,2} | {1,2,1,2,1,2,1,2} | {1,2,1,2,1,2,1,2,1,2}
+ starelid | staattnum | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 | stavalues1 | stavalues2 |  stavalues3   |    stavalues4     |      stavalues5       
+----------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+------------+------------+---------------+-------------------+-----------------------
+ st0      |         1 | f          |           1 |        1 |           1 |        4 |        1 |        2 |        3 |        5 |     14 |     11 |     12 |     13 |     15 |       24 |       21 |       22 |       23 |       25 | (null)      | {1,1}       | {1,2}       | {1,3}       | {1,5}       | {1,2}      | {1,2,1,2}  | {1,2,1,2,1,2} | {1,2,1,2,1,2,1,2} | {1,2,1,2,1,2,1,2,1,2}
 (1 row)
 
 -- No.5-1-9
@@ -748,9 +809,9 @@ SELECT dbms_stats.merge((
        v.stanullfrac, v.stawidth, v.stadistinct,
        v.stakind1, v.stakind2, v.stakind3, v.stakind4,
        v.stakind5,
-       v.staop1, v.staop2, v.staop3,
-       v.staop4,
-       NULL, v.stanumbers1, v.stanumbers2, v.stanumbers3, v.stanumbers4,
+       v.staop1, v.staop2, v.staop3, v.staop4, NULL,
+       v.stacoll1, v.stacoll2, v.stacoll3, v.stacoll4, v.stacoll5,
+       v.stanumbers1, v.stanumbers2, v.stanumbers3, v.stanumbers4,
        v.stanumbers5,
        v.stavalues1, v.stavalues2, v.stavalues3, v.stavalues4
       ,v.stavalues5
@@ -780,6 +841,11 @@ SELECT (m.merge).starelid::regclass,
        (m.merge).staop3,
        (m.merge).staop4,
        (m.merge).staop5,
+       (m.merge).stacoll1,
+       (m.merge).stacoll2,
+       (m.merge).stacoll3,
+       (m.merge).stacoll4,
+       (m.merge).stacoll5,
        (m.merge).stanumbers1,
        (m.merge).stanumbers2,
        (m.merge).stanumbers3,
@@ -795,8 +861,8 @@ SELECT (m.merge).starelid::regclass,
               v.stanullfrac, v.stawidth, v.stadistinct,
               v.stakind1, v.stakind2, v.stakind3, v.stakind4,
               v.stakind5,
-              v.staop1, v.staop2, v.staop3, v.staop4,
-              v.staop5,
+              v.staop1, v.staop2, v.staop3, v.staop4, v.staop5,
+              v.stacoll1, v.stacoll2, v.stacoll3, v.stacoll4, v.stacoll5,
               NULL, v.stanumbers2, v.stanumbers3, v.stanumbers4,
               v.stanumbers5,
               v.stavalues1, v.stavalues2, v.stavalues3, v.stavalues4
@@ -805,9 +871,9 @@ SELECT (m.merge).starelid::regclass,
          FROM dbms_stats.column_stats_locked v
         WHERE v.starelid = 'st0'::regclass
           AND v.staattnum = '2'::int2) m;
- starelid | staattnum | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 |        stavalues1         |    stavalues2     | stavalues3 |            stavalues4             |                stavalues5                 
-----------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+-------------+-------------+-------------+-------------+-------------+---------------------------+-------------------+------------+-----------------------------------+-------------------------------------------
- st0      |         2 | t          |          -2 |       -2 |          -2 |        2 |        3 |        4 |        1 |        5 |     22 |     23 |     24 |     21 |     25 | (null)      | {-2,23}     | {-2,24}     | {-2,21}     | {-2,25}     | {"test ","test ","test "} | {"test ","test "} | {"test "}  | {"test ","test ","test ","test "} | {"test ","test ","test ","test ","test "}
+ starelid | staattnum | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 |        stavalues1         |    stavalues2     | stavalues3 |            stavalues4             |                stavalues5                 
+----------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+---------------------------+-------------------+------------+-----------------------------------+-------------------------------------------
+ st0      |         2 | t          |          -2 |       -2 |          -2 |        2 |        3 |        4 |        1 |        5 |     22 |     23 |     24 |     21 |     25 |       32 |       33 |       34 |       31 |       35 | (null)      | {-2,23}     | {-2,24}     | {-2,21}     | {-2,25}     | {"test ","test ","test "} | {"test ","test "} | {"test "}  | {"test ","test ","test ","test "} | {"test ","test ","test ","test ","test "}
 (1 row)
 
 -- No.5-1-11
@@ -816,9 +882,9 @@ SELECT dbms_stats.merge((
        v.stanullfrac, v.stawidth, v.stadistinct,
        v.stakind1, v.stakind2, v.stakind3, v.stakind4,
        v.stakind5,
-       v.staop1, v.staop2, v.staop3,
-       v.staop4,
-       NULL, v.stanumbers1, v.stanumbers2, v.stanumbers3, v.stanumbers4,
+       v.staop1, v.staop2, v.staop3, v.staop4, NULL,
+       v.stacoll1, v.stacoll2, v.stacoll3, v.stacoll4, v.stacoll5,
+	   v.stanumbers1, v.stanumbers2, v.stanumbers3, v.stanumbers4,
        v.stanumbers5,
        v.stavalues1, v.stavalues2, v.stavalues3, v.stavalues4
       ,v.stavalues5
@@ -827,9 +893,9 @@ SELECT dbms_stats.merge((
        s.stanullfrac, s.stawidth, s.stadistinct,
        s.stakind1, s.stakind2, s.stakind3, s.stakind4,
        s.stakind5,
-       s.staop1, s.staop2, s.staop3,
-       s.staop4,
-       NULL, s.stanumbers1, s.stanumbers2, s.stanumbers3, s.stanumbers4,
+       s.staop1, s.staop2, s.staop3, s.staop4, NULL,
+       s.stacoll1, s.stacoll2, s.stacoll3, s.stacoll4, s.stacoll5,
+	   s.stanumbers1, s.stanumbers2, s.stanumbers3, s.stanumbers4,
        s.stanumbers5,
        s.stavalues1, s.stavalues2, s.stavalues3, s.stavalues4
       ,s.stavalues5
@@ -864,6 +930,11 @@ SELECT (m.merge).starelid::regclass,
        (m.merge).staop3,
        (m.merge).staop4,
        (m.merge).staop5,
+       (m.merge).stacoll1,
+       (m.merge).stacoll2,
+       (m.merge).stacoll3,
+       (m.merge).stacoll4,
+       (m.merge).stacoll5,
        (m.merge).stanumbers1,
        (m.merge).stanumbers2,
        (m.merge).stanumbers3,
@@ -879,8 +950,8 @@ SELECT (m.merge).starelid::regclass,
               v.stanullfrac, v.stawidth, v.stadistinct,
               v.stakind1, v.stakind2, v.stakind3, v.stakind4,
               v.stakind5,
-              v.staop1, v.staop2, v.staop3, v.staop4,
-              v.staop5,
+              v.staop1, v.staop2, v.staop3, v.staop4, v.staop5,
+              v.stacoll1, v.stacoll2, v.stacoll3, v.stacoll4, v.stacoll5,
               NULL, v.stanumbers2, v.stanumbers3, v.stanumbers4,
               v.stanumbers5,
               v.stavalues1, v.stavalues2, v.stavalues3, v.stavalues4
@@ -890,8 +961,8 @@ SELECT (m.merge).starelid::regclass,
               s.stanullfrac, s.stawidth, s.stadistinct,
               s.stakind1, s.stakind2, s.stakind3, s.stakind4,
               s.stakind5,
-              s.staop1, s.staop2, s.staop3, s.staop4,
-              s.staop5,
+              s.staop1, s.staop2, s.staop3, s.staop4, s.staop5,
+              s.stacoll1, s.stacoll2, s.stacoll3, s.stacoll4, s.stacoll5,
               NULL, s.stanumbers2, s.stanumbers3, s.stanumbers4,
               s.stanumbers5,
               s.stavalues1, s.stavalues2, s.stavalues3, s.stavalues4
@@ -903,9 +974,9 @@ SELECT (m.merge).starelid::regclass,
           AND v.staattnum = '2'::int2
           AND s.starelid = 'st0'::regclass
           AND s.staattnum = '1'::int2) m;
- starelid | staattnum | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 |        stavalues1         |    stavalues2     | stavalues3 |            stavalues4             |                stavalues5                 
-----------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+-------------+-------------+-------------+-------------+-------------+---------------------------+-------------------+------------+-----------------------------------+-------------------------------------------
- st0      |         2 | t          |          -2 |       -2 |          -2 |        2 |        3 |        4 |        1 |        5 |     22 |     23 |     24 |     21 |     25 | (null)      | {-2,23}     | {-2,24}     | {-2,21}     | {-2,25}     | {"test ","test ","test "} | {"test ","test "} | {"test "}  | {"test ","test ","test ","test "} | {"test ","test ","test ","test ","test "}
+ starelid | staattnum | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 |        stavalues1         |    stavalues2     | stavalues3 |            stavalues4             |                stavalues5                 
+----------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+---------------------------+-------------------+------------+-----------------------------------+-------------------------------------------
+ st0      |         2 | t          |          -2 |       -2 |          -2 |        2 |        3 |        4 |        1 |        5 |     22 |     23 |     24 |     21 |     25 |       32 |       33 |       34 |       31 |       35 | (null)      | {-2,23}     | {-2,24}     | {-2,21}     | {-2,25}     | {"test ","test ","test "} | {"test ","test "} | {"test "}  | {"test ","test ","test ","test "} | {"test ","test ","test ","test ","test "}
 (1 row)
 
 -- No.5-1-13
@@ -925,6 +996,11 @@ SELECT (m.merge).starelid::regclass,
        (m.merge).staop3,
        (m.merge).staop4,
        (m.merge).staop5,
+       (m.merge).stacoll1,
+       (m.merge).stacoll2,
+       (m.merge).stacoll3,
+       (m.merge).stacoll4,
+       (m.merge).stacoll5,
        (m.merge).stanumbers1,
        (m.merge).stanumbers2,
        (m.merge).stanumbers3,
@@ -938,18 +1014,18 @@ SELECT (m.merge).starelid::regclass,
  FROM (SELECT dbms_stats.merge((
              NULL, NULL, NULL,
              NULL, NULL, NULL,
-             NULL, NULL, NULL, NULL,
-             NULL, NULL, NULL, NULL,
-             NULL, NULL, NULL, NULL,
-             NULL, NULL, NULL, NULL
-            ,NULL, NULL, NULL, NULL
+             NULL, NULL, NULL, NULL, NULL,
+             NULL, NULL, NULL, NULL, NULL,
+             NULL, NULL, NULL, NULL, NULL,
+             NULL, NULL, NULL, NULL, NULL,
+			 NULL, NULL, NULL, NULL, NULL
              ), s)
          FROM pg_statistic s
         WHERE s.starelid = 'st0'::regclass
           AND s.staattnum = '1'::int2) m;
- starelid | staattnum | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 | stavalues1 | stavalues2 |  stavalues3   |    stavalues4     |      stavalues5       
-----------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+-------------+-------------+-------------+-------------+-------------+------------+------------+---------------+-------------------+-----------------------
- st0      |         1 | f          |           1 |        1 |           1 |        4 |        1 |        2 |        3 |        5 |     14 |     11 |     12 |     13 |     15 | {1,4}       | {1,1}       | {1,2}       | {1,3}       | {1,5}       | {1,2}      | {1,2,1,2}  | {1,2,1,2,1,2} | {1,2,1,2,1,2,1,2} | {1,2,1,2,1,2,1,2,1,2}
+ starelid | staattnum | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 | stavalues1 | stavalues2 |  stavalues3   |    stavalues4     |      stavalues5       
+----------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+------------+------------+---------------+-------------------+-----------------------
+ st0      |         1 | f          |           1 |        1 |           1 |        4 |        1 |        2 |        3 |        5 |     14 |     11 |     12 |     13 |     15 |       24 |       21 |       22 |       23 |       25 | {1,4}       | {1,1}       | {1,2}       | {1,3}       | {1,5}       | {1,2}      | {1,2,1,2}  | {1,2,1,2,1,2} | {1,2,1,2,1,2,1,2} | {1,2,1,2,1,2,1,2,1,2}
 (1 row)
 
 -- No.5-1-14
@@ -969,6 +1045,11 @@ SELECT (m.merge).starelid::regclass,
        (m.merge).staop3,
        (m.merge).staop4,
        (m.merge).staop5,
+       (m.merge).stacoll1,
+       (m.merge).stacoll2,
+       (m.merge).stacoll3,
+       (m.merge).stacoll4,
+       (m.merge).stacoll5,
        (m.merge).stanumbers1,
        (m.merge).stanumbers2,
        (m.merge).stanumbers3,
@@ -982,17 +1063,17 @@ SELECT (m.merge).starelid::regclass,
  FROM (SELECT dbms_stats.merge(v, (
              NULL, NULL, NULL,
              NULL, NULL, NULL,
-             NULL, NULL, NULL, NULL,
-             NULL, NULL, NULL, NULL,
-             NULL, NULL, NULL, NULL,
-             NULL, NULL, NULL, NULL,
-             NULL, NULL, NULL, NULL))
+             NULL, NULL, NULL, NULL, NULL,
+             NULL, NULL, NULL, NULL, NULL,
+             NULL, NULL, NULL, NULL, NULL,
+             NULL, NULL, NULL, NULL, NULL,
+			 NULL, NULL, NULL, NULL, NULL))
          FROM dbms_stats.column_stats_locked v
         WHERE v.starelid = 'st0'::regclass
           AND v.staattnum = '2'::int2) m;
- starelid | staattnum | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 |        stavalues1         |    stavalues2     | stavalues3 |            stavalues4             |                stavalues5                 
-----------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+-------------+-------------+-------------+-------------+-------------+---------------------------+-------------------+------------+-----------------------------------+-------------------------------------------
- st0      |         2 | t          |          -2 |       -2 |          -2 |        2 |        3 |        4 |        1 |        5 |     22 |     23 |     24 |     21 |     25 | {-2,22}     | {-2,23}     | {-2,24}     | {-2,21}     | {-2,25}     | {"test ","test ","test "} | {"test ","test "} | {"test "}  | {"test ","test ","test ","test "} | {"test ","test ","test ","test ","test "}
+ starelid | staattnum | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 |        stavalues1         |    stavalues2     | stavalues3 |            stavalues4             |                stavalues5                 
+----------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+---------------------------+-------------------+------------+-----------------------------------+-------------------------------------------
+ st0      |         2 | t          |          -2 |       -2 |          -2 |        2 |        3 |        4 |        1 |        5 |     22 |     23 |     24 |     21 |     25 |       32 |       33 |       34 |       31 |       35 | {-2,22}     | {-2,23}     | {-2,24}     | {-2,21}     | {-2,25}     | {"test ","test ","test "} | {"test ","test "} | {"test "}  | {"test ","test ","test ","test "} | {"test ","test ","test ","test ","test "}
 (1 row)
 
 -- No.5-1-15
@@ -1012,6 +1093,11 @@ SELECT (m.merge).starelid::regclass,
        (m.merge).staop3,
        (m.merge).staop4,
        (m.merge).staop5,
+       (m.merge).stacoll1,
+       (m.merge).stacoll2,
+       (m.merge).stacoll3,
+       (m.merge).stacoll4,
+       (m.merge).stacoll5,
        (m.merge).stanumbers1,
        (m.merge).stanumbers2,
        (m.merge).stanumbers3,
@@ -1029,28 +1115,28 @@ SELECT (m.merge).starelid::regclass,
           AND v.staattnum = '2'::int2
           AND s.starelid = 'st0'::regclass
           AND s.staattnum = '1'::int2) m;
- starelid | staattnum | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 |        stavalues1         |    stavalues2     | stavalues3 |            stavalues4             |                stavalues5                 
-----------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+-------------+-------------+-------------+-------------+-------------+---------------------------+-------------------+------------+-----------------------------------+-------------------------------------------
- st0      |         2 | t          |          -2 |       -2 |          -2 |        2 |        3 |        4 |        1 |        5 |     22 |     23 |     24 |     21 |     25 | {-2,22}     | {-2,23}     | {-2,24}     | {-2,21}     | {-2,25}     | {"test ","test ","test "} | {"test ","test "} | {"test "}  | {"test ","test ","test ","test "} | {"test ","test ","test ","test ","test "}
+ starelid | staattnum | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 |        stavalues1         |    stavalues2     | stavalues3 |            stavalues4             |                stavalues5                 
+----------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+---------------------------+-------------------+------------+-----------------------------------+-------------------------------------------
+ st0      |         2 | t          |          -2 |       -2 |          -2 |        2 |        3 |        4 |        1 |        5 |     22 |     23 |     24 |     21 |     25 |       32 |       33 |       34 |       31 |       35 | {-2,22}     | {-2,23}     | {-2,24}     | {-2,21}     | {-2,25}     | {"test ","test ","test "} | {"test ","test "} | {"test "}  | {"test ","test ","test ","test "} | {"test ","test ","test ","test ","test "}
 (1 row)
 
 -- No.5-1-16
 SELECT dbms_stats.merge((
        v.starelid::regclass, v.staattnum, v.stainherit,
        v.stanullfrac, v.stawidth, v.stadistinct,
-       NULL, NULL, NULL, NULL,
-       NULL, NULL, NULL, NULL,
-       NULL, NULL, NULL, NULL,
-       NULL, NULL, NULL, NULL
-      ,NULL, NULL, NULL, NULL
+       NULL, NULL, NULL, NULL, NULL,
+       NULL, NULL, NULL, NULL, NULL,
+       NULL, NULL, NULL, NULL, NULL,
+       NULL, NULL, NULL, NULL, NULL,
+       NULL, NULL, NULL, NULL, NULL
        ), (
        s.starelid::regclass, s.staattnum, s.stainherit,
        s.stanullfrac, s.stawidth, s.stadistinct,
-       NULL, NULL, NULL, NULL,
-       NULL, NULL, NULL, NULL,
-       NULL, NULL, NULL, NULL,
-       NULL, NULL, NULL, NULL,
-       NULL, NULL, NULL, NULL))
+       NULL, NULL, NULL, NULL, NULL,
+       NULL, NULL, NULL, NULL, NULL,
+       NULL, NULL, NULL, NULL, NULL,
+       NULL, NULL, NULL, NULL, NULL,
+       NULL, NULL, NULL, NULL, NULL))
   FROM dbms_stats.column_stats_locked v,
        pg_statistic s
  WHERE v.starelid = 'st0'::regclass
@@ -1081,6 +1167,11 @@ SELECT (m.merge).starelid::regclass,
        (m.merge).staop3,
        (m.merge).staop4,
        (m.merge).staop5,
+       (m.merge).stacoll1,
+       (m.merge).stacoll2,
+       (m.merge).stacoll3,
+       (m.merge).stacoll4,
+       (m.merge).stacoll5,
        (m.merge).stanumbers1,
        (m.merge).stanumbers2,
        (m.merge).stanumbers3,
@@ -1096,9 +1187,9 @@ SELECT (m.merge).starelid::regclass,
               v.stanullfrac, v.stawidth, v.stadistinct,
               v.stakind1, v.stakind2, v.stakind3, v.stakind4,
               v.stakind5,
-              v.staop1, v.staop2, v.staop3,
-              v.staop4,
-              NULL, v.stanumbers1, v.stanumbers2, v.stanumbers3, v.stanumbers4,
+              v.staop1, v.staop2, v.staop3, v.staop4, NULL,
+              v.stacoll1, v.stacoll2, v.stacoll3, v.stacoll4, v.stacoll5,
+              v.stanumbers1, v.stanumbers2, v.stanumbers3, v.stanumbers4,
               v.stanumbers5,
               v.stavalues1, v.stavalues2, v.stavalues3, v.stavalues4
              ,v.stavalues5
@@ -1107,8 +1198,8 @@ SELECT (m.merge).starelid::regclass,
               s.stanullfrac, s.stawidth, s.stadistinct,
               s.stakind1, s.stakind2, s.stakind3, s.stakind4,
               s.stakind5,
-              s.staop1, s.staop2, s.staop3, s.staop4,
-              s.staop5,
+              s.staop1, s.staop2, s.staop3, s.staop4, s.staop5,
+              s.stacoll1, s.stacoll2, s.stacoll3, s.stacoll4, s.stacoll5,
               s.stanumbers1, s.stanumbers2, s.stanumbers3, s.stanumbers4,
               s.stanumbers5,
               s.stavalues1, s.stavalues2, s.stavalues3, s.stavalues4
@@ -1120,9 +1211,9 @@ SELECT (m.merge).starelid::regclass,
           AND v.staattnum = '1'::int2
           AND s.starelid = 'st0'::regclass
           AND s.staattnum = '1'::int2) m;
- starelid | staattnum | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 | stavalues1 | stavalues2 |  stavalues3   |    stavalues4     |      stavalues5       
-----------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+-------------+-------------+-------------+-------------+-------------+------------+------------+---------------+-------------------+-----------------------
- st0      |         1 | t          |          -1 |       -1 |          -1 |        4 |        1 |        2 |        3 |        5 |     14 |     11 |     12 |     13 |     15 | {1,4}       | {1,1}       | {1,2}       | {1,3}       | {1,5}       | {1,2}      | {1,2,1,2}  | {1,2,1,2,1,2} | {1,2,1,2,1,2,1,2} | {1,2,1,2,1,2,1,2,1,2}
+ starelid | staattnum | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 | stavalues1 | stavalues2 |  stavalues3   |    stavalues4     |      stavalues5       
+----------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+------------+------------+---------------+-------------------+-----------------------
+ st0      |         1 | t          |          -1 |       -1 |          -1 |        4 |        1 |        2 |        3 |        5 |     14 |     11 |     12 |     13 |     15 |       24 |       21 |       22 |       23 |       25 | {1,4}       | {1,1}       | {1,2}       | {1,3}       | {1,5}       | {1,2}      | {1,2,1,2}  | {1,2,1,2,1,2} | {1,2,1,2,1,2,1,2} | {1,2,1,2,1,2,1,2,1,2}
 (1 row)
 
 -- No.5-1-18
@@ -1131,9 +1222,9 @@ SELECT dbms_stats.merge((
        v.stanullfrac, v.stawidth, v.stadistinct,
        v.stakind1, v.stakind2, v.stakind3, v.stakind4,
        v.stakind5,
-       v.staop1, v.staop2, v.staop3,
-       v.staop4,
-       NULL, v.stanumbers1, v.stanumbers2, v.stanumbers3, v.stanumbers4,
+       v.staop1, v.staop2, v.staop3, v.staop4, NULL,
+       v.stacoll1, v.stacoll2, v.stacoll3, v.stacoll4, v.stacoll5,
+	   v.stanumbers1, v.stanumbers2, v.stanumbers3, v.stanumbers4,
        v.stanumbers5,
        v.stavalues1, v.stavalues2, v.stavalues3, v.stavalues4
       ,v.stavalues5
@@ -1142,9 +1233,9 @@ SELECT dbms_stats.merge((
        s.stanullfrac, s.stawidth, s.stadistinct,
        s.stakind1, s.stakind2, s.stakind3, s.stakind4,
        s.stakind5,
-       s.staop1, s.staop2, s.staop3,
-       s.staop4,
-       NULL, s.stanumbers1, s.stanumbers2, s.stanumbers3, s.stanumbers4,
+       s.staop1, s.staop2, s.staop3, s.staop4, NULL,
+       s.stacoll1, s.stacoll2, s.stacoll3, s.stacoll4, s.stacoll5,
+	   s.stanumbers1, s.stanumbers2, s.stanumbers3, s.stanumbers4,
        s.stanumbers5,
        s.stavalues1, s.stavalues2, s.stavalues3, s.stavalues4
       ,s.stavalues5
@@ -1179,6 +1270,11 @@ SELECT (m.merge).starelid::regclass,
        (m.merge).staop3,
        (m.merge).staop4,
        (m.merge).staop5,
+       (m.merge).stacoll1,
+       (m.merge).stacoll2,
+       (m.merge).stacoll3,
+       (m.merge).stacoll4,
+       (m.merge).stacoll5,
        (m.merge).stanumbers1,
        (m.merge).stanumbers2,
        (m.merge).stanumbers3,
@@ -1194,8 +1290,8 @@ SELECT (m.merge).starelid::regclass,
               v.stanullfrac, v.stawidth, v.stadistinct,
               '1', '1', '1', '1',
               '1',
-              v.staop1, v.staop2, v.staop3, v.staop4,
-              v.staop5,
+              v.staop1, v.staop2, v.staop3, v.staop4, v.staop5,
+              v.stacoll1, v.stacoll2, v.stacoll3, v.stacoll4, v.stacoll5,
               v.stanumbers1, v.stanumbers2, v.stanumbers3, v.stanumbers4,
               v.stanumbers5,
               v.stavalues1, v.stavalues2, v.stavalues3, v.stavalues4
@@ -1205,8 +1301,8 @@ SELECT (m.merge).starelid::regclass,
               s.stanullfrac, s.stawidth, s.stadistinct,
               '1', '1', '1', '1',
               '1',
-              s.staop1, s.staop2, s.staop3, s.staop4,
-              s.staop5,
+              s.staop1, s.staop2, s.staop3, s.staop4, s.staop5,
+              s.stacoll1, s.stacoll2, s.stacoll3, s.stacoll4, s.stacoll5,
               s.stanumbers1, s.stanumbers2, s.stanumbers3, s.stanumbers4,
               s.stanumbers5,
               s.stavalues1, s.stavalues2, s.stavalues3, s.stavalues4
@@ -1218,9 +1314,9 @@ SELECT (m.merge).starelid::regclass,
           AND v.staattnum = '2'::int2
           AND s.starelid = 'st0'::regclass
           AND s.staattnum = '1'::int2) m;
- starelid | staattnum | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 |        stavalues1         |    stavalues2     | stavalues3 |            stavalues4             |                stavalues5                 
-----------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+-------------+-------------+-------------+-------------+-------------+---------------------------+-------------------+------------+-----------------------------------+-------------------------------------------
- st0      |         2 | t          |          -2 |       -2 |          -2 |        1 |        1 |        1 |        1 |        1 |     22 |     23 |     24 |     21 |     25 | {-2,22}     | {-2,23}     | {-2,24}     | {-2,21}     | {-2,25}     | {"test ","test ","test "} | {"test ","test "} | {"test "}  | {"test ","test ","test ","test "} | {"test ","test ","test ","test ","test "}
+ starelid | staattnum | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 |        stavalues1         |    stavalues2     | stavalues3 |            stavalues4             |                stavalues5                 
+----------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+---------------------------+-------------------+------------+-----------------------------------+-------------------------------------------
+ st0      |         2 | t          |          -2 |       -2 |          -2 |        1 |        1 |        1 |        1 |        1 |     22 |     23 |     24 |     21 |     25 |       32 |       33 |       34 |       31 |       35 | {-2,22}     | {-2,23}     | {-2,24}     | {-2,21}     | {-2,25}     | {"test ","test ","test "} | {"test ","test "} | {"test "}  | {"test ","test ","test ","test "} | {"test ","test ","test ","test ","test "}
 (1 row)
 
 -- No.5-1-20
@@ -1240,6 +1336,11 @@ SELECT (m.merge).starelid::regclass,
        (m.merge).staop3,
        (m.merge).staop4,
        (m.merge).staop5,
+       (m.merge).stacoll1,
+       (m.merge).stacoll2,
+       (m.merge).stacoll3,
+       (m.merge).stacoll4,
+       (m.merge).stacoll5,
        (m.merge).stanumbers1,
        (m.merge).stanumbers2,
        (m.merge).stanumbers3,
@@ -1254,8 +1355,8 @@ SELECT (m.merge).starelid::regclass,
               v.stanullfrac, v.stawidth, v.stadistinct,
               '2', '2', '2', '2',
               '2',
-              v.staop1, v.staop2, v.staop3, v.staop4,
-              v.staop5,
+              v.staop1, v.staop2, v.staop3, v.staop4, v.staop5,
+              v.stacoll1, v.stacoll2, v.stacoll3, v.stacoll4, v.stacoll5,
               v.stanumbers1, v.stanumbers2, v.stanumbers3, v.stanumbers4,
               v.stanumbers5,
               v.stavalues1, v.stavalues2, v.stavalues3, v.stavalues4
@@ -1265,8 +1366,8 @@ SELECT (m.merge).starelid::regclass,
               s.stanullfrac, s.stawidth, s.stadistinct,
               '2', '2', '2', '2',
               '2',
-              s.staop1, s.staop2, s.staop3, s.staop4,
-              s.staop5,
+              s.staop1, s.staop2, s.staop3, s.staop4, s.staop5,
+              s.stacoll1, s.stacoll2, s.stacoll3, s.stacoll4, s.stacoll5,
               s.stanumbers1, s.stanumbers2, s.stanumbers3, s.stanumbers4,
               s.stanumbers5,
               s.stavalues1, s.stavalues2, s.stavalues3, s.stavalues4
@@ -1278,9 +1379,9 @@ SELECT (m.merge).starelid::regclass,
           AND v.staattnum = '2'::int2
           AND s.starelid = 'st0'::regclass
           AND s.staattnum = '1'::int2) m;
- starelid | staattnum | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 |        stavalues1         |    stavalues2     | stavalues3 |            stavalues4             |                stavalues5                 
-----------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+-------------+-------------+-------------+-------------+-------------+---------------------------+-------------------+------------+-----------------------------------+-------------------------------------------
- st0      |         2 | t          |          -2 |       -2 |          -2 |        2 |        2 |        2 |        2 |        2 |     22 |     23 |     24 |     21 |     25 | {-2,22}     | {-2,23}     | {-2,24}     | {-2,21}     | {-2,25}     | {"test ","test ","test "} | {"test ","test "} | {"test "}  | {"test ","test ","test ","test "} | {"test ","test ","test ","test ","test "}
+ starelid | staattnum | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 |        stavalues1         |    stavalues2     | stavalues3 |            stavalues4             |                stavalues5                 
+----------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+---------------------------+-------------------+------------+-----------------------------------+-------------------------------------------
+ st0      |         2 | t          |          -2 |       -2 |          -2 |        2 |        2 |        2 |        2 |        2 |     22 |     23 |     24 |     21 |     25 |       32 |       33 |       34 |       31 |       35 | {-2,22}     | {-2,23}     | {-2,24}     | {-2,21}     | {-2,25}     | {"test ","test ","test "} | {"test ","test "} | {"test "}  | {"test ","test ","test ","test "} | {"test ","test ","test ","test ","test "}
 (1 row)
 
 -- No.5-1-21
@@ -1288,8 +1389,8 @@ SELECT dbms_stats.merge((v.starelid::regclass, '2', v.stainherit,
               v.stanullfrac, v.stawidth, v.stadistinct,
               '1', '1', '1', '1',
               '1',
-              v.staop1, v.staop2, v.staop3, v.staop4,
-              v.staop5,
+              v.staop1, v.staop2, v.staop3, v.staop4, v.staop5,
+              v.stacoll1, v.stacoll2, v.stacoll3, v.stacoll4, v.stacoll5,
               v.stanumbers1, v.stanumbers2, v.stanumbers3, v.stanumbers4,
               v.stanumbers5,
               v.stavalues1, v.stavalues2, v.stavalues3, v.stavalues4
@@ -1299,8 +1400,8 @@ SELECT dbms_stats.merge((v.starelid::regclass, '2', v.stainherit,
               s.stanullfrac, s.stawidth, s.stadistinct,
               '1', '1', '1', '1',
               '1',
-              s.staop1, s.staop2, s.staop3, s.staop4,
-              s.staop5,
+              s.staop1, s.staop2, s.staop3, s.staop4, s.staop5,
+              s.stacoll1, s.stacoll2, s.stacoll3, s.stacoll4, s.stacoll5,
               s.stanumbers1, s.stanumbers2, s.stanumbers3, s.stanumbers4,
               s.stanumbers5,
               s.stavalues1, s.stavalues2, s.stavalues3, s.stavalues4
@@ -1325,8 +1426,8 @@ SELECT dbms_stats.merge((v.starelid::regclass, '2', v.stainherit,
               v.stanullfrac, v.stawidth, v.stadistinct,
               '2', '2', '2', '2',
               '2',
-              v.staop1, v.staop2, v.staop3, v.staop4,
-              v.staop5,
+              v.staop1, v.staop2, v.staop3, v.staop4, v.staop5,
+              v.stacoll1, v.stacoll2, v.stacoll3, v.stacoll4, v.stacoll5,
               v.stanumbers1, v.stanumbers2, v.stanumbers3, v.stanumbers4,
               v.stanumbers5,
               v.stavalues1, v.stavalues2, v.stavalues3, v.stavalues4
@@ -1336,8 +1437,8 @@ SELECT dbms_stats.merge((v.starelid::regclass, '2', v.stainherit,
               s.stanullfrac, s.stawidth, s.stadistinct,
               '2', '2', '2', '2',
               '2',
-              s.staop1, s.staop2, s.staop3, s.staop4,
-              s.staop5,
+              s.staop1, s.staop2, s.staop3, s.staop4, s.staop5,
+              s.stacoll1, s.stacoll2, s.stacoll3, s.stacoll4, s.stacoll5,
               s.stanumbers1, s.stanumbers2, s.stanumbers3, s.stanumbers4,
               s.stanumbers5,
               s.stavalues1, s.stavalues2, s.stavalues3, s.stavalues4
@@ -3449,7 +3550,7 @@ DELETE FROM pg_statistic
  WHERE starelid = 's0.st0'::regclass;
 SELECT dbms_stats.lock('s0.st0', 'id');
 ERROR:  no statistics available for column "id" of relation "s0.st0"
-CONTEXT:  PL/pgSQL function dbms_stats.lock(regclass,text) line 120 at RAISE
+CONTEXT:  PL/pgSQL function dbms_stats.lock(regclass,text) line 131 at RAISE
 VACUUM ANALYZE;
 -- No.11-1-17
 DELETE FROM dbms_stats.relation_stats_locked;
@@ -3470,19 +3571,19 @@ UPDATE dbms_stats.column_stats_locked
    SET (stanullfrac, stawidth, stadistinct,
         stakind1, stakind2, stakind3, stakind4,
         stakind5,
-        staop1, staop2, staop3, staop4,
-        staop5,
+        staop1, staop2, staop3, staop4, staop5,
+        stacoll1, stacoll2, stacoll3, stacoll4, stacoll5,
         stanumbers1, stanumbers2, stanumbers3, stanumbers4,
         stanumbers5,
         stavalues1, stavalues2, stavalues3, stavalues4
        ,stavalues5
        ) = (
         NULL, NULL, NULL,
-        NULL, NULL, NULL, NULL,
-        NULL, NULL, NULL, NULL,
-        NULL, NULL, NULL, NULL,
-        NULL, NULL, NULL, NULL,
-        NULL, NULL, NULL, NULL)
+        NULL, NULL, NULL, NULL, NULL,
+        NULL, NULL, NULL, NULL, NULL,
+        NULL, NULL, NULL, NULL, NULL,
+        NULL, NULL, NULL, NULL, NULL,
+        NULL, NULL, NULL, NULL, NULL)
  WHERE starelid = 's0.st0'::regclass;
 SELECT dbms_stats.lock('s0.st0', 'id');
   lock  
@@ -10094,7 +10195,7 @@ EXPLAIN (COSTS OFF) SELECT * FROM s0.st4  WHERE a = 1;
 
 SET SESSION AUTHORIZATION regular_user;
 EXPLAIN (COSTS OFF) SELECT * FROM s0.st4  WHERE a = 1;
-ERROR:  permission denied for relation st4
+ERROR:  permission denied for table st4
 EXPLAIN (COSTS OFF) SELECT * FROM s0.vst4 WHERE a = 1;
            QUERY PLAN            
 ---------------------------------

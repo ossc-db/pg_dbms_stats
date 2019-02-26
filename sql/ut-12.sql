@@ -59,6 +59,11 @@ UPDATE pg_statistic SET
     staop3 = 12,
     staop4 = 13,
     staop5 = 15,
+    stacoll1 = 24,
+    stacoll2 = 21,
+    stacoll3 = 22,
+    stacoll4 = 23,
+    stacoll5 = 25,
     stanumbers1 = ARRAY[staattnum,4],
     stanumbers2 = ARRAY[staattnum,1],
     stanumbers3 = ARRAY[staattnum,2],
@@ -85,6 +90,11 @@ UPDATE dbms_stats.column_stats_locked SET
     staop3 = 24,
     staop4 = 21,
     staop5 = 25,
+    stacoll1 = 32,
+    stacoll2 = 33,
+    stacoll3 = 34,
+    stacoll4 = 31,
+    stacoll5 = 35,
     stanumbers1 = ARRAY[-staattnum,22],
     stanumbers2 = ARRAY[-staattnum,23],
     stanumbers3 = ARRAY[-staattnum,24],
@@ -131,6 +141,11 @@ SELECT (m.merge).starelid::regclass,
        (m.merge).staop3,
        (m.merge).staop4,
        (m.merge).staop5,
+       (m.merge).stacoll1,
+       (m.merge).stacoll2,
+       (m.merge).stacoll3,
+       (m.merge).stacoll4,
+       (m.merge).stacoll5,
        (m.merge).stanumbers1,
        (m.merge).stanumbers2,
        (m.merge).stanumbers3,
@@ -163,6 +178,11 @@ SELECT (m.merge).starelid::regclass,
        (m.merge).staop3,
        (m.merge).staop4,
        (m.merge).staop5,
+       (m.merge).stacoll1,
+       (m.merge).stacoll2,
+       (m.merge).stacoll3,
+       (m.merge).stacoll4,
+       (m.merge).stacoll5,
        (m.merge).stanumbers1,
        (m.merge).stanumbers2,
        (m.merge).stanumbers3,
@@ -198,6 +218,11 @@ SELECT (m.merge).starelid::regclass,
        (m.merge).staop3,
        (m.merge).staop4,
        (m.merge).staop5,
+       (m.merge).stacoll1,
+       (m.merge).stacoll2,
+       (m.merge).stacoll3,
+       (m.merge).stacoll4,
+       (m.merge).stacoll5,
        (m.merge).stanumbers1,
        (m.merge).stanumbers2,
        (m.merge).stanumbers3,
@@ -233,6 +258,11 @@ SELECT (m.merge).starelid::regclass,
        (m.merge).staop3,
        (m.merge).staop4,
        (m.merge).staop5,
+       (m.merge).stacoll1,
+       (m.merge).stacoll2,
+       (m.merge).stacoll3,
+       (m.merge).stacoll4,
+       (m.merge).stacoll5,
        (m.merge).stanumbers1,
        (m.merge).stanumbers2,
        (m.merge).stanumbers3,
@@ -264,14 +294,11 @@ SELECT dbms_stats.merge1(v, s)
 SELECT dbms_stats.merge(NULL, (
        s.starelid::regclass, s.staattnum, s.stainherit,
        s.stanullfrac, s.stawidth, s.stadistinct,
-       s.stakind1, s.stakind2, s.stakind3, s.stakind4,
-       s.stakind5,
-       s.staop1, s.staop2, s.staop3,
-       s.staop4,
-       NULL, s.stanumbers1, s.stanumbers2, s.stanumbers3, s.stanumbers4,
-       s.stanumbers5,
-       s.stavalues1, s.stavalues2, s.stavalues3, s.stavalues4
-      ,s.stavalues5
+       s.stakind1, s.stakind2, s.stakind3, s.stakind4, s.stakind5,
+       s.staop1, s.staop2, s.staop3, s.staop4, NULL,
+       s.stacoll1, s.stacoll2, s.stacoll3, s.stacoll4, s.stacoll5,
+	   s.stanumbers1, s.stanumbers2, s.stanumbers3, s.stanumbers4, s.stanumbers5,
+       s.stavalues1, s.stavalues2, s.stavalues3, s.stavalues4 ,s.stavalues5
        ))
   FROM pg_statistic s
  WHERE s.starelid = 'st0'::regclass
@@ -294,6 +321,11 @@ SELECT (m.merge).starelid::regclass,
        (m.merge).staop3,
        (m.merge).staop4,
        (m.merge).staop5,
+       (m.merge).stacoll1,
+       (m.merge).stacoll2,
+       (m.merge).stacoll3,
+       (m.merge).stacoll4,
+       (m.merge).stacoll5,
        (m.merge).stanumbers1,
        (m.merge).stanumbers2,
        (m.merge).stanumbers3,
@@ -307,10 +339,9 @@ SELECT (m.merge).starelid::regclass,
  FROM (SELECT dbms_stats.merge(NULL, (
               s.starelid::regclass, s.staattnum, s.stainherit,
               s.stanullfrac, s.stawidth, s.stadistinct,
-              s.stakind1, s.stakind2, s.stakind3, s.stakind4,
-              s.stakind5,
-              s.staop1, s.staop2, s.staop3, s.staop4,
-              s.staop5,
+              s.stakind1, s.stakind2, s.stakind3, s.stakind4, s.stakind5,
+              s.staop1, s.staop2, s.staop3, s.staop4, s.staop5,
+              s.stacoll1, s.stacoll2, s.stacoll3, s.stacoll4, s.stacoll5,
               NULL, s.stanumbers2, s.stanumbers3, s.stanumbers4,
               s.stanumbers5,
               s.stavalues1, s.stavalues2, s.stavalues3, s.stavalues4
@@ -326,9 +357,9 @@ SELECT dbms_stats.merge((
        v.stanullfrac, v.stawidth, v.stadistinct,
        v.stakind1, v.stakind2, v.stakind3, v.stakind4,
        v.stakind5,
-       v.staop1, v.staop2, v.staop3,
-       v.staop4,
-       NULL, v.stanumbers1, v.stanumbers2, v.stanumbers3, v.stanumbers4,
+       v.staop1, v.staop2, v.staop3, v.staop4, NULL,
+       v.stacoll1, v.stacoll2, v.stacoll3, v.stacoll4, v.stacoll5,
+       v.stanumbers1, v.stanumbers2, v.stanumbers3, v.stanumbers4,
        v.stanumbers5,
        v.stavalues1, v.stavalues2, v.stavalues3, v.stavalues4
       ,v.stavalues5
@@ -354,6 +385,11 @@ SELECT (m.merge).starelid::regclass,
        (m.merge).staop3,
        (m.merge).staop4,
        (m.merge).staop5,
+       (m.merge).stacoll1,
+       (m.merge).stacoll2,
+       (m.merge).stacoll3,
+       (m.merge).stacoll4,
+       (m.merge).stacoll5,
        (m.merge).stanumbers1,
        (m.merge).stanumbers2,
        (m.merge).stanumbers3,
@@ -369,8 +405,8 @@ SELECT (m.merge).starelid::regclass,
               v.stanullfrac, v.stawidth, v.stadistinct,
               v.stakind1, v.stakind2, v.stakind3, v.stakind4,
               v.stakind5,
-              v.staop1, v.staop2, v.staop3, v.staop4,
-              v.staop5,
+              v.staop1, v.staop2, v.staop3, v.staop4, v.staop5,
+              v.stacoll1, v.stacoll2, v.stacoll3, v.stacoll4, v.stacoll5,
               NULL, v.stanumbers2, v.stanumbers3, v.stanumbers4,
               v.stanumbers5,
               v.stavalues1, v.stavalues2, v.stavalues3, v.stavalues4
@@ -386,9 +422,9 @@ SELECT dbms_stats.merge((
        v.stanullfrac, v.stawidth, v.stadistinct,
        v.stakind1, v.stakind2, v.stakind3, v.stakind4,
        v.stakind5,
-       v.staop1, v.staop2, v.staop3,
-       v.staop4,
-       NULL, v.stanumbers1, v.stanumbers2, v.stanumbers3, v.stanumbers4,
+       v.staop1, v.staop2, v.staop3, v.staop4, NULL,
+       v.stacoll1, v.stacoll2, v.stacoll3, v.stacoll4, v.stacoll5,
+	   v.stanumbers1, v.stanumbers2, v.stanumbers3, v.stanumbers4,
        v.stanumbers5,
        v.stavalues1, v.stavalues2, v.stavalues3, v.stavalues4
       ,v.stavalues5
@@ -397,9 +433,9 @@ SELECT dbms_stats.merge((
        s.stanullfrac, s.stawidth, s.stadistinct,
        s.stakind1, s.stakind2, s.stakind3, s.stakind4,
        s.stakind5,
-       s.staop1, s.staop2, s.staop3,
-       s.staop4,
-       NULL, s.stanumbers1, s.stanumbers2, s.stanumbers3, s.stanumbers4,
+       s.staop1, s.staop2, s.staop3, s.staop4, NULL,
+       s.stacoll1, s.stacoll2, s.stacoll3, s.stacoll4, s.stacoll5,
+	   s.stanumbers1, s.stanumbers2, s.stanumbers3, s.stanumbers4,
        s.stanumbers5,
        s.stavalues1, s.stavalues2, s.stavalues3, s.stavalues4
       ,s.stavalues5
@@ -428,6 +464,11 @@ SELECT (m.merge).starelid::regclass,
        (m.merge).staop3,
        (m.merge).staop4,
        (m.merge).staop5,
+       (m.merge).stacoll1,
+       (m.merge).stacoll2,
+       (m.merge).stacoll3,
+       (m.merge).stacoll4,
+       (m.merge).stacoll5,
        (m.merge).stanumbers1,
        (m.merge).stanumbers2,
        (m.merge).stanumbers3,
@@ -443,8 +484,8 @@ SELECT (m.merge).starelid::regclass,
               v.stanullfrac, v.stawidth, v.stadistinct,
               v.stakind1, v.stakind2, v.stakind3, v.stakind4,
               v.stakind5,
-              v.staop1, v.staop2, v.staop3, v.staop4,
-              v.staop5,
+              v.staop1, v.staop2, v.staop3, v.staop4, v.staop5,
+              v.stacoll1, v.stacoll2, v.stacoll3, v.stacoll4, v.stacoll5,
               NULL, v.stanumbers2, v.stanumbers3, v.stanumbers4,
               v.stanumbers5,
               v.stavalues1, v.stavalues2, v.stavalues3, v.stavalues4
@@ -454,8 +495,8 @@ SELECT (m.merge).starelid::regclass,
               s.stanullfrac, s.stawidth, s.stadistinct,
               s.stakind1, s.stakind2, s.stakind3, s.stakind4,
               s.stakind5,
-              s.staop1, s.staop2, s.staop3, s.staop4,
-              s.staop5,
+              s.staop1, s.staop2, s.staop3, s.staop4, s.staop5,
+              s.stacoll1, s.stacoll2, s.stacoll3, s.stacoll4, s.stacoll5,
               NULL, s.stanumbers2, s.stanumbers3, s.stanumbers4,
               s.stanumbers5,
               s.stavalues1, s.stavalues2, s.stavalues3, s.stavalues4
@@ -485,6 +526,11 @@ SELECT (m.merge).starelid::regclass,
        (m.merge).staop3,
        (m.merge).staop4,
        (m.merge).staop5,
+       (m.merge).stacoll1,
+       (m.merge).stacoll2,
+       (m.merge).stacoll3,
+       (m.merge).stacoll4,
+       (m.merge).stacoll5,
        (m.merge).stanumbers1,
        (m.merge).stanumbers2,
        (m.merge).stanumbers3,
@@ -498,11 +544,11 @@ SELECT (m.merge).starelid::regclass,
  FROM (SELECT dbms_stats.merge((
              NULL, NULL, NULL,
              NULL, NULL, NULL,
-             NULL, NULL, NULL, NULL,
-             NULL, NULL, NULL, NULL,
-             NULL, NULL, NULL, NULL,
-             NULL, NULL, NULL, NULL
-            ,NULL, NULL, NULL, NULL
+             NULL, NULL, NULL, NULL, NULL,
+             NULL, NULL, NULL, NULL, NULL,
+             NULL, NULL, NULL, NULL, NULL,
+             NULL, NULL, NULL, NULL, NULL,
+			 NULL, NULL, NULL, NULL, NULL
              ), s)
          FROM pg_statistic s
         WHERE s.starelid = 'st0'::regclass
@@ -525,6 +571,11 @@ SELECT (m.merge).starelid::regclass,
        (m.merge).staop3,
        (m.merge).staop4,
        (m.merge).staop5,
+       (m.merge).stacoll1,
+       (m.merge).stacoll2,
+       (m.merge).stacoll3,
+       (m.merge).stacoll4,
+       (m.merge).stacoll5,
        (m.merge).stanumbers1,
        (m.merge).stanumbers2,
        (m.merge).stanumbers3,
@@ -538,11 +589,11 @@ SELECT (m.merge).starelid::regclass,
  FROM (SELECT dbms_stats.merge(v, (
              NULL, NULL, NULL,
              NULL, NULL, NULL,
-             NULL, NULL, NULL, NULL,
-             NULL, NULL, NULL, NULL,
-             NULL, NULL, NULL, NULL,
-             NULL, NULL, NULL, NULL,
-             NULL, NULL, NULL, NULL))
+             NULL, NULL, NULL, NULL, NULL,
+             NULL, NULL, NULL, NULL, NULL,
+             NULL, NULL, NULL, NULL, NULL,
+             NULL, NULL, NULL, NULL, NULL,
+			 NULL, NULL, NULL, NULL, NULL))
          FROM dbms_stats.column_stats_locked v
         WHERE v.starelid = 'st0'::regclass
           AND v.staattnum = '2'::int2) m;
@@ -564,6 +615,11 @@ SELECT (m.merge).starelid::regclass,
        (m.merge).staop3,
        (m.merge).staop4,
        (m.merge).staop5,
+       (m.merge).stacoll1,
+       (m.merge).stacoll2,
+       (m.merge).stacoll3,
+       (m.merge).stacoll4,
+       (m.merge).stacoll5,
        (m.merge).stanumbers1,
        (m.merge).stanumbers2,
        (m.merge).stanumbers3,
@@ -586,19 +642,19 @@ SELECT (m.merge).starelid::regclass,
 SELECT dbms_stats.merge((
        v.starelid::regclass, v.staattnum, v.stainherit,
        v.stanullfrac, v.stawidth, v.stadistinct,
-       NULL, NULL, NULL, NULL,
-       NULL, NULL, NULL, NULL,
-       NULL, NULL, NULL, NULL,
-       NULL, NULL, NULL, NULL
-      ,NULL, NULL, NULL, NULL
+       NULL, NULL, NULL, NULL, NULL,
+       NULL, NULL, NULL, NULL, NULL,
+       NULL, NULL, NULL, NULL, NULL,
+       NULL, NULL, NULL, NULL, NULL,
+       NULL, NULL, NULL, NULL, NULL
        ), (
        s.starelid::regclass, s.staattnum, s.stainherit,
        s.stanullfrac, s.stawidth, s.stadistinct,
-       NULL, NULL, NULL, NULL,
-       NULL, NULL, NULL, NULL,
-       NULL, NULL, NULL, NULL,
-       NULL, NULL, NULL, NULL,
-       NULL, NULL, NULL, NULL))
+       NULL, NULL, NULL, NULL, NULL,
+       NULL, NULL, NULL, NULL, NULL,
+       NULL, NULL, NULL, NULL, NULL,
+       NULL, NULL, NULL, NULL, NULL,
+       NULL, NULL, NULL, NULL, NULL))
   FROM dbms_stats.column_stats_locked v,
        pg_statistic s
  WHERE v.starelid = 'st0'::regclass
@@ -623,6 +679,11 @@ SELECT (m.merge).starelid::regclass,
        (m.merge).staop3,
        (m.merge).staop4,
        (m.merge).staop5,
+       (m.merge).stacoll1,
+       (m.merge).stacoll2,
+       (m.merge).stacoll3,
+       (m.merge).stacoll4,
+       (m.merge).stacoll5,
        (m.merge).stanumbers1,
        (m.merge).stanumbers2,
        (m.merge).stanumbers3,
@@ -638,9 +699,9 @@ SELECT (m.merge).starelid::regclass,
               v.stanullfrac, v.stawidth, v.stadistinct,
               v.stakind1, v.stakind2, v.stakind3, v.stakind4,
               v.stakind5,
-              v.staop1, v.staop2, v.staop3,
-              v.staop4,
-              NULL, v.stanumbers1, v.stanumbers2, v.stanumbers3, v.stanumbers4,
+              v.staop1, v.staop2, v.staop3, v.staop4, NULL,
+              v.stacoll1, v.stacoll2, v.stacoll3, v.stacoll4, v.stacoll5,
+              v.stanumbers1, v.stanumbers2, v.stanumbers3, v.stanumbers4,
               v.stanumbers5,
               v.stavalues1, v.stavalues2, v.stavalues3, v.stavalues4
              ,v.stavalues5
@@ -649,8 +710,8 @@ SELECT (m.merge).starelid::regclass,
               s.stanullfrac, s.stawidth, s.stadistinct,
               s.stakind1, s.stakind2, s.stakind3, s.stakind4,
               s.stakind5,
-              s.staop1, s.staop2, s.staop3, s.staop4,
-              s.staop5,
+              s.staop1, s.staop2, s.staop3, s.staop4, s.staop5,
+              s.stacoll1, s.stacoll2, s.stacoll3, s.stacoll4, s.stacoll5,
               s.stanumbers1, s.stanumbers2, s.stanumbers3, s.stanumbers4,
               s.stanumbers5,
               s.stavalues1, s.stavalues2, s.stavalues3, s.stavalues4
@@ -669,9 +730,9 @@ SELECT dbms_stats.merge((
        v.stanullfrac, v.stawidth, v.stadistinct,
        v.stakind1, v.stakind2, v.stakind3, v.stakind4,
        v.stakind5,
-       v.staop1, v.staop2, v.staop3,
-       v.staop4,
-       NULL, v.stanumbers1, v.stanumbers2, v.stanumbers3, v.stanumbers4,
+       v.staop1, v.staop2, v.staop3, v.staop4, NULL,
+       v.stacoll1, v.stacoll2, v.stacoll3, v.stacoll4, v.stacoll5,
+	   v.stanumbers1, v.stanumbers2, v.stanumbers3, v.stanumbers4,
        v.stanumbers5,
        v.stavalues1, v.stavalues2, v.stavalues3, v.stavalues4
       ,v.stavalues5
@@ -680,9 +741,9 @@ SELECT dbms_stats.merge((
        s.stanullfrac, s.stawidth, s.stadistinct,
        s.stakind1, s.stakind2, s.stakind3, s.stakind4,
        s.stakind5,
-       s.staop1, s.staop2, s.staop3,
-       s.staop4,
-       NULL, s.stanumbers1, s.stanumbers2, s.stanumbers3, s.stanumbers4,
+       s.staop1, s.staop2, s.staop3, s.staop4, NULL,
+       s.stacoll1, s.stacoll2, s.stacoll3, s.stacoll4, s.stacoll5,
+	   s.stanumbers1, s.stanumbers2, s.stanumbers3, s.stanumbers4,
        s.stanumbers5,
        s.stavalues1, s.stavalues2, s.stavalues3, s.stavalues4
       ,s.stavalues5
@@ -711,6 +772,11 @@ SELECT (m.merge).starelid::regclass,
        (m.merge).staop3,
        (m.merge).staop4,
        (m.merge).staop5,
+       (m.merge).stacoll1,
+       (m.merge).stacoll2,
+       (m.merge).stacoll3,
+       (m.merge).stacoll4,
+       (m.merge).stacoll5,
        (m.merge).stanumbers1,
        (m.merge).stanumbers2,
        (m.merge).stanumbers3,
@@ -726,8 +792,8 @@ SELECT (m.merge).starelid::regclass,
               v.stanullfrac, v.stawidth, v.stadistinct,
               '1', '1', '1', '1',
               '1',
-              v.staop1, v.staop2, v.staop3, v.staop4,
-              v.staop5,
+              v.staop1, v.staop2, v.staop3, v.staop4, v.staop5,
+              v.stacoll1, v.stacoll2, v.stacoll3, v.stacoll4, v.stacoll5,
               v.stanumbers1, v.stanumbers2, v.stanumbers3, v.stanumbers4,
               v.stanumbers5,
               v.stavalues1, v.stavalues2, v.stavalues3, v.stavalues4
@@ -737,8 +803,8 @@ SELECT (m.merge).starelid::regclass,
               s.stanullfrac, s.stawidth, s.stadistinct,
               '1', '1', '1', '1',
               '1',
-              s.staop1, s.staop2, s.staop3, s.staop4,
-              s.staop5,
+              s.staop1, s.staop2, s.staop3, s.staop4, s.staop5,
+              s.stacoll1, s.stacoll2, s.stacoll3, s.stacoll4, s.stacoll5,
               s.stanumbers1, s.stanumbers2, s.stanumbers3, s.stanumbers4,
               s.stanumbers5,
               s.stavalues1, s.stavalues2, s.stavalues3, s.stavalues4
@@ -768,6 +834,11 @@ SELECT (m.merge).starelid::regclass,
        (m.merge).staop3,
        (m.merge).staop4,
        (m.merge).staop5,
+       (m.merge).stacoll1,
+       (m.merge).stacoll2,
+       (m.merge).stacoll3,
+       (m.merge).stacoll4,
+       (m.merge).stacoll5,
        (m.merge).stanumbers1,
        (m.merge).stanumbers2,
        (m.merge).stanumbers3,
@@ -782,8 +853,8 @@ SELECT (m.merge).starelid::regclass,
               v.stanullfrac, v.stawidth, v.stadistinct,
               '2', '2', '2', '2',
               '2',
-              v.staop1, v.staop2, v.staop3, v.staop4,
-              v.staop5,
+              v.staop1, v.staop2, v.staop3, v.staop4, v.staop5,
+              v.stacoll1, v.stacoll2, v.stacoll3, v.stacoll4, v.stacoll5,
               v.stanumbers1, v.stanumbers2, v.stanumbers3, v.stanumbers4,
               v.stanumbers5,
               v.stavalues1, v.stavalues2, v.stavalues3, v.stavalues4
@@ -793,8 +864,8 @@ SELECT (m.merge).starelid::regclass,
               s.stanullfrac, s.stawidth, s.stadistinct,
               '2', '2', '2', '2',
               '2',
-              s.staop1, s.staop2, s.staop3, s.staop4,
-              s.staop5,
+              s.staop1, s.staop2, s.staop3, s.staop4, s.staop5,
+              s.stacoll1, s.stacoll2, s.stacoll3, s.stacoll4, s.stacoll5,
               s.stanumbers1, s.stanumbers2, s.stanumbers3, s.stanumbers4,
               s.stanumbers5,
               s.stavalues1, s.stavalues2, s.stavalues3, s.stavalues4
@@ -812,8 +883,8 @@ SELECT dbms_stats.merge((v.starelid::regclass, '2', v.stainherit,
               v.stanullfrac, v.stawidth, v.stadistinct,
               '1', '1', '1', '1',
               '1',
-              v.staop1, v.staop2, v.staop3, v.staop4,
-              v.staop5,
+              v.staop1, v.staop2, v.staop3, v.staop4, v.staop5,
+              v.stacoll1, v.stacoll2, v.stacoll3, v.stacoll4, v.stacoll5,
               v.stanumbers1, v.stanumbers2, v.stanumbers3, v.stanumbers4,
               v.stanumbers5,
               v.stavalues1, v.stavalues2, v.stavalues3, v.stavalues4
@@ -823,8 +894,8 @@ SELECT dbms_stats.merge((v.starelid::regclass, '2', v.stainherit,
               s.stanullfrac, s.stawidth, s.stadistinct,
               '1', '1', '1', '1',
               '1',
-              s.staop1, s.staop2, s.staop3, s.staop4,
-              s.staop5,
+              s.staop1, s.staop2, s.staop3, s.staop4, s.staop5,
+              s.stacoll1, s.stacoll2, s.stacoll3, s.stacoll4, s.stacoll5,
               s.stanumbers1, s.stanumbers2, s.stanumbers3, s.stanumbers4,
               s.stanumbers5,
               s.stavalues1, s.stavalues2, s.stavalues3, s.stavalues4
@@ -842,8 +913,8 @@ SELECT dbms_stats.merge((v.starelid::regclass, '2', v.stainherit,
               v.stanullfrac, v.stawidth, v.stadistinct,
               '2', '2', '2', '2',
               '2',
-              v.staop1, v.staop2, v.staop3, v.staop4,
-              v.staop5,
+              v.staop1, v.staop2, v.staop3, v.staop4, v.staop5,
+              v.stacoll1, v.stacoll2, v.stacoll3, v.stacoll4, v.stacoll5,
               v.stanumbers1, v.stanumbers2, v.stanumbers3, v.stanumbers4,
               v.stanumbers5,
               v.stavalues1, v.stavalues2, v.stavalues3, v.stavalues4
@@ -853,8 +924,8 @@ SELECT dbms_stats.merge((v.starelid::regclass, '2', v.stainherit,
               s.stanullfrac, s.stawidth, s.stadistinct,
               '2', '2', '2', '2',
               '2',
-              s.staop1, s.staop2, s.staop3, s.staop4,
-              s.staop5,
+              s.staop1, s.staop2, s.staop3, s.staop4, s.staop5,
+              s.stacoll1, s.stacoll2, s.stacoll3, s.stacoll4, s.stacoll5,
               s.stanumbers1, s.stanumbers2, s.stanumbers3, s.stanumbers4,
               s.stanumbers5,
               s.stavalues1, s.stavalues2, s.stavalues3, s.stavalues4
@@ -888,11 +959,10 @@ SELECT count(*) FROM dbms_stats.relation_stats_backup;
 SELECT count(*) FROM dbms_stats.column_stats_backup;
 
 -- No.7-1-10
--- #### 9.2 doesn't has materialized views
--- DELETE FROM dbms_stats.relation_stats_backup;
--- SELECT dbms_stats.backup(1, 's0.smv0'::regclass, NULL);
--- SELECT count(*) FROM dbms_stats.relation_stats_backup;
--- SELECT count(*) FROM dbms_stats.column_stats_backup;
+DELETE FROM dbms_stats.relation_stats_backup;
+SELECT dbms_stats.backup(1, 's0.smv0'::regclass, NULL);
+SELECT count(*) FROM dbms_stats.relation_stats_backup;
+SELECT count(*) FROM dbms_stats.column_stats_backup;
 
 -- No.7-1-12
 DELETE FROM dbms_stats.relation_stats_backup;
@@ -1005,10 +1075,9 @@ SELECT dbms_stats.backup('s0.sft0'::regclass, NULL, 'dummy comment');
 SELECT id, unit, comment FROM dbms_stats.backup_history;
 
 -- No.8-1-12
--- #### 9.2 doesn't has materialized views
--- DELETE FROM dbms_stats.backup_history;
--- SELECT dbms_stats.backup('s0.smv0'::regclass, NULL, 'dummy comment');
--- SELECT id, unit, comment FROM dbms_stats.backup_history;
+DELETE FROM dbms_stats.backup_history;
+SELECT dbms_stats.backup('s0.smv0'::regclass, NULL, 'dummy comment');
+SELECT id, unit, comment FROM dbms_stats.backup_history;
 
 -- No.8-1-13
 DELETE FROM dbms_stats.backup_history;
@@ -1266,7 +1335,7 @@ DROP TABLE s1.st0;
 
 SELECT count(*) FROM dbms_stats.relation_stats_locked;
 SELECT count(*) FROM dbms_stats.column_stats_locked;
-CREATE TABLE s1.st0(id integer, num integer);
+CREATE TABLE s1.st0(id integer, num integer) WITH (autovacuum_enabled = 'false');
 INSERT INTO s1.st0 VALUES (1, 15), (2, 25), (3, 35), (4, 45);
 VACUUM ANALYZE;
 -- No.9-1-16
@@ -1364,24 +1433,23 @@ DELETE FROM dbms_stats.relation_stats_backup
    AND relname = 's0.sft0';
 
 -- No.9-1-22
--- #### 9.2 doesn't has materialized views
--- DELETE FROM dbms_stats.relation_stats_locked;
--- INSERT INTO dbms_stats.relation_stats_backup(
---                id, relid, relname, relpages, reltuples,
---                relallvisible,
---                curpages)
---      VALUES (3, 's0.smv0'::regclass, 's0.smv0', 1, 1,
---              1,
---              1);
--- SELECT * FROM relations_backup_v
---  WHERE id = 3
---    AND relname = 's0.smv0';
--- SELECT dbms_stats.restore(2, 's0.smv0', NULL);
--- SELECT count(*) FROM dbms_stats.column_stats_locked;
--- SELECT count(*) FROM dbms_stats.relation_stats_locked;
--- DELETE FROM dbms_stats.relation_stats_backup
---  WHERE id = 3
---    AND relname = 's0.smv0';
+DELETE FROM dbms_stats.relation_stats_locked;
+INSERT INTO dbms_stats.relation_stats_backup(
+               id, relid, relname, relpages, reltuples,
+               relallvisible,
+               curpages)
+     VALUES (3, 's0.smv0'::regclass, 's0.smv0', 1, 1,
+             1,
+             1);
+SELECT * FROM relations_backup_v
+ WHERE id = 3
+   AND relname = 's0.smv0';
+SELECT dbms_stats.restore(2, 's0.smv0', NULL);
+SELECT count(*) FROM dbms_stats.column_stats_locked;
+SELECT count(*) FROM dbms_stats.relation_stats_locked;
+DELETE FROM dbms_stats.relation_stats_backup
+ WHERE id = 3
+   AND relname = 's0.smv0';
 
 -- No.9-1-23
 DELETE FROM dbms_stats.relation_stats_locked;
@@ -1597,11 +1665,10 @@ SELECT dbms_stats.lock('s0.sft0', 'id');
 SELECT * FROM relations_locked_v;
 SELECT * FROM columns_locked_v c;
 -- No.11-1-13
--- #### 9.2 doesn't has materialized views
--- DELETE FROM dbms_stats.relation_stats_locked;
--- SELECT dbms_stats.lock('s0.smv0', 'id');
--- SELECT * FROM relations_locked_v;
--- SELECT * FROM columns_locked_v c;
+DELETE FROM dbms_stats.relation_stats_locked;
+SELECT dbms_stats.lock('s0.smv0', 'id');
+SELECT * FROM relations_locked_v;
+SELECT * FROM columns_locked_v c;
 -- No.11-1-14
 DELETE FROM dbms_stats.relation_stats_locked;
 SELECT dbms_stats.lock('pg_catalog.pg_class', 'id');
@@ -1628,19 +1695,19 @@ UPDATE dbms_stats.column_stats_locked
    SET (stanullfrac, stawidth, stadistinct,
         stakind1, stakind2, stakind3, stakind4,
         stakind5,
-        staop1, staop2, staop3, staop4,
-        staop5,
+        staop1, staop2, staop3, staop4, staop5,
+        stacoll1, stacoll2, stacoll3, stacoll4, stacoll5,
         stanumbers1, stanumbers2, stanumbers3, stanumbers4,
         stanumbers5,
         stavalues1, stavalues2, stavalues3, stavalues4
        ,stavalues5
        ) = (
         NULL, NULL, NULL,
-        NULL, NULL, NULL, NULL,
-        NULL, NULL, NULL, NULL,
-        NULL, NULL, NULL, NULL,
-        NULL, NULL, NULL, NULL,
-        NULL, NULL, NULL, NULL)
+        NULL, NULL, NULL, NULL, NULL,
+        NULL, NULL, NULL, NULL, NULL,
+        NULL, NULL, NULL, NULL, NULL,
+        NULL, NULL, NULL, NULL, NULL,
+        NULL, NULL, NULL, NULL, NULL)
  WHERE starelid = 's0.st0'::regclass;
 SELECT dbms_stats.lock('s0.st0', 'id');
 SELECT * FROM relations_locked_v;
@@ -1697,11 +1764,10 @@ SELECT dbms_stats.lock('s0.sft0');
 SELECT * FROM relations_locked_v;
 SELECT * FROM columns_locked_v c;
 -- No.11-2-10
--- #### 9.2 doesn't has materialized views
--- DELETE FROM dbms_stats.relation_stats_locked;
--- SELECT dbms_stats.lock('s0.smv0');
--- SELECT * FROM relations_locked_v;
--- SELECT * FROM columns_locked_v c;
+DELETE FROM dbms_stats.relation_stats_locked;
+SELECT dbms_stats.lock('s0.smv0');
+SELECT * FROM relations_locked_v;
+SELECT * FROM columns_locked_v c;
 -- No.11-2-11
 DELETE FROM dbms_stats.relation_stats_locked;
 SELECT dbms_stats.lock('pg_catalog.pg_class');
@@ -2757,7 +2823,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 SET pg_dbms_stats.use_locked_stats TO on;
-CREATE TABLE s0.st4 (a text);
+CREATE TABLE s0.st4 (a text) WITH (autovacuum_enabled = 'false');
 INSERT INTO s0.st4 SELECT '1' || md5(g::text) FROM generate_series(1, 10000) as g;
 VACUUM ANALYZE s0.st4;
 -- should estimate that rows = 1, not 5000
@@ -2773,7 +2839,7 @@ SELECT dbms_stats.clean_up_stats();
 /*
  * No.15-2 Ditto for index stats
  */
-CREATE TABLE s0.st4 (a double precision);
+CREATE TABLE s0.st4 (a double precision) WITH (autovacuum_enabled = 'false');
 CREATE INDEX on s0.st4 (floor(log(a)));
 SELECT dbms_stats.lock_table_stats('s0.st4');
 INSERT INTO s0.st4 (SELECT a from GENERATE_SERIES(1, 99999) a);
@@ -2788,7 +2854,7 @@ SELECT dbms_stats.clean_up_stats();
 
 -- No.16 error description. -- abnormal case.
 RESET SESSION AUTHORIZATION;
-CREATE TABLE s0.st4 (a int, b text);
+CREATE TABLE s0.st4 (a int, b text) WITH (autovacuum_enabled = 'false');
 CREATE VIEW s0.vst4 AS select * FROM s0.st4;
 GRANT SELECT ON s0.vst4 TO regular_user;
 
@@ -2800,4 +2866,35 @@ EXPLAIN (COSTS OFF) SELECT * FROM s0.vst4 WHERE a = 1;
 
 \c - super_user
 ALTER TABLE dbms_stats.relation_stats_locked OWNER TO super_user;
+DROP TABLE s0.st4 CASCADE;
+
+/*
+ * No.20-1 confirm change at 1.3.5. Moved from ut-common.sql at 1.3.11
+ */
+SELECT CURRENT_USER;
+CREATE TABLE s0.st4 (a int, b text) WITH (autovacuum_enabled = 'false');
+CREATE INDEX i_st4_a on s0.st4 (a);
+CREATE VIEW s0.vst4 AS select * FROM s0.st4;
+GRANT SELECT ON s0.vst4 TO regular_user;
+INSERT INTO s0.st4 (SELECT a, a::text FROM generate_series(0, 999) a);
+ANALYZE s0.st4;
+SELECT dbms_stats.lock('s0.st4');
+DELETE FROM s0.st4;
+INSERT INTO s0.st4 (SELECT 1, a::text FROM generate_series(0, 999) a);
+ANALYZE s0.st4;
+
+EXPLAIN (COSTS OFF) SELECT * FROM s0.vst4 WHERE a = 1;
+EXPLAIN (COSTS OFF) SELECT * FROM s0.st4  WHERE a = 1;
+
+SET SESSION AUTHORIZATION regular_user;
+
+EXPLAIN (COSTS OFF) SELECT * FROM s0.st4  WHERE a = 1;
+EXPLAIN (COSTS OFF) SELECT * FROM s0.vst4 WHERE a = 1;
+
+SET pg_dbms_stats.use_locked_stats TO off;
+EXPLAIN (COSTS OFF) SELECT * FROM s0.vst4 WHERE a = 1;
+\c - super_user
+ALTER TABLE dbms_stats.relation_stats_locked OWNER TO super_user;
+
+SELECT dbms_stats.unlock('s0.st4');
 DROP TABLE s0.st4 CASCADE;

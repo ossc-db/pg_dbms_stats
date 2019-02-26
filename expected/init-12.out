@@ -1,3 +1,10 @@
+CREATE MATERIALIZED VIEW s0.smv0 AS
+SELECT st0.id,
+       st0.num,
+       st2.txt
+  FROM s0.st0,s0.st2
+ WHERE st0.id = st2.id
+ ORDER BY id;
 CREATE VIEW plain_relations_statistic_v AS
 SELECT oid::regclass,
        relpages,
@@ -82,6 +89,11 @@ CREATE TABLE dbms_stats.work (
   staop3           oid,
   staop4           oid,
   staop5           oid,
+  stacoll1         oid,
+  stacoll2         oid,
+  stacoll3         oid,
+  stacoll4         oid,
+  stacoll5         oid,
   stanumbers1      float4[],
   stanumbers2      float4[],
   stanumbers3      float4[],
@@ -92,7 +104,7 @@ CREATE TABLE dbms_stats.work (
   stavalues3       dbms_stats.anyarray,
   stavalues4       dbms_stats.anyarray
  ,stavalues5       dbms_stats.anyarray
-);
+) WITH (autovacuum_enabled = 'false');
 CREATE VIEW work_v AS
 SELECT nspname, relname, relpages, reltuples, relallvisible,
        curpages, attname, nspname_of_typename, typname, atttypmod,

@@ -27,8 +27,8 @@ BuildRoot:  %{buildroot}
 Vendor:     NIPPON TELEGRAPH AND TELEPHONE CORPORATION
 
 ## postgresql-devel package required
-BuildRequires:  postgresql11
-Requires:  postgresql11-libs
+BuildRequires:  postgresql11-devel
+Requires:  postgresql11-server
 
 ## Description for "pg_dbms_stats"
 %description
@@ -49,7 +49,9 @@ Summary:  Just-in-time compilation support for pg_dbms_stats11
 
 %description llvmjit
 Just-in-time compilation support for pg_dbms_stats11
+Fix package dependency
 
+Fixed dependency definition of RPM SPEC file.
 ## pre work for build pg_dbms_stats
 %prep
 PATH=/usr/pgsql-11/bin:$PATH

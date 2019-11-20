@@ -40,7 +40,9 @@
 #if PG_VERSION_NUM >= 100000
 #include <math.h>
 #endif
-
+#if PG_VERSION_NUM >= 120000
+#include "access/relation.h"
+#endif
 #include "pg_dbms_stats.h"
 
 PG_MODULE_MAGIC;
@@ -727,7 +729,7 @@ dbms_stats_invalidate_cache_internal(Oid relid, bool sta_col)
 	/*
 	 * invalidate prepared statements and force re-planning with pg_dbms_stats.
 	 */
-	rel = try_relation_open(relid, NoLock);
+	rel = try_relation_open(relid, AccessShareLock);
 	if (rel != NULL)
 	{
 		if (sta_col &&
@@ -754,7 +756,7 @@ dbms_stats_invalidate_cache_internal(Oid relid, bool sta_col)
 			CacheInvalidateRelcacheByRelid(rel->rd_index->indrelid);
 
 		CacheInvalidateRelcache(rel);
-		relation_close(rel, NoLock);
+		relation_close(rel, AccessShareLock);
 	}
 }
 
@@ -835,14 +837,14 @@ dbms_stats_is_system_catalog_internal(Oid relid)
 		return false;
 
 	/* no such relation */
-	rel = try_relation_open(relid, NoLock);
+	rel = try_relation_open(relid, AccessShareLock);
 	if (rel == NULL)
 		return false;
 
 	/* check by namespace name. */
 	schema_name = get_namespace_name(rel->rd_rel->relnamespace);
 	result = dbms_stats_is_system_schema_internal(schema_name);
-	relation_close(rel, NoLock);
+	relation_close(rel, AccessShareLock);
 
 	return result;
 }

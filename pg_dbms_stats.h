@@ -10,6 +10,6 @@
 #define PG_DBMS_STATS_H
 
 bool dbms_stats_is_system_schema_internal(char *schema_name);
-bool dbms_stats_is_system_catalog_internal(Oid regclass);
+bool dbms_stats_is_system_catalog_internal(Oid regclass, LOCKMODE lockmode);
 
 #endif /* PG_DBMS_STATS_H */

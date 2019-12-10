@@ -37,6 +37,7 @@ SELECT starelid::regclass, staattnum, stainherit,
        stanullfrac, stawidth, stadistinct,
        stakind1, stakind2, stakind3, stakind4, stakind5,
        staop1, staop2, staop3, staop4, staop5,
+       stacoll1, stacoll2, stacoll3, stacoll4, stacoll5,
        stanumbers1, stanumbers2, stanumbers3, stanumbers4, stanumbers5,
        stavalues1::text, stavalues2::text, stavalues3::text, stavalues4::text, stavalues5::text
   FROM pg_statistic
@@ -46,6 +47,7 @@ SELECT starelid::regclass, staattnum, attname, stainherit,
        stanullfrac, stawidth, stadistinct,
        stakind1, stakind2, stakind3, stakind4, stakind5,
        staop1, staop2, staop3, staop4, staop5,
+       stacoll1, stacoll2, stacoll3, stacoll4, stacoll5,
        stanumbers1, stanumbers2, stanumbers3, stanumbers4, stanumbers5,
        stavalues1, stavalues2, stavalues3, stavalues4, stavalues5
   FROM dbms_stats.column_stats_locked c
@@ -58,6 +60,7 @@ SELECT id, statypid,
        stanullfrac, stawidth, stadistinct,
        stakind1, stakind2, stakind3, stakind4, stakind5,
        staop1, staop2, staop3, staop4, staop5,
+       stacoll1, stacoll2, stacoll3, stacoll4, stacoll5,
        stanumbers1, stanumbers2, stanumbers3, stanumbers4, stanumbers5,
        stavalues1, stavalues2, stavalues3, stavalues4, stavalues5
   FROM dbms_stats.column_stats_backup
@@ -111,6 +114,7 @@ SELECT nspname, relname, relpages, reltuples, relallvisible,
        stainherit, stanullfrac, stawidth, stadistinct,
        stakind1, stakind2, stakind3, stakind4, stakind5,
        staop1, staop2, staop3, staop4, staop5,
+       stacoll1, stacoll2, stacoll3, stacoll4, stacoll5,
        stanumbers1, stanumbers2, stanumbers3, stanumbers4, stanumbers5,
        stavalues1, stavalues2, stavalues3, stavalues4, stavalues5
   FROM dbms_stats.work

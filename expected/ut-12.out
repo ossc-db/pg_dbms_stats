@@ -470,6 +470,11 @@ UPDATE pg_statistic SET
     staop3 = 12,
     staop4 = 13,
     staop5 = 15,
+    stacoll1 = 24,
+    stacoll2 = 21,
+    stacoll3 = 22,
+    stacoll4 = 23,
+    stacoll5 = 25,
     stanumbers1 = ARRAY[staattnum,4],
     stanumbers2 = ARRAY[staattnum,1],
     stanumbers3 = ARRAY[staattnum,2],
@@ -501,6 +506,11 @@ UPDATE dbms_stats.column_stats_locked SET
     staop3 = 24,
     staop4 = 21,
     staop5 = 25,
+    stacoll1 = 34,
+    stacoll2 = 31,
+    stacoll3 = 32,
+    stacoll4 = 33,
+    stacoll5 = 35,
     stanumbers1 = ARRAY[-staattnum,22],
     stanumbers2 = ARRAY[-staattnum,23],
     stanumbers3 = ARRAY[-staattnum,24],
@@ -523,18 +533,18 @@ CREATE FUNCTION dbms_stats.merge1(
 LANGUAGE C STABLE;
 SELECT * FROM columns_locked_v
  WHERE starelid = 'st0'::regclass;
- starelid | staattnum | attname | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 |        stavalues1         |    stavalues2     | stavalues3 |            stavalues4             |                stavalues5                 
-----------+-----------+---------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+-------------+-------------+-------------+-------------+-------------+---------------------------+-------------------+------------+-----------------------------------+-------------------------------------------
- st0      |         1 | id      | t          |          -1 |       -1 |          -1 |        2 |        3 |        4 |        1 |        5 |     22 |     23 |     24 |     21 |     25 | {-1,22}     | {-1,23}     | {-1,24}     | {-1,21}     | {-1,25}     | {1,2,1,2,1,2}             | {1,2,1,2}         | {1,2}      | {1,2,1,2,1,2,1,2}                 | {1,2,1,2,1,2,1,2,1,2}
- st0      |         2 | name    | t          |          -2 |       -2 |          -2 |        2 |        3 |        4 |        1 |        5 |     22 |     23 |     24 |     21 |     25 | {-2,22}     | {-2,23}     | {-2,24}     | {-2,21}     | {-2,25}     | {"test ","test ","test "} | {"test ","test "} | {"test "}  | {"test ","test ","test ","test "} | {"test ","test ","test ","test ","test "}
+ starelid | staattnum | attname | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 |        stavalues1         |    stavalues2     | stavalues3 |            stavalues4             |                stavalues5                 
+----------+-----------+---------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+---------------------------+-------------------+------------+-----------------------------------+-------------------------------------------
+ st0      |         1 | id      | t          |          -1 |       -1 |          -1 |        2 |        3 |        4 |        1 |        5 |     22 |     23 |     24 |     21 |     25 |       34 |       31 |       32 |       33 |       35 | {-1,22}     | {-1,23}     | {-1,24}     | {-1,21}     | {-1,25}     | {1,2,1,2,1,2}             | {1,2,1,2}         | {1,2}      | {1,2,1,2,1,2,1,2}                 | {1,2,1,2,1,2,1,2,1,2}
+ st0      |         2 | name    | t          |          -2 |       -2 |          -2 |        2 |        3 |        4 |        1 |        5 |     22 |     23 |     24 |     21 |     25 |       34 |       31 |       32 |       33 |       35 | {-2,22}     | {-2,23}     | {-2,24}     | {-2,21}     | {-2,25}     | {"test ","test ","test "} | {"test ","test "} | {"test "}  | {"test ","test ","test ","test "} | {"test ","test ","test ","test ","test "}
 (2 rows)
 
 SELECT * FROM plain_columns_statistic_v
  WHERE starelid = 'st0'::regclass;
- starelid | staattnum | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 | stavalues1 |    stavalues2     |        stavalues3         |            stavalues4             |                stavalues5                 
-----------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+-------------+-------------+-------------+-------------+-------------+------------+-------------------+---------------------------+-----------------------------------+-------------------------------------------
- st0      |         1 | f          |           1 |        1 |           1 |        4 |        1 |        2 |        3 |        5 |     14 |     11 |     12 |     13 |     15 | {1,4}       | {1,1}       | {1,2}       | {1,3}       | {1,5}       | {1,2}      | {1,2,1,2}         | {1,2,1,2,1,2}             | {1,2,1,2,1,2,1,2}                 | {1,2,1,2,1,2,1,2,1,2}
- st0      |         2 | f          |           2 |        2 |           2 |        4 |        1 |        2 |        3 |        5 |     14 |     11 |     12 |     13 |     15 | {2,4}       | {2,1}       | {2,2}       | {2,3}       | {2,5}       | {"test "}  | {"test ","test "} | {"test ","test ","test "} | {"test ","test ","test ","test "} | {"test ","test ","test ","test ","test "}
+ starelid | staattnum | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 | stavalues1 |    stavalues2     |        stavalues3         |            stavalues4             |                stavalues5                 
+----------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+------------+-------------------+---------------------------+-----------------------------------+-------------------------------------------
+ st0      |         1 | f          |           1 |        1 |           1 |        4 |        1 |        2 |        3 |        5 |     14 |     11 |     12 |     13 |     15 |       24 |       21 |       22 |       23 |       25 | {1,4}       | {1,1}       | {1,2}       | {1,3}       | {1,5}       | {1,2}      | {1,2,1,2}         | {1,2,1,2,1,2}             | {1,2,1,2,1,2,1,2}                 | {1,2,1,2,1,2,1,2,1,2}
+ st0      |         2 | f          |           2 |        2 |           2 |        4 |        1 |        2 |        3 |        5 |     14 |     11 |     12 |     13 |     15 |       24 |       21 |       22 |       23 |       25 | {2,4}       | {2,1}       | {2,2}       | {2,3}       | {2,5}       | {"test "}  | {"test ","test "} | {"test ","test ","test "} | {"test ","test ","test ","test "} | {"test ","test ","test ","test ","test "}
 (2 rows)
 
 SET client_min_messages TO LOG;
@@ -555,6 +565,11 @@ SELECT (m.merge).starelid::regclass,
        (m.merge).staop3,
        (m.merge).staop4,
        (m.merge).staop5,
+       (m.merge).stacoll1,
+       (m.merge).stacoll2,
+       (m.merge).stacoll3,
+       (m.merge).stacoll4,
+       (m.merge).stacoll5,
        (m.merge).stanumbers1,
        (m.merge).stanumbers2,
        (m.merge).stanumbers3,
@@ -569,9 +584,9 @@ SELECT (m.merge).starelid::regclass,
          FROM pg_statistic s
         WHERE starelid = 'st0'::regclass
           AND staattnum = '1'::int2) m;
- starelid | staattnum | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 | stavalues1 | stavalues2 |  stavalues3   |    stavalues4     |      stavalues5       
-----------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+-------------+-------------+-------------+-------------+-------------+------------+------------+---------------+-------------------+-----------------------
- st0      |         1 | f          |           1 |        1 |           1 |        4 |        1 |        2 |        3 |        5 |     14 |     11 |     12 |     13 |     15 | {1,4}       | {1,1}       | {1,2}       | {1,3}       | {1,5}       | {1,2}      | {1,2,1,2}  | {1,2,1,2,1,2} | {1,2,1,2,1,2,1,2} | {1,2,1,2,1,2,1,2,1,2}
+ starelid | staattnum | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 | stavalues1 | stavalues2 |  stavalues3   |    stavalues4     |      stavalues5       
+----------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+------------+------------+---------------+-------------------+-----------------------
+ st0      |         1 | f          |           1 |        1 |           1 |        4 |        1 |        2 |        3 |        5 |     14 |     11 |     12 |     13 |     15 |       24 |       21 |       22 |       23 |       25 | {1,4}       | {1,1}       | {1,2}       | {1,3}       | {1,5}       | {1,2}      | {1,2,1,2}  | {1,2,1,2,1,2} | {1,2,1,2,1,2,1,2} | {1,2,1,2,1,2,1,2,1,2}
 (1 row)
 
 -- No.5-1-2
@@ -591,6 +606,11 @@ SELECT (m.merge).starelid::regclass,
        (m.merge).staop3,
        (m.merge).staop4,
        (m.merge).staop5,
+       (m.merge).stacoll1,
+       (m.merge).stacoll2,
+       (m.merge).stacoll3,
+       (m.merge).stacoll4,
+       (m.merge).stacoll5,
        (m.merge).stanumbers1,
        (m.merge).stanumbers2,
        (m.merge).stanumbers3,
@@ -605,9 +625,9 @@ SELECT (m.merge).starelid::regclass,
          FROM dbms_stats.column_stats_locked v
         WHERE starelid = 'st0'::regclass
           AND staattnum = '2'::int2) m;
- starelid | staattnum | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 |        stavalues1         |    stavalues2     | stavalues3 |            stavalues4             |                stavalues5                 
-----------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+-------------+-------------+-------------+-------------+-------------+---------------------------+-------------------+------------+-----------------------------------+-------------------------------------------
- st0      |         2 | t          |          -2 |       -2 |          -2 |        2 |        3 |        4 |        1 |        5 |     22 |     23 |     24 |     21 |     25 | {-2,22}     | {-2,23}     | {-2,24}     | {-2,21}     | {-2,25}     | {"test ","test ","test "} | {"test ","test "} | {"test "}  | {"test ","test ","test ","test "} | {"test ","test ","test ","test ","test "}
+ starelid | staattnum | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 |        stavalues1         |    stavalues2     | stavalues3 |            stavalues4             |                stavalues5                 
+----------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+---------------------------+-------------------+------------+-----------------------------------+-------------------------------------------
+ st0      |         2 | t          |          -2 |       -2 |          -2 |        2 |        3 |        4 |        1 |        5 |     22 |     23 |     24 |     21 |     25 |       34 |       31 |       32 |       33 |       35 | {-2,22}     | {-2,23}     | {-2,24}     | {-2,21}     | {-2,25}     | {"test ","test ","test "} | {"test ","test "} | {"test "}  | {"test ","test ","test ","test "} | {"test ","test ","test ","test ","test "}
 (1 row)
 
 -- No.5-1-3
@@ -634,6 +654,11 @@ SELECT (m.merge).starelid::regclass,
        (m.merge).staop3,
        (m.merge).staop4,
        (m.merge).staop5,
+       (m.merge).stacoll1,
+       (m.merge).stacoll2,
+       (m.merge).stacoll3,
+       (m.merge).stacoll4,
+       (m.merge).stacoll5,
        (m.merge).stanumbers1,
        (m.merge).stanumbers2,
        (m.merge).stanumbers3,
@@ -651,9 +676,9 @@ SELECT (m.merge).starelid::regclass,
           AND v.staattnum = '2'::int2
           AND s.starelid = 'st0'::regclass
           AND s.staattnum = '1'::int2) m;
- starelid | staattnum | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 |        stavalues1         |    stavalues2     | stavalues3 |            stavalues4             |                stavalues5                 
-----------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+-------------+-------------+-------------+-------------+-------------+---------------------------+-------------------+------------+-----------------------------------+-------------------------------------------
- st0      |         2 | t          |          -2 |       -2 |          -2 |        2 |        3 |        4 |        1 |        5 |     22 |     23 |     24 |     21 |     25 | {-2,22}     | {-2,23}     | {-2,24}     | {-2,21}     | {-2,25}     | {"test ","test ","test "} | {"test ","test "} | {"test "}  | {"test ","test ","test ","test "} | {"test ","test ","test ","test ","test "}
+ starelid | staattnum | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 |        stavalues1         |    stavalues2     | stavalues3 |            stavalues4             |                stavalues5                 
+----------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+---------------------------+-------------------+------------+-----------------------------------+-------------------------------------------
+ st0      |         2 | t          |          -2 |       -2 |          -2 |        2 |        3 |        4 |        1 |        5 |     22 |     23 |     24 |     21 |     25 |       34 |       31 |       32 |       33 |       35 | {-2,22}     | {-2,23}     | {-2,24}     | {-2,21}     | {-2,25}     | {"test ","test ","test "} | {"test ","test "} | {"test "}  | {"test ","test ","test ","test "} | {"test ","test ","test ","test ","test "}
 (1 row)
 
 -- No.5-1-5
@@ -673,6 +698,11 @@ SELECT (m.merge).starelid::regclass,
        (m.merge).staop3,
        (m.merge).staop4,
        (m.merge).staop5,
+       (m.merge).stacoll1,
+       (m.merge).stacoll2,
+       (m.merge).stacoll3,
+       (m.merge).stacoll4,
+       (m.merge).stacoll5,
        (m.merge).stanumbers1,
        (m.merge).stanumbers2,
        (m.merge).stanumbers3,
@@ -690,9 +720,9 @@ SELECT (m.merge).starelid::regclass,
           AND v.staattnum = '2'::int2
           AND s.starelid = 'st0'::regclass
           AND s.staattnum = '1'::int2) m;
- starelid | staattnum | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 |        stavalues1         |    stavalues2     | stavalues3 |            stavalues4             |                stavalues5                 
-----------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+-------------+-------------+-------------+-------------+-------------+---------------------------+-------------------+------------+-----------------------------------+-------------------------------------------
- st0      |         2 | t          |          -2 |       -2 |          -2 |        2 |        3 |        4 |        1 |        5 |     22 |     23 |     24 |     21 |     25 | {-2,22}     | {-2,23}     | {-2,24}     | {-2,21}     | {-2,25}     | {"test ","test ","test "} | {"test ","test "} | {"test "}  | {"test ","test ","test ","test "} | {"test ","test ","test ","test ","test "}
+ starelid | staattnum | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 |        stavalues1         |    stavalues2     | stavalues3 |            stavalues4             |                stavalues5                 
+----------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+---------------------------+-------------------+------------+-----------------------------------+-------------------------------------------
+ st0      |         2 | t          |          -2 |       -2 |          -2 |        2 |        3 |        4 |        1 |        5 |     22 |     23 |     24 |     21 |     25 |       34 |       31 |       32 |       33 |       35 | {-2,22}     | {-2,23}     | {-2,24}     | {-2,21}     | {-2,25}     | {"test ","test ","test "} | {"test ","test "} | {"test "}  | {"test ","test ","test ","test "} | {"test ","test ","test ","test ","test "}
 (1 row)
 
 -- No.5-1-6
@@ -712,7 +742,8 @@ SELECT dbms_stats.merge(NULL, (
        s.stakind5,
        s.staop1, s.staop2, s.staop3,
        s.staop4,
-       NULL, s.stanumbers1, s.stanumbers2, s.stanumbers3, s.stanumbers4,
+       NULL, stacoll1, stacoll2, stacoll3, stacoll4, stacoll5,
+       s.stanumbers1, s.stanumbers2, s.stanumbers3, s.stanumbers4,
        s.stanumbers5,
        s.stavalues1, s.stavalues2, s.stavalues3, s.stavalues4
       ,s.stavalues5
@@ -720,10 +751,11 @@ SELECT dbms_stats.merge(NULL, (
   FROM pg_statistic s
  WHERE s.starelid = 'st0'::regclass
    AND s.staattnum = '1'::int2;
-ERROR:  cannot cast type record to pg_statistic
-LINE 8:        NULL, s.stanumbers1, s.stanumbers2, s.stanumbers3, s....
-                     ^
-DETAIL:  Cannot cast type real[] to oid in column 17.
+ merge  
+--------
+ (null)
+(1 row)
+
 -- No.5-1-8
 SELECT (m.merge).starelid::regclass,
        (m.merge).staattnum,
@@ -741,6 +773,11 @@ SELECT (m.merge).starelid::regclass,
        (m.merge).staop3,
        (m.merge).staop4,
        (m.merge).staop5,
+       (m.merge).stacoll1,
+       (m.merge).stacoll2,
+       (m.merge).stacoll3,
+       (m.merge).stacoll4,
+       (m.merge).stacoll5,
        (m.merge).stanumbers1,
        (m.merge).stanumbers2,
        (m.merge).stanumbers3,
@@ -758,6 +795,8 @@ SELECT (m.merge).starelid::regclass,
               s.stakind5,
               s.staop1, s.staop2, s.staop3, s.staop4,
               s.staop5,
+              s.stacoll1, s.stacoll2, s.stacoll3, s.stacoll4,
+              s.stacoll5,
               NULL, s.stanumbers2, s.stanumbers3, s.stanumbers4,
               s.stanumbers5,
               s.stavalues1, s.stavalues2, s.stavalues3, s.stavalues4
@@ -766,10 +805,11 @@ SELECT (m.merge).starelid::regclass,
          FROM pg_statistic s
         WHERE s.starelid = 'st0'::regclass
           AND s.staattnum = '1'::int2) m;
-ERROR:  cannot cast type record to pg_statistic
-LINE 34:               NULL, s.stanumbers2, s.stanumbers3, s.stanumbe...
-                             ^
-DETAIL:  Cannot cast type real[] to oid in column 18.
+ starelid | staattnum | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 | stavalues1 | stavalues2 |  stavalues3   |    stavalues4     |      stavalues5       
+----------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+------------+------------+---------------+-------------------+-----------------------
+ st0      |         1 | f          |           1 |        1 |           1 |        4 |        1 |        2 |        3 |        5 |     14 |     11 |     12 |     13 |     15 |       24 |       21 |       22 |       23 |       25 | (null)      | {1,1}       | {1,2}       | {1,3}       | {1,5}       | {1,2}      | {1,2,1,2}  | {1,2,1,2,1,2} | {1,2,1,2,1,2,1,2} | {1,2,1,2,1,2,1,2,1,2}
+(1 row)
+
 -- No.5-1-9
 SELECT dbms_stats.merge((
        v.starelid::regclass, v.staattnum, v.stainherit,
@@ -778,7 +818,9 @@ SELECT dbms_stats.merge((
        v.stakind5,
        v.staop1, v.staop2, v.staop3,
        v.staop4,
-       NULL, v.stanumbers1, v.stanumbers2, v.stanumbers3, v.stanumbers4,
+       NULL, v.stacoll1, v.stacoll2, v.stacoll3, v.stacoll4,
+       v.stacoll5,
+       v.stanumbers1, v.stanumbers2, v.stanumbers3, v.stanumbers4,
        v.stanumbers5,
        v.stavalues1, v.stavalues2, v.stavalues3, v.stavalues4
       ,v.stavalues5
@@ -786,10 +828,11 @@ SELECT dbms_stats.merge((
   FROM dbms_stats.column_stats_locked v
  WHERE v.starelid = 'st0'::regclass
    AND v.staattnum = '2'::int2;
-ERROR:  cannot cast type record to dbms_stats.column_stats_locked
-LINE 8:        NULL, v.stanumbers1, v.stanumbers2, v.stanumbers3, v....
-                     ^
-DETAIL:  Cannot cast type real[] to oid in column 17.
+ merge  
+--------
+ (null)
+(1 row)
+
 -- No.5-1-10
 SELECT (m.merge).starelid::regclass,
        (m.merge).staattnum,
@@ -807,6 +850,11 @@ SELECT (m.merge).starelid::regclass,
        (m.merge).staop3,
        (m.merge).staop4,
        (m.merge).staop5,
+       (m.merge).stacoll1,
+       (m.merge).stacoll2,
+       (m.merge).stacoll3,
+       (m.merge).stacoll4,
+       (m.merge).stacoll5,
        (m.merge).stanumbers1,
        (m.merge).stanumbers2,
        (m.merge).stanumbers3,
@@ -824,6 +872,7 @@ SELECT (m.merge).starelid::regclass,
               v.stakind5,
               v.staop1, v.staop2, v.staop3, v.staop4,
               v.staop5,
+              v.stacoll1, v.stacoll2, v.stacoll3, v.stacoll4, v.stacoll5,
               NULL, v.stanumbers2, v.stanumbers3, v.stanumbers4,
               v.stanumbers5,
               v.stavalues1, v.stavalues2, v.stavalues3, v.stavalues4
@@ -832,10 +881,11 @@ SELECT (m.merge).starelid::regclass,
          FROM dbms_stats.column_stats_locked v
         WHERE v.starelid = 'st0'::regclass
           AND v.staattnum = '2'::int2) m;
-ERROR:  cannot cast type record to dbms_stats.column_stats_locked
-LINE 34:               NULL, v.stanumbers2, v.stanumbers3, v.stanumbe...
-                             ^
-DETAIL:  Cannot cast type real[] to oid in column 18.
+ starelid | staattnum | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 |        stavalues1         |    stavalues2     | stavalues3 |            stavalues4             |                stavalues5                 
+----------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+---------------------------+-------------------+------------+-----------------------------------+-------------------------------------------
+ st0      |         2 | t          |          -2 |       -2 |          -2 |        2 |        3 |        4 |        1 |        5 |     22 |     23 |     24 |     21 |     25 |       34 |       31 |       32 |       33 |       35 | (null)      | {-2,23}     | {-2,24}     | {-2,21}     | {-2,25}     | {"test ","test ","test "} | {"test ","test "} | {"test "}  | {"test ","test ","test ","test "} | {"test ","test ","test ","test ","test "}
+(1 row)
+
 -- No.5-1-11
 SELECT dbms_stats.merge((
        v.starelid::regclass, v.staattnum, v.stainherit,
@@ -844,10 +894,11 @@ SELECT dbms_stats.merge((
        v.stakind5,
        v.staop1, v.staop2, v.staop3,
        v.staop4,
-       NULL, v.stanumbers1, v.stanumbers2, v.stanumbers3, v.stanumbers4,
+       NULL, v.stacoll1, v.stacoll2, v.stacoll3, v.stacoll4, v.stacoll5,
+       v.stanumbers1, v.stanumbers2, v.stanumbers3, v.stanumbers4,
        v.stanumbers5,
-       v.stavalues1, v.stavalues2, v.stavalues3, v.stavalues4
-      ,v.stavalues5
+       v.stavalues1, v.stavalues2, v.stavalues3, v.stavalues4,
+       v.stavalues5
        ), (
        s.starelid::regclass, s.staattnum, s.stainherit,
        s.stanullfrac, s.stawidth, s.stadistinct,
@@ -855,10 +906,11 @@ SELECT dbms_stats.merge((
        s.stakind5,
        s.staop1, s.staop2, s.staop3,
        s.staop4,
-       NULL, s.stanumbers1, s.stanumbers2, s.stanumbers3, s.stanumbers4,
+       NULL, s.stacoll1, s.stacoll2, s.stacoll3, s.stacoll4, s.stacoll5,
+       s.stanumbers1, s.stanumbers2, s.stanumbers3, s.stanumbers4,
        s.stanumbers5,
-       s.stavalues1, s.stavalues2, s.stavalues3, s.stavalues4
-      ,s.stavalues5
+       s.stavalues1, s.stavalues2, s.stavalues3, s.stavalues4,
+       s.stavalues5
        ))
   FROM dbms_stats.column_stats_locked v,
        pg_statistic s
@@ -866,10 +918,13 @@ SELECT dbms_stats.merge((
    AND v.staattnum = '2'::int2
    AND s.starelid = 'st0'::regclass
    AND s.staattnum = '1'::int2;
-ERROR:  cannot cast type record to dbms_stats.column_stats_locked
-LINE 8:        NULL, v.stanumbers1, v.stanumbers2, v.stanumbers3, v....
-                     ^
-DETAIL:  Cannot cast type real[] to oid in column 17.
+LOG:  pg_dbms_stats: bad statistics
+DETAIL:  column "staop5" should not be null
+ merge  
+--------
+ (null)
+(1 row)
+
 -- No.5-1-12
 SELECT (m.merge).starelid::regclass,
        (m.merge).staattnum,
@@ -887,6 +942,11 @@ SELECT (m.merge).starelid::regclass,
        (m.merge).staop3,
        (m.merge).staop4,
        (m.merge).staop5,
+       (m.merge).stacoll1,
+       (m.merge).stacoll2,
+       (m.merge).stacoll3,
+       (m.merge).stacoll4,
+       (m.merge).stacoll5,
        (m.merge).stanumbers1,
        (m.merge).stanumbers2,
        (m.merge).stanumbers3,
@@ -904,10 +964,11 @@ SELECT (m.merge).starelid::regclass,
               v.stakind5,
               v.staop1, v.staop2, v.staop3, v.staop4,
               v.staop5,
+              v.stacoll1, v.stacoll2, v.stacoll3, v.stacoll4,
+              v.stacoll5,
               NULL, v.stanumbers2, v.stanumbers3, v.stanumbers4,
               v.stanumbers5,
-              v.stavalues1, v.stavalues2, v.stavalues3, v.stavalues4
-             ,v.stavalues5
+              v.stavalues1, v.stavalues2, v.stavalues3, v.stavalues4,v.stavalues5
               ), (
               s.starelid::regclass, s.staattnum, s.stainherit,
               s.stanullfrac, s.stawidth, s.stadistinct,
@@ -915,7 +976,9 @@ SELECT (m.merge).starelid::regclass,
               s.stakind5,
               s.staop1, s.staop2, s.staop3, s.staop4,
               s.staop5,
-              NULL, s.stanumbers2, s.stanumbers3, s.stanumbers4,
+              s.stacoll1, s.stacoll2, s.stacoll3, s.stacoll4, s.stacoll5,
+              NULL,
+              s.stanumbers2, s.stanumbers3, s.stanumbers4,
               s.stanumbers5,
               s.stavalues1, s.stavalues2, s.stavalues3, s.stavalues4
              ,s.stavalues5
@@ -926,10 +989,11 @@ SELECT (m.merge).starelid::regclass,
           AND v.staattnum = '2'::int2
           AND s.starelid = 'st0'::regclass
           AND s.staattnum = '1'::int2) m;
-ERROR:  cannot cast type record to dbms_stats.column_stats_locked
-LINE 34:               NULL, v.stanumbers2, v.stanumbers3, v.stanumbe...
-                             ^
-DETAIL:  Cannot cast type real[] to oid in column 18.
+ starelid | staattnum | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 |        stavalues1         |    stavalues2     | stavalues3 |            stavalues4             |                stavalues5                 
+----------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+---------------------------+-------------------+------------+-----------------------------------+-------------------------------------------
+ st0      |         2 | t          |          -2 |       -2 |          -2 |        2 |        3 |        4 |        1 |        5 |     22 |     23 |     24 |     21 |     25 |       34 |       31 |       32 |       33 |       35 | (null)      | {-2,23}     | {-2,24}     | {-2,21}     | {-2,25}     | {"test ","test ","test "} | {"test ","test "} | {"test "}  | {"test ","test ","test ","test "} | {"test ","test ","test ","test ","test "}
+(1 row)
+
 -- No.5-1-13
 SELECT (m.merge).starelid::regclass,
        (m.merge).staattnum,
@@ -947,6 +1011,11 @@ SELECT (m.merge).starelid::regclass,
        (m.merge).staop3,
        (m.merge).staop4,
        (m.merge).staop5,
+       (m.merge).stacoll1,
+       (m.merge).stacoll2,
+       (m.merge).stacoll3,
+       (m.merge).stacoll4,
+       (m.merge).stacoll5,
        (m.merge).stanumbers1,
        (m.merge).stanumbers2,
        (m.merge).stanumbers3,
@@ -961,6 +1030,7 @@ SELECT (m.merge).starelid::regclass,
              NULL, NULL, NULL,
              NULL, NULL, NULL,
              NULL, NULL, NULL, NULL,
+             NULL, NULL, NULL, NULL, NULL,
              NULL, NULL, NULL, NULL,
              NULL, NULL, NULL, NULL,
              NULL, NULL, NULL, NULL
@@ -969,10 +1039,11 @@ SELECT (m.merge).starelid::regclass,
          FROM pg_statistic s
         WHERE s.starelid = 'st0'::regclass
           AND s.staattnum = '1'::int2) m;
-ERROR:  cannot cast type record to dbms_stats.column_stats_locked
-LINE 27:  FROM (SELECT dbms_stats.merge((
-                                        ^
-DETAIL:  Input has too few columns.
+ starelid | staattnum | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 | stavalues1 | stavalues2 |  stavalues3   |    stavalues4     |      stavalues5       
+----------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+------------+------------+---------------+-------------------+-----------------------
+ st0      |         1 | f          |           1 |        1 |           1 |        4 |        1 |        2 |        3 |        5 |     14 |     11 |     12 |     13 |     15 |       24 |       21 |       22 |       23 |       25 | {1,4}       | {1,1}       | {1,2}       | {1,3}       | {1,5}       | {1,2}      | {1,2,1,2}  | {1,2,1,2,1,2} | {1,2,1,2,1,2,1,2} | {1,2,1,2,1,2,1,2,1,2}
+(1 row)
+
 -- No.5-1-14
 SELECT (m.merge).starelid::regclass,
        (m.merge).staattnum,
@@ -990,6 +1061,11 @@ SELECT (m.merge).starelid::regclass,
        (m.merge).staop3,
        (m.merge).staop4,
        (m.merge).staop5,
+       (m.merge).stacoll1,
+       (m.merge).stacoll2,
+       (m.merge).stacoll3,
+       (m.merge).stacoll4,
+       (m.merge).stacoll5,
        (m.merge).stanumbers1,
        (m.merge).stanumbers2,
        (m.merge).stanumbers3,
@@ -1004,6 +1080,7 @@ SELECT (m.merge).starelid::regclass,
              NULL, NULL, NULL,
              NULL, NULL, NULL,
              NULL, NULL, NULL, NULL,
+             NULL, NULL, NULL, NULL, NULL,
              NULL, NULL, NULL, NULL,
              NULL, NULL, NULL, NULL,
              NULL, NULL, NULL, NULL,
@@ -1011,10 +1088,11 @@ SELECT (m.merge).starelid::regclass,
          FROM dbms_stats.column_stats_locked v
         WHERE v.starelid = 'st0'::regclass
           AND v.staattnum = '2'::int2) m;
-ERROR:  cannot cast type record to pg_statistic
-LINE 27:  FROM (SELECT dbms_stats.merge(v, (
-                                           ^
-DETAIL:  Input has too few columns.
+ starelid | staattnum | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 |        stavalues1         |    stavalues2     | stavalues3 |            stavalues4             |                stavalues5                 
+----------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+---------------------------+-------------------+------------+-----------------------------------+-------------------------------------------
+ st0      |         2 | t          |          -2 |       -2 |          -2 |        2 |        3 |        4 |        1 |        5 |     22 |     23 |     24 |     21 |     25 |       34 |       31 |       32 |       33 |       35 | {-2,22}     | {-2,23}     | {-2,24}     | {-2,21}     | {-2,25}     | {"test ","test ","test "} | {"test ","test "} | {"test "}  | {"test ","test ","test ","test "} | {"test ","test ","test ","test ","test "}
+(1 row)
+
 -- No.5-1-15
 SELECT (m.merge).starelid::regclass,
        (m.merge).staattnum,
@@ -1032,6 +1110,11 @@ SELECT (m.merge).starelid::regclass,
        (m.merge).staop3,
        (m.merge).staop4,
        (m.merge).staop5,
+       (m.merge).stacoll1,
+       (m.merge).stacoll2,
+       (m.merge).stacoll3,
+       (m.merge).stacoll4,
+       (m.merge).stacoll5,
        (m.merge).stanumbers1,
        (m.merge).stanumbers2,
        (m.merge).stanumbers3,
@@ -1049,9 +1132,9 @@ SELECT (m.merge).starelid::regclass,
           AND v.staattnum = '2'::int2
           AND s.starelid = 'st0'::regclass
           AND s.staattnum = '1'::int2) m;
- starelid | staattnum | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 |        stavalues1         |    stavalues2     | stavalues3 |            stavalues4             |                stavalues5                 
-----------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+-------------+-------------+-------------+-------------+-------------+---------------------------+-------------------+------------+-----------------------------------+-------------------------------------------
- st0      |         2 | t          |          -2 |       -2 |          -2 |        2 |        3 |        4 |        1 |        5 |     22 |     23 |     24 |     21 |     25 | {-2,22}     | {-2,23}     | {-2,24}     | {-2,21}     | {-2,25}     | {"test ","test ","test "} | {"test ","test "} | {"test "}  | {"test ","test ","test ","test "} | {"test ","test ","test ","test ","test "}
+ starelid | staattnum | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 |        stavalues1         |    stavalues2     | stavalues3 |            stavalues4             |                stavalues5                 
+----------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+---------------------------+-------------------+------------+-----------------------------------+-------------------------------------------
+ st0      |         2 | t          |          -2 |       -2 |          -2 |        2 |        3 |        4 |        1 |        5 |     22 |     23 |     24 |     21 |     25 |       34 |       31 |       32 |       33 |       35 | {-2,22}     | {-2,23}     | {-2,24}     | {-2,21}     | {-2,25}     | {"test ","test ","test "} | {"test ","test "} | {"test "}  | {"test ","test ","test ","test "} | {"test ","test ","test ","test ","test "}
 (1 row)
 
 -- No.5-1-16
@@ -1059,6 +1142,7 @@ SELECT dbms_stats.merge((
        v.starelid::regclass, v.staattnum, v.stainherit,
        v.stanullfrac, v.stawidth, v.stadistinct,
        NULL, NULL, NULL, NULL,
+       NULL, NULL, NULL, NULL, NULL,
        NULL, NULL, NULL, NULL,
        NULL, NULL, NULL, NULL,
        NULL, NULL, NULL, NULL
@@ -1067,6 +1151,7 @@ SELECT dbms_stats.merge((
        s.starelid::regclass, s.staattnum, s.stainherit,
        s.stanullfrac, s.stawidth, s.stadistinct,
        NULL, NULL, NULL, NULL,
+       NULL, NULL, NULL, NULL, NULL,
        NULL, NULL, NULL, NULL,
        NULL, NULL, NULL, NULL,
        NULL, NULL, NULL, NULL,
@@ -1077,10 +1162,13 @@ SELECT dbms_stats.merge((
    AND v.staattnum = '2'::int2
    AND s.starelid = 'st0'::regclass
    AND s.staattnum = '1'::int2;
-ERROR:  cannot cast type record to dbms_stats.column_stats_locked
-LINE 1: SELECT dbms_stats.merge((
-                                ^
-DETAIL:  Input has too few columns.
+LOG:  pg_dbms_stats: bad statistics
+DETAIL:  column "stakind1" should not be null
+ merge  
+--------
+ (null)
+(1 row)
+
 -- No.5-1-17
 SELECT (m.merge).starelid::regclass,
        (m.merge).staattnum,
@@ -1098,6 +1186,11 @@ SELECT (m.merge).starelid::regclass,
        (m.merge).staop3,
        (m.merge).staop4,
        (m.merge).staop5,
+       (m.merge).stacoll1,
+       (m.merge).stacoll2,
+       (m.merge).stacoll3,
+       (m.merge).stacoll4,
+       (m.merge).stacoll5,
        (m.merge).stanumbers1,
        (m.merge).stanumbers2,
        (m.merge).stanumbers3,
@@ -1113,9 +1206,9 @@ SELECT (m.merge).starelid::regclass,
               v.stanullfrac, v.stawidth, v.stadistinct,
               v.stakind1, v.stakind2, v.stakind3, v.stakind4,
               v.stakind5,
-              v.staop1, v.staop2, v.staop3,
-              v.staop4,
-              NULL, v.stanumbers1, v.stanumbers2, v.stanumbers3, v.stanumbers4,
+              v.staop1, v.staop2, v.staop3, v.staop4, NULL,
+              v.stacoll1, v.stacoll2, v.stacoll3, v.stacoll4, v.stacoll5,
+              v.stanumbers1, v.stanumbers2, v.stanumbers3, v.stanumbers4,
               v.stanumbers5,
               v.stavalues1, v.stavalues2, v.stavalues3, v.stavalues4
              ,v.stavalues5
@@ -1126,6 +1219,7 @@ SELECT (m.merge).starelid::regclass,
               s.stakind5,
               s.staop1, s.staop2, s.staop3, s.staop4,
               s.staop5,
+              s.stacoll1, s.stacoll2, s.stacoll3, s.stacoll4, s.stacoll5,
               s.stanumbers1, s.stanumbers2, s.stanumbers3, s.stanumbers4,
               s.stanumbers5,
               s.stavalues1, s.stavalues2, s.stavalues3, s.stavalues4
@@ -1137,10 +1231,11 @@ SELECT (m.merge).starelid::regclass,
           AND v.staattnum = '1'::int2
           AND s.starelid = 'st0'::regclass
           AND s.staattnum = '1'::int2) m;
-ERROR:  cannot cast type record to dbms_stats.column_stats_locked
-LINE 34:               NULL, v.stanumbers1, v.stanumbers2, v.stanumbe...
-                             ^
-DETAIL:  Cannot cast type real[] to oid in column 17.
+ starelid | staattnum | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 | stavalues1 | stavalues2 |  stavalues3   |    stavalues4     |      stavalues5       
+----------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+------------+------------+---------------+-------------------+-----------------------
+ st0      |         1 | t          |          -1 |       -1 |          -1 |        4 |        1 |        2 |        3 |        5 |     14 |     11 |     12 |     13 |     15 |       24 |       21 |       22 |       23 |       25 | {1,4}       | {1,1}       | {1,2}       | {1,3}       | {1,5}       | {1,2}      | {1,2,1,2}  | {1,2,1,2,1,2} | {1,2,1,2,1,2,1,2} | {1,2,1,2,1,2,1,2,1,2}
+(1 row)
+
 -- No.5-1-18
 SELECT dbms_stats.merge((
        v.starelid::regclass, v.staattnum, v.stainherit,
@@ -1148,8 +1243,9 @@ SELECT dbms_stats.merge((
        v.stakind1, v.stakind2, v.stakind3, v.stakind4,
        v.stakind5,
        v.staop1, v.staop2, v.staop3,
-       v.staop4,
-       NULL, v.stanumbers1, v.stanumbers2, v.stanumbers3, v.stanumbers4,
+       v.staop4, NULL,
+       v.stacoll1, v.stacoll2, v.stacoll3, v.stacoll4, v.stacoll5,
+       v.stanumbers1, v.stanumbers2, v.stanumbers3, v.stanumbers4,
        v.stanumbers5,
        v.stavalues1, v.stavalues2, v.stavalues3, v.stavalues4
       ,v.stavalues5
@@ -1159,8 +1255,9 @@ SELECT dbms_stats.merge((
        s.stakind1, s.stakind2, s.stakind3, s.stakind4,
        s.stakind5,
        s.staop1, s.staop2, s.staop3,
-       s.staop4,
-       NULL, s.stanumbers1, s.stanumbers2, s.stanumbers3, s.stanumbers4,
+       s.staop4, NULL,
+       s.stacoll1, s.stacoll2, s.stacoll3, s.stacoll4, s.stacoll5,
+       s.stanumbers1, s.stanumbers2, s.stanumbers3, s.stanumbers4,
        s.stanumbers5,
        s.stavalues1, s.stavalues2, s.stavalues3, s.stavalues4
       ,s.stavalues5
@@ -1171,10 +1268,13 @@ SELECT dbms_stats.merge((
    AND v.staattnum = '1'::int2
    AND s.starelid = 'st0'::regclass
    AND s.staattnum = '1'::int2;
-ERROR:  cannot cast type record to dbms_stats.column_stats_locked
-LINE 8:        NULL, v.stanumbers1, v.stanumbers2, v.stanumbers3, v....
-                     ^
-DETAIL:  Cannot cast type real[] to oid in column 17.
+LOG:  pg_dbms_stats: bad statistics
+DETAIL:  column "staop5" should not be null
+ merge  
+--------
+ (null)
+(1 row)
+
 -- No.5-1-19
 SELECT (m.merge).starelid::regclass,
        (m.merge).staattnum,
@@ -1192,6 +1292,11 @@ SELECT (m.merge).starelid::regclass,
        (m.merge).staop3,
        (m.merge).staop4,
        (m.merge).staop5,
+       (m.merge).stacoll1,
+       (m.merge).stacoll2,
+       (m.merge).stacoll3,
+       (m.merge).stacoll4,
+       (m.merge).stacoll5,
        (m.merge).stanumbers1,
        (m.merge).stanumbers2,
        (m.merge).stanumbers3,
@@ -1209,6 +1314,7 @@ SELECT (m.merge).starelid::regclass,
               '1',
               v.staop1, v.staop2, v.staop3, v.staop4,
               v.staop5,
+              v.stacoll1, v.stacoll2, v.stacoll3, v.stacoll4, v.stacoll5,
               v.stanumbers1, v.stanumbers2, v.stanumbers3, v.stanumbers4,
               v.stanumbers5,
               v.stavalues1, v.stavalues2, v.stavalues3, v.stavalues4
@@ -1220,6 +1326,7 @@ SELECT (m.merge).starelid::regclass,
               '1',
               s.staop1, s.staop2, s.staop3, s.staop4,
               s.staop5,
+              s.stacoll1, s.stacoll2, s.stacoll3, s.stacoll4, s.stacoll5,
               s.stanumbers1, s.stanumbers2, s.stanumbers3, s.stanumbers4,
               s.stanumbers5,
               s.stavalues1, s.stavalues2, s.stavalues3, s.stavalues4
@@ -1231,10 +1338,11 @@ SELECT (m.merge).starelid::regclass,
           AND v.staattnum = '2'::int2
           AND s.starelid = 'st0'::regclass
           AND s.staattnum = '1'::int2) m;
-ERROR:  cannot cast type record to dbms_stats.column_stats_locked
-LINE 34:               v.stanumbers1, v.stanumbers2, v.stanumbers3, v...
-                       ^
-DETAIL:  Cannot cast type real[] to oid in column 17.
+ starelid | staattnum | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 |        stavalues1         |    stavalues2     | stavalues3 |            stavalues4             |                stavalues5                 
+----------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+---------------------------+-------------------+------------+-----------------------------------+-------------------------------------------
+ st0      |         2 | t          |          -2 |       -2 |          -2 |        1 |        1 |        1 |        1 |        1 |     22 |     23 |     24 |     21 |     25 |       34 |       31 |       32 |       33 |       35 | {-2,22}     | {-2,23}     | {-2,24}     | {-2,21}     | {-2,25}     | {"test ","test ","test "} | {"test ","test "} | {"test "}  | {"test ","test ","test ","test "} | {"test ","test ","test ","test ","test "}
+(1 row)
+
 -- No.5-1-20
 SELECT (m.merge).starelid::regclass,
        (m.merge).staattnum,
@@ -1252,6 +1360,11 @@ SELECT (m.merge).starelid::regclass,
        (m.merge).staop3,
        (m.merge).staop4,
        (m.merge).staop5,
+       (m.merge).stacoll1,
+       (m.merge).stacoll2,
+       (m.merge).stacoll3,
+       (m.merge).stacoll4,
+       (m.merge).stacoll5,
        (m.merge).stanumbers1,
        (m.merge).stanumbers2,
        (m.merge).stanumbers3,
@@ -1268,6 +1381,7 @@ SELECT (m.merge).starelid::regclass,
               '2',
               v.staop1, v.staop2, v.staop3, v.staop4,
               v.staop5,
+              v.stacoll1, v.stacoll2, v.stacoll3, v.stacoll4, v.stacoll5,
               v.stanumbers1, v.stanumbers2, v.stanumbers3, v.stanumbers4,
               v.stanumbers5,
               v.stavalues1, v.stavalues2, v.stavalues3, v.stavalues4
@@ -1279,6 +1393,7 @@ SELECT (m.merge).starelid::regclass,
               '2',
               s.staop1, s.staop2, s.staop3, s.staop4,
               s.staop5,
+              s.stacoll1, s.stacoll2, s.stacoll3, s.stacoll4, s.stacoll5,
               s.stanumbers1, s.stanumbers2, s.stanumbers3, s.stanumbers4,
               s.stanumbers5,
               s.stavalues1, s.stavalues2, s.stavalues3, s.stavalues4
@@ -1290,10 +1405,11 @@ SELECT (m.merge).starelid::regclass,
           AND v.staattnum = '2'::int2
           AND s.starelid = 'st0'::regclass
           AND s.staattnum = '1'::int2) m;
-ERROR:  cannot cast type record to dbms_stats.column_stats_locked
-LINE 33:               v.stanumbers1, v.stanumbers2, v.stanumbers3, v...
-                       ^
-DETAIL:  Cannot cast type real[] to oid in column 17.
+ starelid | staattnum | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 |        stavalues1         |    stavalues2     | stavalues3 |            stavalues4             |                stavalues5                 
+----------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+---------------------------+-------------------+------------+-----------------------------------+-------------------------------------------
+ st0      |         2 | t          |          -2 |       -2 |          -2 |        2 |        2 |        2 |        2 |        2 |     22 |     23 |     24 |     21 |     25 |       34 |       31 |       32 |       33 |       35 | {-2,22}     | {-2,23}     | {-2,24}     | {-2,21}     | {-2,25}     | {"test ","test ","test "} | {"test ","test "} | {"test "}  | {"test ","test ","test ","test "} | {"test ","test ","test ","test ","test "}
+(1 row)
+
 -- No.5-1-21
 SELECT dbms_stats.merge((v.starelid::regclass, '2', v.stainherit,
               v.stanullfrac, v.stawidth, v.stadistinct,
@@ -1301,6 +1417,7 @@ SELECT dbms_stats.merge((v.starelid::regclass, '2', v.stainherit,
               '1',
               v.staop1, v.staop2, v.staop3, v.staop4,
               v.staop5,
+              v.stacoll1, v.stacoll2, v.stacoll3, v.stacoll4, v.stacoll5,
               v.stanumbers1, v.stanumbers2, v.stanumbers3, v.stanumbers4,
               v.stanumbers5,
               v.stavalues1, v.stavalues2, v.stavalues3, v.stavalues4
@@ -1312,6 +1429,7 @@ SELECT dbms_stats.merge((v.starelid::regclass, '2', v.stainherit,
               '1',
               s.staop1, s.staop2, s.staop3, s.staop4,
               s.staop5,
+              s.stacoll1, s.stacoll2, s.stacoll3, s.stacoll4, s.stacoll5,
               s.stanumbers1, s.stanumbers2, s.stanumbers3, s.stanumbers4,
               s.stanumbers5,
               s.stavalues1, s.stavalues2, s.stavalues3, s.stavalues4
@@ -1323,10 +1441,14 @@ SELECT dbms_stats.merge((v.starelid::regclass, '2', v.stainherit,
           AND v.staattnum = '1'::int2
           AND s.starelid = 'st0'::regclass
           AND s.staattnum = '1'::int2;
-ERROR:  cannot cast type record to dbms_stats.column_stats_locked
-LINE 7:               v.stanumbers1, v.stanumbers2, v.stanumbers3, v...
-                      ^
-DETAIL:  Cannot cast type real[] to oid in column 17.
+LOG:  pg_dbms_stats: bad column type
+DETAIL:  type of column "name" has been changed
+HINT:  need to execute dbms_stats.unlock('st0', 'name')
+ merge  
+--------
+ (null)
+(1 row)
+
 -- No.5-1-22
 SELECT dbms_stats.merge((v.starelid::regclass, '2', v.stainherit,
               v.stanullfrac, v.stawidth, v.stadistinct,
@@ -1334,6 +1456,7 @@ SELECT dbms_stats.merge((v.starelid::regclass, '2', v.stainherit,
               '2',
               v.staop1, v.staop2, v.staop3, v.staop4,
               v.staop5,
+              v.stacoll1, v.stacoll2, v.stacoll3, v.stacoll4, v.stacoll5,
               v.stanumbers1, v.stanumbers2, v.stanumbers3, v.stanumbers4,
               v.stanumbers5,
               v.stavalues1, v.stavalues2, v.stavalues3, v.stavalues4
@@ -1345,6 +1468,7 @@ SELECT dbms_stats.merge((v.starelid::regclass, '2', v.stainherit,
               '2',
               s.staop1, s.staop2, s.staop3, s.staop4,
               s.staop5,
+              s.stacoll1, s.stacoll2, s.stacoll3, s.stacoll4, s.stacoll5,
               s.stanumbers1, s.stanumbers2, s.stanumbers3, s.stanumbers4,
               s.stanumbers5,
               s.stavalues1, s.stavalues2, s.stavalues3, s.stavalues4
@@ -1356,10 +1480,14 @@ SELECT dbms_stats.merge((v.starelid::regclass, '2', v.stainherit,
           AND v.staattnum = '1'::int2
           AND s.starelid = 'st0'::regclass
           AND s.staattnum = '1'::int2;
-ERROR:  cannot cast type record to dbms_stats.column_stats_locked
-LINE 7:               v.stanumbers1, v.stanumbers2, v.stanumbers3, v...
-                      ^
-DETAIL:  Cannot cast type real[] to oid in column 17.
+LOG:  pg_dbms_stats: bad column type
+DETAIL:  type of column "name" has been changed
+HINT:  need to execute dbms_stats.unlock('st0', 'name')
+ merge  
+--------
+ (null)
+(1 row)
+
 RESET client_min_messages;
 SELECT dbms_stats.unlock_database_stats();
  unlock_database_stats 
@@ -2011,47 +2139,47 @@ SELECT * FROM relations_backup_v;
 (26 rows)
 
 SELECT * FROM columns_backup_v;
- id | statypid | starelid | staattnum | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 |      stanumbers1       | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 |       stavalues1       | stavalues2 | stavalues3 | stavalues4 | stavalues5 
-----+----------+----------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+------------------------+-------------+-------------+-------------+-------------+------------------------+------------+------------+------------+------------
-  2 |       23 | st0      |         1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {1,2}                  | (null)     | (null)     | (null)     | (null)
-  2 |     1042 | st0      |         2 | f          |           0 |        6 |        -0.5 |        1 |        3 |        0 |        0 |        0 |   1054 |   1058 |      0 |      0 |      0 | {1}                    | {1}         | (null)      | (null)      | (null)      | {"test "}              | (null)     | (null)     | (null)     | (null)
-  2 |       23 | st1      |         1 | f          |           0 |        4 |           3 |        1 |        3 |        0 |        0 |        0 |     96 |     97 |      0 |      0 |      0 | {0.3334,0.3333,0.3333} | {0.3332}    | (null)      | (null)      | (null)      | {1,0,2}                | (null)     | (null)     | (null)     | (null)
-  2 |       25 | st1      |         2 | f          |           0 |        2 |           3 |        1 |        3 |        0 |        0 |        0 |     98 |    664 |      0 |      0 |      0 | {0.3334,0.3333,0.3333} | {0.3332}    | (null)      | (null)      | (null)      | {1,0,2}                | (null)     | (null)     | (null)     | (null)
-  2 |       23 | s0.st0   |         1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {1,2}                  | (null)     | (null)     | (null)     | (null)
-  2 |       23 | s0.st0   |         1 | t          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {1,2,4,5,6}            | (null)     | (null)     | (null)     | (null)
-  2 |       23 | s0.st0   |         2 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {10,20}                | (null)     | (null)     | (null)     | (null)
-  2 |       23 | s0.st0   |         2 | t          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {10,20,40,50,60}       | (null)     | (null)     | (null)     | (null)
-  2 |       23 | s0.st1   |         1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {4,5,6}                | (null)     | (null)     | (null)     | (null)
-  2 |       23 | s0.st1   |         2 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {40,50,60}             | (null)     | (null)     | (null)     | (null)
-  2 |       23 | s0.st2   |         1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {1,2,3}                | (null)     | (null)     | (null)     | (null)
-  2 |       25 | s0.st2   |         2 | f          |           0 |        5 |          -1 |        2 |        3 |        0 |        0 |        0 |    664 |    664 |      0 |      0 |      0 | (null)                 | {0.5}       | (null)      | (null)      | (null)      | {1,comment,test}       | (null)     | (null)     | (null)     | (null)
-  2 |       23 | s1.st0   |         1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {1,2,3,4}              | (null)     | (null)     | (null)     | (null)
-  2 |       23 | s1.st0   |         2 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {15,25,35,45}          | (null)     | (null)     | (null)     | (null)
-  2 |       25 | st1_exp  |         1 | f          |           0 |        5 |           3 |        1 |        3 |        0 |        0 |        0 |     98 |    664 |      0 |      0 |      0 | {0.3334,0.3333,0.3333} | {0.3332}    | (null)      | (null)      | (null)      | {1,0,2}                | (null)     | (null)     | (null)     | (null)
-  2 |       23 | s0.sft0  |         1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {1,2,3,4,5,6,7,8,9,10} | (null)     | (null)     | (null)     | (null)
-  2 |       23 | s0.smv0  |         1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {1,2}                  | (null)     | (null)     | (null)     | (null)
-  2 |       23 | s0.smv0  |         2 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {10,20}                | (null)     | (null)     | (null)     | (null)
-  2 |       25 | s0.smv0  |         3 | f          |           0 |        3 |          -1 |        2 |        3 |        0 |        0 |        0 |    664 |    664 |      0 |      0 |      0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {1,test}               | (null)     | (null)     | (null)     | (null)
-  3 |       23 | s0.st0   |         1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {1,2}                  | (null)     | (null)     | (null)     | (null)
-  3 |       23 | s0.st0   |         1 | t          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {1,2,4,5,6}            | (null)     | (null)     | (null)     | (null)
-  3 |       23 | s0.st0   |         2 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {10,20}                | (null)     | (null)     | (null)     | (null)
-  3 |       23 | s0.st0   |         2 | t          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {10,20,40,50,60}       | (null)     | (null)     | (null)     | (null)
-  5 |       23 | s0.st0   |         1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {1,2}                  | (null)     | (null)     | (null)     | (null)
-  5 |       23 | s0.st0   |         1 | t          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {1,2,4,5,6}            | (null)     | (null)     | (null)     | (null)
-  6 |       23 | s0.st0   |         1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {1,2}                  | (null)     | (null)     | (null)     | (null)
-  6 |       23 | s0.st0   |         1 | t          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {1,2,4,5,6}            | (null)     | (null)     | (null)     | (null)
-  6 |       23 | s0.st0   |         2 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {10,20}                | (null)     | (null)     | (null)     | (null)
-  6 |       23 | s0.st0   |         2 | t          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {10,20,40,50,60}       | (null)     | (null)     | (null)     | (null)
-  7 |       23 | st0      |         1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {1,2}                  | (null)     | (null)     | (null)     | (null)
-  7 |     1042 | st0      |         2 | f          |           0 |        6 |        -0.5 |        1 |        3 |        0 |        0 |        0 |   1054 |   1058 |      0 |      0 |      0 | {1}                    | {1}         | (null)      | (null)      | (null)      | {"test "}              | (null)     | (null)     | (null)     | (null)
-  8 |       23 | s0.st0   |         1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {1,2}                  | (null)     | (null)     | (null)     | (null)
-  8 |       23 | s0.st0   |         1 | t          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {1,2,4,5,6}            | (null)     | (null)     | (null)     | (null)
-  8 |       23 | s0.st0   |         2 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {10,20}                | (null)     | (null)     | (null)     | (null)
-  8 |       23 | s0.st0   |         2 | t          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {10,20,40,50,60}       | (null)     | (null)     | (null)     | (null)
-  8 |       23 | s0.st1   |         1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {4,5,6}                | (null)     | (null)     | (null)     | (null)
-  8 |       23 | s0.st1   |         2 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {40,50,60}             | (null)     | (null)     | (null)     | (null)
-  8 |       23 | s0.st2   |         1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {1,2,3}                | (null)     | (null)     | (null)     | (null)
-  8 |       25 | s0.st2   |         2 | f          |           0 |        5 |          -1 |        2 |        3 |        0 |        0 |        0 |    664 |    664 |      0 |      0 |      0 | (null)                 | {0.5}       | (null)      | (null)      | (null)      | {1,comment,test}       | (null)     | (null)     | (null)     | (null)
+ id | statypid | starelid | staattnum | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 |      stanumbers1       | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 |       stavalues1       | stavalues2 | stavalues3 | stavalues4 | stavalues5 
+----+----------+----------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+------------------------+-------------+-------------+-------------+-------------+------------------------+------------+------------+------------+------------
+  2 |       23 | st0      |         1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {1,2}                  | (null)     | (null)     | (null)     | (null)
+  2 |     1042 | st0      |         2 | f          |           0 |        6 |        -0.5 |        1 |        3 |        0 |        0 |        0 |   1054 |   1058 |      0 |      0 |      0 |      100 |      100 |        0 |        0 |        0 | {1}                    | {1}         | (null)      | (null)      | (null)      | {"test "}              | (null)     | (null)     | (null)     | (null)
+  2 |       23 | st1      |         1 | f          |           0 |        4 |           3 |        1 |        3 |        0 |        0 |        0 |     96 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | {0.3334,0.3333,0.3333} | {0.3332}    | (null)      | (null)      | (null)      | {1,0,2}                | (null)     | (null)     | (null)     | (null)
+  2 |       25 | st1      |         2 | f          |           0 |        2 |           3 |        1 |        3 |        0 |        0 |        0 |     98 |    664 |      0 |      0 |      0 |      100 |      100 |        0 |        0 |        0 | {0.3334,0.3333,0.3333} | {0.3332}    | (null)      | (null)      | (null)      | {1,0,2}                | (null)     | (null)     | (null)     | (null)
+  2 |       23 | s0.st0   |         1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {1,2}                  | (null)     | (null)     | (null)     | (null)
+  2 |       23 | s0.st0   |         1 | t          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {1,2,4,5,6}            | (null)     | (null)     | (null)     | (null)
+  2 |       23 | s0.st0   |         2 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {10,20}                | (null)     | (null)     | (null)     | (null)
+  2 |       23 | s0.st0   |         2 | t          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {10,20,40,50,60}       | (null)     | (null)     | (null)     | (null)
+  2 |       23 | s0.st1   |         1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {4,5,6}                | (null)     | (null)     | (null)     | (null)
+  2 |       23 | s0.st1   |         2 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {40,50,60}             | (null)     | (null)     | (null)     | (null)
+  2 |       23 | s0.st2   |         1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {1,2,3}                | (null)     | (null)     | (null)     | (null)
+  2 |       25 | s0.st2   |         2 | f          |           0 |        5 |          -1 |        2 |        3 |        0 |        0 |        0 |    664 |    664 |      0 |      0 |      0 |      100 |      100 |        0 |        0 |        0 | (null)                 | {0.5}       | (null)      | (null)      | (null)      | {1,comment,test}       | (null)     | (null)     | (null)     | (null)
+  2 |       23 | s1.st0   |         1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {1,2,3,4}              | (null)     | (null)     | (null)     | (null)
+  2 |       23 | s1.st0   |         2 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {15,25,35,45}          | (null)     | (null)     | (null)     | (null)
+  2 |       25 | st1_exp  |         1 | f          |           0 |        5 |           3 |        1 |        3 |        0 |        0 |        0 |     98 |    664 |      0 |      0 |      0 |      100 |      100 |        0 |        0 |        0 | {0.3334,0.3333,0.3333} | {0.3332}    | (null)      | (null)      | (null)      | {1,0,2}                | (null)     | (null)     | (null)     | (null)
+  2 |       23 | s0.sft0  |         1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {1,2,3,4,5,6,7,8,9,10} | (null)     | (null)     | (null)     | (null)
+  2 |       23 | s0.smv0  |         1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {1,2}                  | (null)     | (null)     | (null)     | (null)
+  2 |       23 | s0.smv0  |         2 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {10,20}                | (null)     | (null)     | (null)     | (null)
+  2 |       25 | s0.smv0  |         3 | f          |           0 |        3 |          -1 |        2 |        3 |        0 |        0 |        0 |    664 |    664 |      0 |      0 |      0 |      100 |      100 |        0 |        0 |        0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {1,test}               | (null)     | (null)     | (null)     | (null)
+  3 |       23 | s0.st0   |         1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {1,2}                  | (null)     | (null)     | (null)     | (null)
+  3 |       23 | s0.st0   |         1 | t          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {1,2,4,5,6}            | (null)     | (null)     | (null)     | (null)
+  3 |       23 | s0.st0   |         2 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {10,20}                | (null)     | (null)     | (null)     | (null)
+  3 |       23 | s0.st0   |         2 | t          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {10,20,40,50,60}       | (null)     | (null)     | (null)     | (null)
+  5 |       23 | s0.st0   |         1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {1,2}                  | (null)     | (null)     | (null)     | (null)
+  5 |       23 | s0.st0   |         1 | t          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {1,2,4,5,6}            | (null)     | (null)     | (null)     | (null)
+  6 |       23 | s0.st0   |         1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {1,2}                  | (null)     | (null)     | (null)     | (null)
+  6 |       23 | s0.st0   |         1 | t          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {1,2,4,5,6}            | (null)     | (null)     | (null)     | (null)
+  6 |       23 | s0.st0   |         2 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {10,20}                | (null)     | (null)     | (null)     | (null)
+  6 |       23 | s0.st0   |         2 | t          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {10,20,40,50,60}       | (null)     | (null)     | (null)     | (null)
+  7 |       23 | st0      |         1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {1,2}                  | (null)     | (null)     | (null)     | (null)
+  7 |     1042 | st0      |         2 | f          |           0 |        6 |        -0.5 |        1 |        3 |        0 |        0 |        0 |   1054 |   1058 |      0 |      0 |      0 |      100 |      100 |        0 |        0 |        0 | {1}                    | {1}         | (null)      | (null)      | (null)      | {"test "}              | (null)     | (null)     | (null)     | (null)
+  8 |       23 | s0.st0   |         1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {1,2}                  | (null)     | (null)     | (null)     | (null)
+  8 |       23 | s0.st0   |         1 | t          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {1,2,4,5,6}            | (null)     | (null)     | (null)     | (null)
+  8 |       23 | s0.st0   |         2 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {10,20}                | (null)     | (null)     | (null)     | (null)
+  8 |       23 | s0.st0   |         2 | t          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {10,20,40,50,60}       | (null)     | (null)     | (null)     | (null)
+  8 |       23 | s0.st1   |         1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {4,5,6}                | (null)     | (null)     | (null)     | (null)
+  8 |       23 | s0.st1   |         2 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {40,50,60}             | (null)     | (null)     | (null)     | (null)
+  8 |       23 | s0.st2   |         1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {1,2,3}                | (null)     | (null)     | (null)     | (null)
+  8 |       25 | s0.st2   |         2 | f          |           0 |        5 |          -1 |        2 |        3 |        0 |        0 |        0 |    664 |    664 |      0 |      0 |      0 |      100 |      100 |        0 |        0 |        0 | (null)                 | {0.5}       | (null)      | (null)      | (null)      | {1,comment,test}       | (null)     | (null)     | (null)     | (null)
 (39 rows)
 
 VACUUM ANALYZE;
@@ -2709,12 +2837,12 @@ SELECT id, unit, comment FROM dbms_stats.backup_history
 (1 row)
 
 SELECT * FROM columns_locked_v;
- starelid | staattnum | attname | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 | stavalues1 | stavalues2 | stavalues3 | stavalues4 | stavalues5 
-----------+-----------+---------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+-------------+-------------+-------------+-------------+-------------+------------+------------+------------+------------+------------
- s0.st0   |         1 | id      | f          |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)     | (null)     | (null)     | (null)     | (null)
- s0.st0   |         1 | id      | t          |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)     | (null)     | (null)     | (null)     | (null)
- s0.st0   |         2 | num     | f          |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)     | (null)     | (null)     | (null)     | (null)
- s0.st0   |         2 | num     | t          |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)     | (null)     | (null)     | (null)     | (null)
+ starelid | staattnum | attname | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 | stavalues1 | stavalues2 | stavalues3 | stavalues4 | stavalues5 
+----------+-----------+---------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+------------+------------+------------+------------+------------
+ s0.st0   |         1 | id      | f          |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)     | (null)     | (null)     | (null)     | (null)
+ s0.st0   |         1 | id      | t          |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)     | (null)     | (null)     | (null)     | (null)
+ s0.st0   |         2 | num     | f          |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)     | (null)     | (null)     | (null)     | (null)
+ s0.st0   |         2 | num     | t          |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)     | (null)     | (null)     | (null)     | (null)
 (4 rows)
 
 SELECT * FROM relations_locked_v;
@@ -2736,12 +2864,12 @@ SELECT * FROM relations_locked_v;
 (1 row)
 
 SELECT * FROM columns_locked_v;
- starelid | staattnum | attname | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 |    stavalues1    | stavalues2 | stavalues3 | stavalues4 | stavalues5 
-----------+-----------+---------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+-------------+-------------+-------------+-------------+-------------+------------------+------------+------------+------------+------------
- s0.st0   |         1 | id      | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2}            | (null)     | (null)     | (null)     | (null)
- s0.st0   |         1 | id      | t          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2,4,5,6}      | (null)     | (null)     | (null)     | (null)
- s0.st0   |         2 | num     | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)      | {1}         | (null)      | (null)      | (null)      | {10,20}          | (null)     | (null)     | (null)     | (null)
- s0.st0   |         2 | num     | t          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)      | {1}         | (null)      | (null)      | (null)      | {10,20,40,50,60} | (null)     | (null)     | (null)     | (null)
+ starelid | staattnum | attname | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 |    stavalues1    | stavalues2 | stavalues3 | stavalues4 | stavalues5 
+----------+-----------+---------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+------------------+------------+------------+------------+------------
+ s0.st0   |         1 | id      | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2}            | (null)     | (null)     | (null)     | (null)
+ s0.st0   |         1 | id      | t          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2,4,5,6}      | (null)     | (null)     | (null)     | (null)
+ s0.st0   |         2 | num     | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {10,20}          | (null)     | (null)     | (null)     | (null)
+ s0.st0   |         2 | num     | t          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {10,20,40,50,60} | (null)     | (null)     | (null)     | (null)
 (4 rows)
 
 -- No.9-1-25
@@ -2766,12 +2894,12 @@ SELECT * FROM relations_locked_v;
 (1 row)
 
 SELECT * FROM columns_locked_v;
- starelid | staattnum | attname | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 |    stavalues1    | stavalues2 | stavalues3 | stavalues4 | stavalues5 
-----------+-----------+---------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+-------------+-------------+-------------+-------------+-------------+------------------+------------+------------+------------+------------
- s0.st0   |         1 | id      | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2}            | (null)     | (null)     | (null)     | (null)
- s0.st0   |         1 | id      | t          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2,4,5,6}      | (null)     | (null)     | (null)     | (null)
- s0.st0   |         2 | num     | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)      | {1}         | (null)      | (null)      | (null)      | {10,20}          | (null)     | (null)     | (null)     | (null)
- s0.st0   |         2 | num     | t          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)      | {1}         | (null)      | (null)      | (null)      | {10,20,40,50,60} | (null)     | (null)     | (null)     | (null)
+ starelid | staattnum | attname | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 |    stavalues1    | stavalues2 | stavalues3 | stavalues4 | stavalues5 
+----------+-----------+---------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+------------------+------------+------------+------------+------------
+ s0.st0   |         1 | id      | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2}            | (null)     | (null)     | (null)     | (null)
+ s0.st0   |         1 | id      | t          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2,4,5,6}      | (null)     | (null)     | (null)     | (null)
+ s0.st0   |         2 | num     | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {10,20}          | (null)     | (null)     | (null)     | (null)
+ s0.st0   |         2 | num     | t          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {10,20,40,50,60} | (null)     | (null)     | (null)     | (null)
 (4 rows)
 
 /*
@@ -3128,27 +3256,27 @@ SELECT id, unit, comment FROM dbms_stats.backup_history
 (1 row)
 
 SELECT * FROM columns_locked_v;
- starelid | staattnum | attname | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 | stavalues1 | stavalues2 | stavalues3 | stavalues4 | stavalues5 
-----------+-----------+---------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+-------------+-------------+-------------+-------------+-------------+------------+------------+------------+------------+------------
- st0      |         1 | id      | f          |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)     | (null)     | (null)     | (null)     | (null)
- st0      |         2 | name    | f          |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)     | (null)     | (null)     | (null)     | (null)
- st1      |         1 | val     | f          |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)     | (null)     | (null)     | (null)     | (null)
- st1      |         2 | str     | f          |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)     | (null)     | (null)     | (null)     | (null)
- s0.st0   |         1 | id      | f          |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)     | (null)     | (null)     | (null)     | (null)
- s0.st0   |         1 | id      | t          |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)     | (null)     | (null)     | (null)     | (null)
- s0.st0   |         2 | num     | f          |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)     | (null)     | (null)     | (null)     | (null)
- s0.st0   |         2 | num     | t          |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)     | (null)     | (null)     | (null)     | (null)
- s0.st1   |         1 | id      | f          |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)     | (null)     | (null)     | (null)     | (null)
- s0.st1   |         2 | num     | f          |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)     | (null)     | (null)     | (null)     | (null)
- s0.st2   |         1 | id      | f          |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)     | (null)     | (null)     | (null)     | (null)
- s0.st2   |         2 | txt     | f          |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)     | (null)     | (null)     | (null)     | (null)
- st1_exp  |         1 | lower   | f          |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)     | (null)     | (null)     | (null)     | (null)
- s0.sft0  |         1 | id      | f          |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)     | (null)     | (null)     | (null)     | (null)
- s0.smv0  |         1 | id      | f          |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)     | (null)     | (null)     | (null)     | (null)
- s0.smv0  |         2 | num     | f          |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)     | (null)     | (null)     | (null)     | (null)
- s0.smv0  |         3 | txt     | f          |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)     | (null)     | (null)     | (null)     | (null)
- s1.st0   |         1 | id      | f          |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)     | (null)     | (null)     | (null)     | (null)
- s1.st0   |         2 | num     | f          |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)     | (null)     | (null)     | (null)     | (null)
+ starelid | staattnum | attname | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 | stavalues1 | stavalues2 | stavalues3 | stavalues4 | stavalues5 
+----------+-----------+---------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+------------+------------+------------+------------+------------
+ st0      |         1 | id      | f          |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)     | (null)     | (null)     | (null)     | (null)
+ st0      |         2 | name    | f          |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)     | (null)     | (null)     | (null)     | (null)
+ st1      |         1 | val     | f          |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)     | (null)     | (null)     | (null)     | (null)
+ st1      |         2 | str     | f          |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)     | (null)     | (null)     | (null)     | (null)
+ s0.st0   |         1 | id      | f          |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)     | (null)     | (null)     | (null)     | (null)
+ s0.st0   |         1 | id      | t          |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)     | (null)     | (null)     | (null)     | (null)
+ s0.st0   |         2 | num     | f          |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)     | (null)     | (null)     | (null)     | (null)
+ s0.st0   |         2 | num     | t          |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)     | (null)     | (null)     | (null)     | (null)
+ s0.st1   |         1 | id      | f          |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)     | (null)     | (null)     | (null)     | (null)
+ s0.st1   |         2 | num     | f          |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)     | (null)     | (null)     | (null)     | (null)
+ s0.st2   |         1 | id      | f          |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)     | (null)     | (null)     | (null)     | (null)
+ s0.st2   |         2 | txt     | f          |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)     | (null)     | (null)     | (null)     | (null)
+ st1_exp  |         1 | lower   | f          |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)     | (null)     | (null)     | (null)     | (null)
+ s0.sft0  |         1 | id      | f          |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)     | (null)     | (null)     | (null)     | (null)
+ s0.smv0  |         1 | id      | f          |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)     | (null)     | (null)     | (null)     | (null)
+ s0.smv0  |         2 | num     | f          |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)     | (null)     | (null)     | (null)     | (null)
+ s0.smv0  |         3 | txt     | f          |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)     | (null)     | (null)     | (null)     | (null)
+ s1.st0   |         1 | id      | f          |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)     | (null)     | (null)     | (null)     | (null)
+ s1.st0   |         2 | num     | f          |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)     | (null)     | (null)     | (null)     | (null)
 (19 rows)
 
 SELECT * FROM relations_locked_v;
@@ -3205,27 +3333,27 @@ SELECT * FROM relations_locked_v;
 (16 rows)
 
 SELECT * FROM columns_locked_v;
- starelid | staattnum | attname | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 |    stavalues1    | stavalues2 | stavalues3 | stavalues4 | stavalues5 
-----------+-----------+---------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+-------------+-------------+-------------+-------------+-------------+------------------+------------+------------+------------+------------
- st0      |         1 | id      | f          |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)           | (null)     | (null)     | (null)     | (null)
- st0      |         2 | name    | f          |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)           | (null)     | (null)     | (null)     | (null)
- st1      |         1 | val     | f          |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)           | (null)     | (null)     | (null)     | (null)
- st1      |         2 | str     | f          |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)           | (null)     | (null)     | (null)     | (null)
- s0.st0   |         1 | id      | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2}            | (null)     | (null)     | (null)     | (null)
- s0.st0   |         1 | id      | t          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2,4,5,6}      | (null)     | (null)     | (null)     | (null)
- s0.st0   |         2 | num     | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)      | {1}         | (null)      | (null)      | (null)      | {10,20}          | (null)     | (null)     | (null)     | (null)
- s0.st0   |         2 | num     | t          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)      | {1}         | (null)      | (null)      | (null)      | {10,20,40,50,60} | (null)     | (null)     | (null)     | (null)
- s0.st1   |         1 | id      | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)      | {1}         | (null)      | (null)      | (null)      | {4,5,6}          | (null)     | (null)     | (null)     | (null)
- s0.st1   |         2 | num     | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)      | {1}         | (null)      | (null)      | (null)      | {40,50,60}       | (null)     | (null)     | (null)     | (null)
- s0.st2   |         1 | id      | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2,3}          | (null)     | (null)     | (null)     | (null)
- s0.st2   |         2 | txt     | f          |           0 |        5 |          -1 |        2 |        3 |        0 |        0 |        0 |    664 |    664 |      0 |      0 |      0 | (null)      | {0.5}       | (null)      | (null)      | (null)      | {1,comment,test} | (null)     | (null)     | (null)     | (null)
- st1_exp  |         1 | lower   | f          |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)           | (null)     | (null)     | (null)     | (null)
- s0.sft0  |         1 | id      | f          |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)           | (null)     | (null)     | (null)     | (null)
- s0.smv0  |         1 | id      | f          |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)           | (null)     | (null)     | (null)     | (null)
- s0.smv0  |         2 | num     | f          |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)           | (null)     | (null)     | (null)     | (null)
- s0.smv0  |         3 | txt     | f          |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)           | (null)     | (null)     | (null)     | (null)
- s1.st0   |         1 | id      | f          |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)           | (null)     | (null)     | (null)     | (null)
- s1.st0   |         2 | num     | f          |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)           | (null)     | (null)     | (null)     | (null)
+ starelid | staattnum | attname | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 |    stavalues1    | stavalues2 | stavalues3 | stavalues4 | stavalues5 
+----------+-----------+---------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+------------------+------------+------------+------------+------------
+ st0      |         1 | id      | f          |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)           | (null)     | (null)     | (null)     | (null)
+ st0      |         2 | name    | f          |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)           | (null)     | (null)     | (null)     | (null)
+ st1      |         1 | val     | f          |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)           | (null)     | (null)     | (null)     | (null)
+ st1      |         2 | str     | f          |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)           | (null)     | (null)     | (null)     | (null)
+ s0.st0   |         1 | id      | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2}            | (null)     | (null)     | (null)     | (null)
+ s0.st0   |         1 | id      | t          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2,4,5,6}      | (null)     | (null)     | (null)     | (null)
+ s0.st0   |         2 | num     | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {10,20}          | (null)     | (null)     | (null)     | (null)
+ s0.st0   |         2 | num     | t          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {10,20,40,50,60} | (null)     | (null)     | (null)     | (null)
+ s0.st1   |         1 | id      | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {4,5,6}          | (null)     | (null)     | (null)     | (null)
+ s0.st1   |         2 | num     | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {40,50,60}       | (null)     | (null)     | (null)     | (null)
+ s0.st2   |         1 | id      | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2,3}          | (null)     | (null)     | (null)     | (null)
+ s0.st2   |         2 | txt     | f          |           0 |        5 |          -1 |        2 |        3 |        0 |        0 |        0 |    664 |    664 |      0 |      0 |      0 |      100 |      100 |        0 |        0 |        0 | (null)      | {0.5}       | (null)      | (null)      | (null)      | {1,comment,test} | (null)     | (null)     | (null)     | (null)
+ st1_exp  |         1 | lower   | f          |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)           | (null)     | (null)     | (null)     | (null)
+ s0.sft0  |         1 | id      | f          |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)           | (null)     | (null)     | (null)     | (null)
+ s0.smv0  |         1 | id      | f          |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)           | (null)     | (null)     | (null)     | (null)
+ s0.smv0  |         2 | num     | f          |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)           | (null)     | (null)     | (null)     | (null)
+ s0.smv0  |         3 | txt     | f          |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)           | (null)     | (null)     | (null)     | (null)
+ s1.st0   |         1 | id      | f          |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)           | (null)     | (null)     | (null)     | (null)
+ s1.st0   |         2 | num     | f          |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)           | (null)     | (null)     | (null)     | (null)
 (19 rows)
 
 -- No.10-7-5
@@ -3260,16 +3388,16 @@ SELECT * FROM relations_locked_v;
 (6 rows)
 
 SELECT * FROM columns_locked_v;
- starelid | staattnum | attname | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 |    stavalues1    | stavalues2 | stavalues3 | stavalues4 | stavalues5 
-----------+-----------+---------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+-------------+-------------+-------------+-------------+-------------+------------------+------------+------------+------------+------------
- s0.st0   |         1 | id      | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2}            | (null)     | (null)     | (null)     | (null)
- s0.st0   |         1 | id      | t          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2,4,5,6}      | (null)     | (null)     | (null)     | (null)
- s0.st0   |         2 | num     | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)      | {1}         | (null)      | (null)      | (null)      | {10,20}          | (null)     | (null)     | (null)     | (null)
- s0.st0   |         2 | num     | t          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)      | {1}         | (null)      | (null)      | (null)      | {10,20,40,50,60} | (null)     | (null)     | (null)     | (null)
- s0.st1   |         1 | id      | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)      | {1}         | (null)      | (null)      | (null)      | {4,5,6}          | (null)     | (null)     | (null)     | (null)
- s0.st1   |         2 | num     | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)      | {1}         | (null)      | (null)      | (null)      | {40,50,60}       | (null)     | (null)     | (null)     | (null)
- s0.st2   |         1 | id      | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2,3}          | (null)     | (null)     | (null)     | (null)
- s0.st2   |         2 | txt     | f          |           0 |        5 |          -1 |        2 |        3 |        0 |        0 |        0 |    664 |    664 |      0 |      0 |      0 | (null)      | {0.5}       | (null)      | (null)      | (null)      | {1,comment,test} | (null)     | (null)     | (null)     | (null)
+ starelid | staattnum | attname | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 |    stavalues1    | stavalues2 | stavalues3 | stavalues4 | stavalues5 
+----------+-----------+---------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+------------------+------------+------------+------------+------------
+ s0.st0   |         1 | id      | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2}            | (null)     | (null)     | (null)     | (null)
+ s0.st0   |         1 | id      | t          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2,4,5,6}      | (null)     | (null)     | (null)     | (null)
+ s0.st0   |         2 | num     | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {10,20}          | (null)     | (null)     | (null)     | (null)
+ s0.st0   |         2 | num     | t          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {10,20,40,50,60} | (null)     | (null)     | (null)     | (null)
+ s0.st1   |         1 | id      | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {4,5,6}          | (null)     | (null)     | (null)     | (null)
+ s0.st1   |         2 | num     | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {40,50,60}       | (null)     | (null)     | (null)     | (null)
+ s0.st2   |         1 | id      | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2,3}          | (null)     | (null)     | (null)     | (null)
+ s0.st2   |         2 | txt     | f          |           0 |        5 |          -1 |        2 |        3 |        0 |        0 |        0 |    664 |    664 |      0 |      0 |      0 |      100 |      100 |        0 |        0 |        0 | (null)      | {0.5}       | (null)      | (null)      | (null)      | {1,comment,test} | (null)     | (null)     | (null)     | (null)
 (8 rows)
 
 /*
@@ -3323,10 +3451,10 @@ SELECT * FROM relations_locked_v;
 (1 row)
 
 SELECT * FROM columns_locked_v c;
- starelid | staattnum | attname | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 | stavalues1  | stavalues2 | stavalues3 | stavalues4 | stavalues5 
-----------+-----------+---------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+-------------+-------------+-------------+-------------+-------------+-------------+------------+------------+------------+------------
- s0.st0   |         1 | id      | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2}       | (null)     | (null)     | (null)     | (null)
- s0.st0   |         1 | id      | t          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2,4,5,6} | (null)     | (null)     | (null)     | (null)
+ starelid | staattnum | attname | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 | stavalues1  | stavalues2 | stavalues3 | stavalues4 | stavalues5 
+----------+-----------+---------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+-------------+------------+------------+------------+------------
+ s0.st0   |         1 | id      | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2}       | (null)     | (null)     | (null)     | (null)
+ s0.st0   |         1 | id      | t          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2,4,5,6} | (null)     | (null)     | (null)     | (null)
 (2 rows)
 
 -- No.11-1-5
@@ -3349,10 +3477,10 @@ SELECT * FROM relations_locked_v;
 (1 row)
 
 SELECT * FROM columns_locked_v c;
- starelid | staattnum | attname | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 | stavalues1  | stavalues2 | stavalues3 | stavalues4 | stavalues5 
-----------+-----------+---------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+-------------+-------------+-------------+-------------+-------------+-------------+------------+------------+------------+------------
- s0.st0   |         1 | id      | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2}       | (null)     | (null)     | (null)     | (null)
- s0.st0   |         1 | id      | t          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2,4,5,6} | (null)     | (null)     | (null)     | (null)
+ starelid | staattnum | attname | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 | stavalues1  | stavalues2 | stavalues3 | stavalues4 | stavalues5 
+----------+-----------+---------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+-------------+------------+------------+------------+------------
+ s0.st0   |         1 | id      | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2}       | (null)     | (null)     | (null)     | (null)
+ s0.st0   |         1 | id      | t          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2,4,5,6} | (null)     | (null)     | (null)     | (null)
 (2 rows)
 
 -- No.11-1-7
@@ -3380,9 +3508,9 @@ SELECT * FROM relations_locked_v;
 (1 row)
 
 SELECT * FROM columns_locked_v c;
- starelid | staattnum | attname | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 |      stanumbers1       | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 | stavalues1 | stavalues2 | stavalues3 | stavalues4 | stavalues5 
-----------+-----------+---------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+------------------------+-------------+-------------+-------------+-------------+------------+------------+------------+------------+------------
- st1_exp  |         1 | lower   | f          |           0 |        5 |           3 |        1 |        3 |        0 |        0 |        0 |     98 |    664 |      0 |      0 |      0 | {0.3334,0.3333,0.3333} | {0.3332}    | (null)      | (null)      | (null)      | {1,0,2}    | (null)     | (null)     | (null)     | (null)
+ starelid | staattnum | attname | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 |      stanumbers1       | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 | stavalues1 | stavalues2 | stavalues3 | stavalues4 | stavalues5 
+----------+-----------+---------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+------------------------+-------------+-------------+-------------+-------------+------------+------------+------------+------------+------------
+ st1_exp  |         1 | lower   | f          |           0 |        5 |           3 |        1 |        3 |        0 |        0 |        0 |     98 |    664 |      0 |      0 |      0 |      100 |      100 |        0 |        0 |        0 | {0.3334,0.3333,0.3333} | {0.3332}    | (null)      | (null)      | (null)      | {1,0,2}    | (null)     | (null)     | (null)     | (null)
 (1 row)
 
 DELETE FROM dbms_stats.relation_stats_locked;
@@ -3411,9 +3539,9 @@ SELECT * FROM relations_locked_v;
 (1 row)
 
 SELECT * FROM columns_locked_v c;
- starelid | staattnum | attname | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 |       stavalues1       | stavalues2 | stavalues3 | stavalues4 | stavalues5 
-----------+-----------+---------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+-------------+-------------+-------------+-------------+-------------+------------------------+------------+------------+------------+------------
- s0.sft0  |         1 | id      | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2,3,4,5,6,7,8,9,10} | (null)     | (null)     | (null)     | (null)
+ starelid | staattnum | attname | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 |       stavalues1       | stavalues2 | stavalues3 | stavalues4 | stavalues5 
+----------+-----------+---------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+------------------------+------------+------------+------------+------------
+ s0.sft0  |         1 | id      | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2,3,4,5,6,7,8,9,10} | (null)     | (null)     | (null)     | (null)
 (1 row)
 
 -- No.11-1-13
@@ -3431,9 +3559,9 @@ SELECT * FROM relations_locked_v;
 (1 row)
 
 SELECT * FROM columns_locked_v c;
- starelid | staattnum | attname | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 | stavalues1 | stavalues2 | stavalues3 | stavalues4 | stavalues5 
-----------+-----------+---------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+-------------+-------------+-------------+-------------+-------------+------------+------------+------------+------------+------------
- s0.smv0  |         1 | id      | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2}      | (null)     | (null)     | (null)     | (null)
+ starelid | staattnum | attname | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 | stavalues1 | stavalues2 | stavalues3 | stavalues4 | stavalues5 
+----------+-----------+---------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+------------+------------+------------+------------+------------
+ s0.smv0  |         1 | id      | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2}      | (null)     | (null)     | (null)     | (null)
 (1 row)
 
 -- No.11-1-14
@@ -3500,10 +3628,10 @@ SELECT * FROM relations_locked_v;
 (1 row)
 
 SELECT * FROM columns_locked_v c;
- starelid | staattnum | attname | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 | stavalues1  | stavalues2 | stavalues3 | stavalues4 | stavalues5 
-----------+-----------+---------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+-------------+-------------+-------------+-------------+-------------+-------------+------------+------------+------------+------------
- s0.st0   |         1 | id      | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2}       | (null)     | (null)     | (null)     | (null)
- s0.st0   |         1 | id      | t          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2,4,5,6} | (null)     | (null)     | (null)     | (null)
+ starelid | staattnum | attname | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 | stavalues1  | stavalues2 | stavalues3 | stavalues4 | stavalues5 
+----------+-----------+---------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+-------------+------------+------------+------------+------------
+ s0.st0   |         1 | id      | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2}       | (null)     | (null)     | (null)     | (null)
+ s0.st0   |         1 | id      | t          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2,4,5,6} | (null)     | (null)     | (null)     | (null)
 (2 rows)
 
 -- No.11-1-18
@@ -3553,12 +3681,12 @@ SELECT * FROM relations_locked_v;
 (1 row)
 
 SELECT * FROM columns_locked_v c;
- starelid | staattnum | attname | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 |    stavalues1    | stavalues2 | stavalues3 | stavalues4 | stavalues5 
-----------+-----------+---------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+-------------+-------------+-------------+-------------+-------------+------------------+------------+------------+------------+------------
- s0.st0   |         1 | id      | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2}            | (null)     | (null)     | (null)     | (null)
- s0.st0   |         1 | id      | t          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2,4,5,6}      | (null)     | (null)     | (null)     | (null)
- s0.st0   |         2 | num     | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)      | {1}         | (null)      | (null)      | (null)      | {10,20}          | (null)     | (null)     | (null)     | (null)
- s0.st0   |         2 | num     | t          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)      | {1}         | (null)      | (null)      | (null)      | {10,20,40,50,60} | (null)     | (null)     | (null)     | (null)
+ starelid | staattnum | attname | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 |    stavalues1    | stavalues2 | stavalues3 | stavalues4 | stavalues5 
+----------+-----------+---------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+------------------+------------+------------+------------+------------
+ s0.st0   |         1 | id      | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2}            | (null)     | (null)     | (null)     | (null)
+ s0.st0   |         1 | id      | t          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2,4,5,6}      | (null)     | (null)     | (null)     | (null)
+ s0.st0   |         2 | num     | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {10,20}          | (null)     | (null)     | (null)     | (null)
+ s0.st0   |         2 | num     | t          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {10,20,40,50,60} | (null)     | (null)     | (null)     | (null)
 (4 rows)
 
 SELECT * FROM internal_locks;
@@ -3597,12 +3725,12 @@ SELECT * FROM relations_locked_v;
 (1 row)
 
 SELECT * FROM columns_locked_v c;
- starelid | staattnum | attname | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 |    stavalues1    | stavalues2 | stavalues3 | stavalues4 | stavalues5 
-----------+-----------+---------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+-------------+-------------+-------------+-------------+-------------+------------------+------------+------------+------------+------------
- s0.st0   |         1 | id      | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2}            | (null)     | (null)     | (null)     | (null)
- s0.st0   |         1 | id      | t          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2,4,5,6}      | (null)     | (null)     | (null)     | (null)
- s0.st0   |         2 | num     | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)      | {1}         | (null)      | (null)      | (null)      | {10,20}          | (null)     | (null)     | (null)     | (null)
- s0.st0   |         2 | num     | t          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)      | {1}         | (null)      | (null)      | (null)      | {10,20,40,50,60} | (null)     | (null)     | (null)     | (null)
+ starelid | staattnum | attname | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 |    stavalues1    | stavalues2 | stavalues3 | stavalues4 | stavalues5 
+----------+-----------+---------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+------------------+------------+------------+------------+------------
+ s0.st0   |         1 | id      | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2}            | (null)     | (null)     | (null)     | (null)
+ s0.st0   |         1 | id      | t          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2,4,5,6}      | (null)     | (null)     | (null)     | (null)
+ s0.st0   |         2 | num     | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {10,20}          | (null)     | (null)     | (null)     | (null)
+ s0.st0   |         2 | num     | t          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {10,20,40,50,60} | (null)     | (null)     | (null)     | (null)
 (4 rows)
 
 -- No.11-2-5
@@ -3626,8 +3754,8 @@ SELECT * FROM relations_locked_v;
 (1 row)
 
 SELECT * FROM columns_locked_v c;
- starelid | staattnum | attname | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 | stavalues1 | stavalues2 | stavalues3 | stavalues4 | stavalues5 
-----------+-----------+---------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+-------------+-------------+-------------+-------------+-------------+------------+------------+------------+------------+------------
+ starelid | staattnum | attname | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 | stavalues1 | stavalues2 | stavalues3 | stavalues4 | stavalues5 
+----------+-----------+---------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+------------+------------+------------+------------+------------
 (0 rows)
 
 -- No.11-2-7
@@ -3657,9 +3785,9 @@ SELECT * FROM relations_locked_v;
 (1 row)
 
 SELECT * FROM columns_locked_v c;
- starelid | staattnum | attname | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 |       stavalues1       | stavalues2 | stavalues3 | stavalues4 | stavalues5 
-----------+-----------+---------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+-------------+-------------+-------------+-------------+-------------+------------------------+------------+------------+------------+------------
- s0.sft0  |         1 | id      | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2,3,4,5,6,7,8,9,10} | (null)     | (null)     | (null)     | (null)
+ starelid | staattnum | attname | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 |       stavalues1       | stavalues2 | stavalues3 | stavalues4 | stavalues5 
+----------+-----------+---------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+------------------------+------------+------------+------------+------------
+ s0.sft0  |         1 | id      | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2,3,4,5,6,7,8,9,10} | (null)     | (null)     | (null)     | (null)
 (1 row)
 
 -- No.11-2-10
@@ -3677,11 +3805,11 @@ SELECT * FROM relations_locked_v;
 (1 row)
 
 SELECT * FROM columns_locked_v c;
- starelid | staattnum | attname | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 | stavalues1 | stavalues2 | stavalues3 | stavalues4 | stavalues5 
-----------+-----------+---------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+-------------+-------------+-------------+-------------+-------------+------------+------------+------------+------------+------------
- s0.smv0  |         1 | id      | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2}      | (null)     | (null)     | (null)     | (null)
- s0.smv0  |         2 | num     | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)      | {1}         | (null)      | (null)      | (null)      | {10,20}    | (null)     | (null)     | (null)     | (null)
- s0.smv0  |         3 | txt     | f          |           0 |        3 |          -1 |        2 |        3 |        0 |        0 |        0 |    664 |    664 |      0 |      0 |      0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,test}   | (null)     | (null)     | (null)     | (null)
+ starelid | staattnum | attname | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 | stavalues1 | stavalues2 | stavalues3 | stavalues4 | stavalues5 
+----------+-----------+---------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+------------+------------+------------+------------+------------
+ s0.smv0  |         1 | id      | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2}      | (null)     | (null)     | (null)     | (null)
+ s0.smv0  |         2 | num     | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {10,20}    | (null)     | (null)     | (null)     | (null)
+ s0.smv0  |         3 | txt     | f          |           0 |        3 |          -1 |        2 |        3 |        0 |        0 |        0 |    664 |    664 |      0 |      0 |      0 |      100 |      100 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,test}   | (null)     | (null)     | (null)     | (null)
 (3 rows)
 
 -- No.11-2-11
@@ -3718,12 +3846,12 @@ SELECT * FROM relations_locked_v;
 (1 row)
 
 SELECT * FROM columns_locked_v c;
- starelid | staattnum | attname | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 |    stavalues1    | stavalues2 | stavalues3 | stavalues4 | stavalues5 
-----------+-----------+---------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+-------------+-------------+-------------+-------------+-------------+------------------+------------+------------+------------+------------
- s0.st0   |         1 | id      | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2}            | (null)     | (null)     | (null)     | (null)
- s0.st0   |         1 | id      | t          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2,4,5,6}      | (null)     | (null)     | (null)     | (null)
- s0.st0   |         2 | num     | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)      | {1}         | (null)      | (null)      | (null)      | {10,20}          | (null)     | (null)     | (null)     | (null)
- s0.st0   |         2 | num     | t          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)      | {1}         | (null)      | (null)      | (null)      | {10,20,40,50,60} | (null)     | (null)     | (null)     | (null)
+ starelid | staattnum | attname | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 |    stavalues1    | stavalues2 | stavalues3 | stavalues4 | stavalues5 
+----------+-----------+---------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+------------------+------------+------------+------------+------------
+ s0.st0   |         1 | id      | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2}            | (null)     | (null)     | (null)     | (null)
+ s0.st0   |         1 | id      | t          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2,4,5,6}      | (null)     | (null)     | (null)     | (null)
+ s0.st0   |         2 | num     | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {10,20}          | (null)     | (null)     | (null)     | (null)
+ s0.st0   |         2 | num     | t          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {10,20,40,50,60} | (null)     | (null)     | (null)     | (null)
 (4 rows)
 
 -- No.11-2-13
@@ -3741,12 +3869,12 @@ SELECT * FROM relations_locked_v;
 (1 row)
 
 SELECT * FROM columns_locked_v c;
- starelid | staattnum | attname | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 |    stavalues1    | stavalues2 | stavalues3 | stavalues4 | stavalues5 
-----------+-----------+---------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+-------------+-------------+-------------+-------------+-------------+------------------+------------+------------+------------+------------
- s0.st0   |         1 | id      | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2}            | (null)     | (null)     | (null)     | (null)
- s0.st0   |         1 | id      | t          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2,4,5,6}      | (null)     | (null)     | (null)     | (null)
- s0.st0   |         2 | num     | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)      | {1}         | (null)      | (null)      | (null)      | {10,20}          | (null)     | (null)     | (null)     | (null)
- s0.st0   |         2 | num     | t          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 | (null)      | {1}         | (null)      | (null)      | (null)      | {10,20,40,50,60} | (null)     | (null)     | (null)     | (null)
+ starelid | staattnum | attname | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 |    stavalues1    | stavalues2 | stavalues3 | stavalues4 | stavalues5 
+----------+-----------+---------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+------------------+------------+------------+------------+------------
+ s0.st0   |         1 | id      | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2}            | (null)     | (null)     | (null)     | (null)
+ s0.st0   |         1 | id      | t          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2,4,5,6}      | (null)     | (null)     | (null)     | (null)
+ s0.st0   |         2 | num     | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {10,20}          | (null)     | (null)     | (null)     | (null)
+ s0.st0   |         2 | num     | t          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {10,20,40,50,60} | (null)     | (null)     | (null)     | (null)
 (4 rows)
 
 /*

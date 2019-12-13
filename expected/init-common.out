@@ -10,7 +10,6 @@ CREATE EXTENSION pg_dbms_stats;
 SET client_min_messages = warning;
 DROP ROLE IF EXISTS regular_user;
 CREATE ROLE regular_user LOGIN;
-SET client_min_messages = fatal;
 DROP ROLE IF EXISTS super_user;
 CREATE ROLE super_user SUPERUSER CREATEDB CREATEROLE INHERIT LOGIN;
 -- create object

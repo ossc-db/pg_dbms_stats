@@ -40,7 +40,10 @@
 #if PG_VERSION_NUM >= 100000
 #include <math.h>
 #endif
-
+#if PG_VERSION_NUM >= 120000
+#include "access/relation.h"
+#include "optimizer/plancat.h"
+#endif
 #include "pg_dbms_stats.h"
 
 PG_MODULE_MAGIC;
@@ -226,7 +229,9 @@ static void init_rel_stats_entry(StatsRelationEntry *entry, Oid relid);
 static void dbms_stats_estimate_rel_size(Relation rel, int32 *attr_widths,
 				  BlockNumber *pages, double *tuples, double *allvisfrac,
 				  BlockNumber curpages);
+#if PG_VERSION_NUM < 120000
 static int32 dbms_stats_get_rel_data_width(Relation rel, int32 *attr_widths);
+#endif
 
 /* Unit test suit functions */
 #ifdef UNIT_TEST
@@ -727,7 +732,7 @@ dbms_stats_invalidate_cache_internal(Oid relid, bool sta_col)
 	/*
 	 * invalidate prepared statements and force re-planning with pg_dbms_stats.
 	 */
-	rel = try_relation_open(relid, NoLock);
+	rel = try_relation_open(relid, AccessShareLock);
 	if (rel != NULL)
 	{
 		if (sta_col &&
@@ -754,7 +759,7 @@ dbms_stats_invalidate_cache_internal(Oid relid, bool sta_col)
 			CacheInvalidateRelcacheByRelid(rel->rd_index->indrelid);
 
 		CacheInvalidateRelcache(rel);
-		relation_close(rel, NoLock);
+		relation_close(rel, AccessShareLock);
 	}
 }
 
@@ -814,7 +819,7 @@ dbms_stats_is_system_catalog(PG_FUNCTION_ARGS)
 		PG_RETURN_BOOL(true);
 
 	relid = PG_GETARG_OID(0);
-	result = dbms_stats_is_system_catalog_internal(relid);
+	result = dbms_stats_is_system_catalog_internal(relid, AccessShareLock);
 
 	PG_RETURN_BOOL(result);
 }
@@ -824,7 +829,7 @@ dbms_stats_is_system_catalog(PG_FUNCTION_ARGS)
  *   Check whether the given relation is one of system catalogs.
  */
 bool
-dbms_stats_is_system_catalog_internal(Oid relid)
+dbms_stats_is_system_catalog_internal(Oid relid, LOCKMODE lockmode)
 {
 	Relation	rel;
 	char	   *schema_name;
@@ -835,14 +840,14 @@ dbms_stats_is_system_catalog_internal(Oid relid)
 		return false;
 
 	/* no such relation */
-	rel = try_relation_open(relid, NoLock);
+	rel = try_relation_open(relid, lockmode);
 	if (rel == NULL)
 		return false;
 
 	/* check by namespace name. */
 	schema_name = get_namespace_name(rel->rd_rel->relnamespace);
 	result = dbms_stats_is_system_schema_internal(schema_name);
-	relation_close(rel, NoLock);
+	relation_close(rel, lockmode);
 
 	return result;
 }
@@ -1132,7 +1137,7 @@ get_merged_relation_stats(Oid relid, BlockNumber *pages, double *tuples,
 	/*
 	 * pg_dbms_stats doesn't handle system catalogs and its internal relation_stats_effective
 	 */
-	if (dbms_stats_is_system_catalog_internal(relid))
+	if (dbms_stats_is_system_catalog_internal(relid, NoLock))
 		return;
 
 	/*
@@ -1291,7 +1296,7 @@ get_merged_column_stats(Oid relid, AttrNumber attnum, bool inh)
 	 * Return NULL for system catalog, directing the caller to use system
 	 * statistics.
 	 */
-	if (dbms_stats_is_system_catalog_internal(relid))
+	if (dbms_stats_is_system_catalog_internal(relid, NoLock))
 		return NULL;
 
 	/* Return cached statistics, if any. */
@@ -1784,7 +1789,11 @@ dbms_stats_estimate_rel_size(Relation rel, int32 *attr_widths,
 				 */
 				int32		tuple_width;
 
+#if PG_VERSION_NUM >= 120000
+				tuple_width = get_rel_data_width(rel, attr_widths);
+#else
 				tuple_width = dbms_stats_get_rel_data_width(rel, attr_widths);
+#endif
 				tuple_width += sizeof(HeapTupleHeaderData);
 				tuple_width += sizeof(ItemPointerData);
 				/* note: integer division is intentional here */
@@ -1826,6 +1835,7 @@ dbms_stats_estimate_rel_size(Relation rel, int32 *attr_widths,
 	}
 }
 
+#if PG_VERSION_NUM < 120000
 /*
  * dbms_stats_get_rel_data_width
  *
@@ -1877,6 +1887,7 @@ dbms_stats_get_rel_data_width(Relation rel, int32 *attr_widths)
 
 	return tuple_width;
 }
+#endif
 
 #ifdef UNIT_TEST
 void test_pg_dbms_stats(int *passed, int *total);

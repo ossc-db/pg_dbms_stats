@@ -9,15 +9,14 @@
 
 #include "access/sysattr.h"
 #include "access/transam.h"
-#if PG_VERSION_NUM >= 120000
 #include "access/relation.h"
-#endif
 #include "catalog/pg_index.h"
 #include "catalog/pg_statistic.h"
 #include "catalog/pg_type.h"
 #include "catalog/namespace.h"
 #include "catalog/pg_authid.h"
 #include "commands/trigger.h"
+#include "common/hashfn.h"
 #include "executor/spi.h"
 #include "funcapi.h"
 #include "optimizer/plancat.h"
@@ -36,13 +35,9 @@
 #include "utils/syscache.h"
 #include "miscadmin.h"
 #include "utils/rel.h"
-#if PG_VERSION_NUM >= 90300
 #include "access/htup_details.h"
 #include "utils/catcache.h"
-#endif
-#if PG_VERSION_NUM >= 100000
 #include <math.h>
-#endif
 
 #include "pg_dbms_stats.h"
 
@@ -54,14 +49,6 @@ PG_MODULE_MAGIC;
 
 #define MAX_REL_CACHE		50		/* expected max # of rel stats entries */
 
-/* acl_ok must be set after the fix for CVE-2017-7484 */
-#if PG_VERSION_NUM >= 100000 || \
-	(PG_VERSION_NUM >=  90603 && PG_VERSION_NUM < 100000) ||	\
-	(PG_VERSION_NUM >=  90507 && PG_VERSION_NUM <  90600) ||	\
-	(PG_VERSION_NUM >=  90412 && PG_VERSION_NUM <  90500) ||	\
-	(PG_VERSION_NUM >=  90317 && PG_VERSION_NUM <  90400) ||	\
-	(PG_VERSION_NUM >=  90221 && PG_VERSION_NUM <  90300)
-#define PGDS_HAVE_ACL_OK
 /*
  * acl_ok of the returning VariableStatData must be set if set_acl_okk is
  * true. The code is compiled only if the compile target PG version is match
@@ -70,26 +57,8 @@ PG_MODULE_MAGIC;
  * pg_dbms_stats is loaded onto is out of the conditions.
  */
 static	bool set_acl_ok = false;
-#endif
 
-/* FormData_pg_attribute is modifed at PG11 */
-#if PG_VERSION_NUM >= 110000
 #define get_attrs(pgatt_attrs) (&(pgatt_attrs))
-#else
-#define get_attrs(pgatt_attrs) (pgatt_attrs)
-#endif
-
-/*
- * get_attrs and heap_attisnull are modifed as of PG11. They behave in the same
- * way beyond the modification as long as nullok == true and desc == NULL
- * respectively.
- */
-#if PG_VERSION_NUM < 110000
-#define get_attname(rid, attnum, nullok) \
-	(AssertMacro((nullok) == true), get_attname((rid), (attnum)))
-#define heap_attisnull(tup, attnum, desc) \
-	(AssertMacro((desc) == NULL), heap_attisnull((tup), (attnum)))
-#endif
 
 /* Relation statistics cache entry */
 typedef struct StatsRelationEntry
@@ -205,7 +174,8 @@ static bool dbms_stats_get_relation_stats(PlannerInfo *root, RangeTblEntry *rte,
 	AttrNumber attnum, VariableStatData *vardata);
 static bool dbms_stats_get_index_stats(PlannerInfo *root, Oid indexOid,
 	AttrNumber indexattnum, VariableStatData *vardata);
-static PlannedStmt *dbms_stats_planner(Query *parse, int cursorOptions,
+static PlannedStmt *dbms_stats_planner(Query *parse, const char *query_string,
+									   int cursorOptions,
 									   ParamListInfo boundParams);
 
 /* internal functions */
@@ -258,7 +228,6 @@ _PG_init(void)
 	}
 #endif
 
-#ifdef PGDS_HAVE_ACL_OK
 	{
 		/*
 		 * Check the PG version this module loaded onto. This aid is required
@@ -275,7 +244,6 @@ _PG_init(void)
 			(major_version == 902 && minor_version >= 21))
 			set_acl_ok = true;
 	}
-#endif
 
 	/* Define custom GUC variables. */
 	DefineCustomBoolVariable("pg_dbms_stats.use_locked_stats",
@@ -967,7 +935,6 @@ dbms_stats_get_relation_stats(PlannerInfo *root,
 		{
 			vardata->freefunc = FreeHeapTuple;
 
-#ifdef PGDS_HAVE_ACL_OK
 			/*
 			 * set acl_ok if required. See the definition of set_acl_ok for
 			 * details.
@@ -980,7 +947,7 @@ dbms_stats_get_relation_stats(PlannerInfo *root,
 					 (pg_attribute_aclcheck(rte->relid, attnum, GetUserId(),
 											ACL_SELECT) == ACLCHECK_OK);
 			 }
-#endif
+
 			return true;
 		}
 	}
@@ -1015,7 +982,6 @@ dbms_stats_get_index_stats(PlannerInfo *root,
 
 	vardata->freefunc = FreeHeapTuple;
 			
-#ifdef PGDS_HAVE_ACL_OK
 	/*
 	 * set acl_ok if required. See the definition of set_acl_ok for details.
 	 */
@@ -1072,7 +1038,7 @@ dbms_stats_get_index_stats(PlannerInfo *root,
 			}
 		}
 	}
-#endif
+
 	return true;
 
 next_plugin:
@@ -1088,16 +1054,19 @@ next_plugin:
  *   Hook function for planner_hook which cleans up invalidated statistics.
  */
 static PlannedStmt *
-dbms_stats_planner(Query *parse, int cursorOptions, ParamListInfo boundParams)
+dbms_stats_planner(Query *parse, const char *query_string,
+				   int cursorOptions, ParamListInfo boundParams)
 {
 	PlannedStmt *ret;
 
 	cleanup_invalidated_cache();
 
 	if (prev_planner_hook)
-		ret = (*prev_planner_hook) (parse, cursorOptions, boundParams);
+		ret = (*prev_planner_hook) (parse, query_string,
+									cursorOptions, boundParams);
 	else
-		ret = standard_planner(parse, cursorOptions, boundParams);
+		ret = standard_planner(parse, query_string,
+							   cursorOptions, boundParams);
 
 	cleanup_invalidated_cache();
 
@@ -1694,9 +1663,7 @@ dbms_stats_estimate_rel_size(Relation rel, int32 *attr_widths,
 	{
 		case RELKIND_RELATION:
 		case RELKIND_INDEX:
-#if PG_VERSION_NUM >= 90300
 		case RELKIND_MATVIEW:
-#endif
 		case RELKIND_TOASTVALUE:
 			/* it has storage, ok to call the smgr */
 			if (curpages == InvalidBlockNumber)

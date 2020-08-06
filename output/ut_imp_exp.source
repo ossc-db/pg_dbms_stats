@@ -1,0 +1,2405 @@
+\pset null '(null)'
+CREATE TABLE s0.st3();
+/*
+ * No.16-1 export_plain_stats-13.sql.sample
+ */
+-- No.16-1-1
+ANALYZE;
+DELETE FROM dbms_stats.column_stats_locked;
+DELETE FROM dbms_stats.relation_stats_locked;
+SELECT dbms_stats.lock_database_stats();
+ lock_database_stats 
+---------------------
+ pt0
+ pt0_idx
+ st0
+ st0_idx
+ st1
+ s0.st0
+ s0.st0_idx
+ s0.st1
+ s0.st1_idx
+ s0.st2
+ s0.st2_idx
+ st1_idx
+ st1_exp
+ s0.sft0
+ s0.smv0
+ s1.st0
+ s0.st3
+(17 rows)
+
+UPDATE dbms_stats.relation_stats_locked
+   SET (relpages, reltuples, relallvisible, curpages) = (0,0,0,0);
+UPDATE dbms_stats.column_stats_locked SET
+    stanullfrac = -staattnum,
+    stawidth = -staattnum,
+    stadistinct = -staattnum,
+    stakind1 = 2,
+    stakind2 = 3,
+    stakind3 = 4,
+    stakind4 = 1,
+    stakind5 = 5,
+    staop1 = 22,
+    staop2 = 23,
+    staop3 = 24,
+    staop4 = 21,
+    staop5 = 25,
+    stacoll1 = 32,
+    stacoll2 = 33,
+    stacoll3 = 34,
+    stacoll4 = 31,
+    stacoll5 = 35,
+    stanumbers1 = ARRAY[-staattnum,22],
+    stanumbers2 = ARRAY[-staattnum,23],
+    stanumbers3 = ARRAY[-staattnum,24],
+    stanumbers4 = ARRAY[-staattnum,21],
+    stanumbers5 = ARRAY[-staattnum,25],
+    stavalues1 = stavalues3,
+    stavalues2 = stavalues2,
+    stavalues3 = stavalues1,
+    stavalues4 = stavalues4,
+    stavalues5 = stavalues5;
+\i doc/export_plain_stats-13.sql.sample
+/*
+ * If you want the statistics of per-relation or per-column, please modify
+ * nspname, relname, and attname in 'WHERE' clause.
+ */
+BEGIN TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+/*
+ * If you want to chage the output file name, please modify the following name.
+ */
+\o export_stats.dmp
+COPY (SELECT n2.nspname,
+             c.relname,
+             c.relpages,
+             c.reltuples,
+             c.relallvisible,
+             (pg_relation_size(c.oid) / current_setting('block_size')::int4)::int4
+                 AS curpages,
+             pg_catalog.pg_stat_get_last_analyze_time(c.oid)
+                 AS last_analyze,
+             pg_catalog.pg_stat_get_last_autoanalyze_time(c.oid)
+                 AS last_autoanalyze,
+             COALESCE(a.attname, ''),
+             n1.nspname AS schemaname_of_atttype,
+             t.typname,
+             a.atttypmod,
+             s.stainherit,
+             s.stanullfrac,
+             s.stawidth,
+             s.stadistinct,
+             s.stakind1,
+             s.stakind2,
+             s.stakind3,
+             s.stakind4,
+             s.stakind5,
+             s.staop1,
+             s.staop2,
+             s.staop3,
+             s.staop4,
+             s.staop5,
+             s.stacoll1,
+             s.stacoll2,
+             s.stacoll3,
+             s.stacoll4,
+             s.stacoll5,
+             s.stanumbers1,
+             s.stanumbers2,
+             s.stanumbers3,
+             s.stanumbers4,
+             s.stanumbers5,
+             s.stavalues1,
+             s.stavalues2,
+             s.stavalues3,
+             s.stavalues4,
+             s.stavalues5
+        FROM pg_statistic s
+        JOIN pg_attribute a
+          ON (s.starelid = a.attrelid AND s.staattnum = a.attnum)
+        JOIN pg_type t
+          ON a.atttypid = t.oid
+        JOIN pg_namespace n1
+          ON t.typnamespace = n1.oid
+       RIGHT JOIN pg_catalog.pg_class c
+          ON s.starelid = c.oid
+        JOIN pg_catalog.pg_namespace n2
+          ON c.relnamespace = n2.oid
+       WHERE c.relkind IN ('r', 'i', 'f', 'm')
+         AND NOT n2.nspname IN ('pg_catalog',
+                                'pg_toast',
+                                'information_schema',
+                                'dbms_stats')
+        -- AND n2.nspname = 'public'
+        -- AND c.relname = 'test'
+        -- AND a.attname = 'id'
+       ORDER BY starelid, staattnum)
+TO STDOUT
+(FORMAT 'binary');
+\o
+COMMIT;
+COPY dbms_stats.work FROM '@abs_srcdir@/export_stats.dmp' (FORMAT 'binary');
+SELECT * FROM work_v;
+ nspname | relname | relpages | reltuples | relallvisible | curpages | attname | nspname_of_typename | typname | atttypmod | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 |      stanumbers1       | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 |       stavalues1       | stavalues2 | stavalues3 | stavalues4 | stavalues5 
+---------+---------+----------+-----------+---------------+----------+---------+---------------------+---------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+------------------------+-------------+-------------+-------------+-------------+------------------------+------------+------------+------------+------------
+ public  | pt0     |        0 |         0 |             0 |        0 |         | (null)              | (null)  |    (null) | (null)     |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null)                 | (null)      | (null)      | (null)      | (null)      | (null)                 | (null)     | (null)     | (null)     | (null)
+ public  | pt0_idx |        2 |         0 |             0 |        2 |         | (null)              | (null)  |    (null) | (null)     |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null)                 | (null)      | (null)      | (null)      | (null)      | (null)                 | (null)     | (null)     | (null)     | (null)
+ public  | st0     |        1 |         2 |             1 |        1 | id      | pg_catalog          | int4    |        -1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {1,2}                  | (null)     | (null)     | (null)     | (null)
+ public  | st0     |        1 |         2 |             1 |        1 | name    | pg_catalog          | bpchar  |         9 | f          |           0 |        6 |        -0.5 |        1 |        3 |        0 |        0 |        0 |   1054 |   1058 |      0 |      0 |      0 |      100 |      100 |        0 |        0 |        0 | {1}                    | {1}         | (null)      | (null)      | (null)      | {"test "}              | (null)     | (null)     | (null)     | (null)
+ public  | st0_idx |        2 |         2 |             0 |        2 |         | (null)              | (null)  |    (null) | (null)     |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null)                 | (null)      | (null)      | (null)      | (null)      | (null)                 | (null)     | (null)     | (null)     | (null)
+ public  | st1     |       45 |     10000 |            45 |       45 | str     | pg_catalog          | text    |        -1 | f          |           0 |        2 |           3 |        1 |        3 |        0 |        0 |        0 |     98 |    664 |      0 |      0 |      0 |      100 |      100 |        0 |        0 |        0 | {0.3334,0.3333,0.3333} | {0.3332}    | (null)      | (null)      | (null)      | {1,0,2}                | (null)     | (null)     | (null)     | (null)
+ public  | st1     |       45 |     10000 |            45 |       45 | val     | pg_catalog          | int4    |        -1 | f          |           0 |        4 |           3 |        1 |        3 |        0 |        0 |        0 |     96 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | {0.3334,0.3333,0.3333} | {0.3332}    | (null)      | (null)      | (null)      | {1,0,2}                | (null)     | (null)     | (null)     | (null)
+ public  | st1_exp |       11 |     10000 |             0 |       11 | lower   | pg_catalog          | text    |        -1 | f          |           0 |        5 |           3 |        1 |        3 |        0 |        0 |        0 |     98 |    664 |      0 |      0 |      0 |      100 |      100 |        0 |        0 |        0 | {0.3334,0.3333,0.3333} | {0.3332}    | (null)      | (null)      | (null)      | {1,0,2}                | (null)     | (null)     | (null)     | (null)
+ public  | st1_idx |       11 |     10000 |             0 |       11 |         | (null)              | (null)  |    (null) | (null)     |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null)                 | (null)      | (null)      | (null)      | (null)      | (null)                 | (null)     | (null)     | (null)     | (null)
+ s0      | sft0    |        1 |        10 |             0 |        0 | id      | pg_catalog          | int4    |        -1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {1,2,3,4,5,6,7,8,9,10} | (null)     | (null)     | (null)     | (null)
+ s0      | smv0    |        1 |         2 |             1 |        1 | id      | pg_catalog          | int4    |        -1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {1,2}                  | (null)     | (null)     | (null)     | (null)
+ s0      | smv0    |        1 |         2 |             1 |        1 | num     | pg_catalog          | int4    |        -1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {10,20}                | (null)     | (null)     | (null)     | (null)
+ s0      | smv0    |        1 |         2 |             1 |        1 | txt     | pg_catalog          | text    |        -1 | f          |           0 |        3 |          -1 |        2 |        3 |        0 |        0 |        0 |    664 |    664 |      0 |      0 |      0 |      100 |      100 |        0 |        0 |        0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {1,test}               | (null)     | (null)     | (null)     | (null)
+ s0      | st0     |        1 |         2 |             1 |        1 | id      | pg_catalog          | int4    |        -1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {1,2}                  | (null)     | (null)     | (null)     | (null)
+ s0      | st0     |        1 |         2 |             1 |        1 | id      | pg_catalog          | int4    |        -1 | t          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {1,2,4,5,6}            | (null)     | (null)     | (null)     | (null)
+ s0      | st0     |        1 |         2 |             1 |        1 | num     | pg_catalog          | int4    |        -1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {10,20}                | (null)     | (null)     | (null)     | (null)
+ s0      | st0     |        1 |         2 |             1 |        1 | num     | pg_catalog          | int4    |        -1 | t          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {10,20,40,50,60}       | (null)     | (null)     | (null)     | (null)
+ s0      | st0_idx |        2 |         2 |             0 |        2 |         | (null)              | (null)  |    (null) | (null)     |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null)                 | (null)      | (null)      | (null)      | (null)      | (null)                 | (null)     | (null)     | (null)     | (null)
+ s0      | st1     |        1 |         3 |             1 |        1 | id      | pg_catalog          | int4    |        -1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {4,5,6}                | (null)     | (null)     | (null)     | (null)
+ s0      | st1     |        1 |         3 |             1 |        1 | num     | pg_catalog          | int4    |        -1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {40,50,60}             | (null)     | (null)     | (null)     | (null)
+ s0      | st1_idx |        2 |         3 |             0 |        2 |         | (null)              | (null)  |    (null) | (null)     |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null)                 | (null)      | (null)      | (null)      | (null)      | (null)                 | (null)     | (null)     | (null)     | (null)
+ s0      | st2     |        1 |         3 |             1 |        1 | id      | pg_catalog          | int4    |        -1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {1,2,3}                | (null)     | (null)     | (null)     | (null)
+ s0      | st2     |        1 |         3 |             1 |        1 | txt     | pg_catalog          | text    |        -1 | f          |           0 |        5 |          -1 |        2 |        3 |        0 |        0 |        0 |    664 |    664 |      0 |      0 |      0 |      100 |      100 |        0 |        0 |        0 | (null)                 | {0.5}       | (null)      | (null)      | (null)      | {1,comment,test}       | (null)     | (null)     | (null)     | (null)
+ s0      | st2_idx |        2 |         3 |             0 |        2 |         | (null)              | (null)  |    (null) | (null)     |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null)                 | (null)      | (null)      | (null)      | (null)      | (null)                 | (null)     | (null)     | (null)     | (null)
+ s0      | st3     |        0 |         0 |             0 |        0 |         | (null)              | (null)  |    (null) | (null)     |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null)                 | (null)      | (null)      | (null)      | (null)      | (null)                 | (null)     | (null)     | (null)     | (null)
+ s1      | st0     |        1 |         4 |             1 |        1 | id      | pg_catalog          | int4    |        -1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {1,2,3,4}              | (null)     | (null)     | (null)     | (null)
+ s1      | st0     |        1 |         4 |             1 |        1 | num     | pg_catalog          | int4    |        -1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)                 | {1}         | (null)      | (null)      | (null)      | {15,25,35,45}          | (null)     | (null)     | (null)     | (null)
+(27 rows)
+
+TRUNCATE dbms_stats.work;
+-- No.16-1-2
+\! sed '/ORDER/i\\ AND n2.nspname = '"\'s0\'" doc/export_plain_stats-13.sql.sample > doc/export_plain_stats-13.sql.sample_test
+\i doc/export_plain_stats-13.sql.sample_test
+/*
+ * If you want the statistics of per-relation or per-column, please modify
+ * nspname, relname, and attname in 'WHERE' clause.
+ */
+BEGIN TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+/*
+ * If you want to chage the output file name, please modify the following name.
+ */
+\o export_stats.dmp
+COPY (SELECT n2.nspname,
+             c.relname,
+             c.relpages,
+             c.reltuples,
+             c.relallvisible,
+             (pg_relation_size(c.oid) / current_setting('block_size')::int4)::int4
+                 AS curpages,
+             pg_catalog.pg_stat_get_last_analyze_time(c.oid)
+                 AS last_analyze,
+             pg_catalog.pg_stat_get_last_autoanalyze_time(c.oid)
+                 AS last_autoanalyze,
+             COALESCE(a.attname, ''),
+             n1.nspname AS schemaname_of_atttype,
+             t.typname,
+             a.atttypmod,
+             s.stainherit,
+             s.stanullfrac,
+             s.stawidth,
+             s.stadistinct,
+             s.stakind1,
+             s.stakind2,
+             s.stakind3,
+             s.stakind4,
+             s.stakind5,
+             s.staop1,
+             s.staop2,
+             s.staop3,
+             s.staop4,
+             s.staop5,
+             s.stacoll1,
+             s.stacoll2,
+             s.stacoll3,
+             s.stacoll4,
+             s.stacoll5,
+             s.stanumbers1,
+             s.stanumbers2,
+             s.stanumbers3,
+             s.stanumbers4,
+             s.stanumbers5,
+             s.stavalues1,
+             s.stavalues2,
+             s.stavalues3,
+             s.stavalues4,
+             s.stavalues5
+        FROM pg_statistic s
+        JOIN pg_attribute a
+          ON (s.starelid = a.attrelid AND s.staattnum = a.attnum)
+        JOIN pg_type t
+          ON a.atttypid = t.oid
+        JOIN pg_namespace n1
+          ON t.typnamespace = n1.oid
+       RIGHT JOIN pg_catalog.pg_class c
+          ON s.starelid = c.oid
+        JOIN pg_catalog.pg_namespace n2
+          ON c.relnamespace = n2.oid
+       WHERE c.relkind IN ('r', 'i', 'f', 'm')
+         AND NOT n2.nspname IN ('pg_catalog',
+                                'pg_toast',
+                                'information_schema',
+                                'dbms_stats')
+        -- AND n2.nspname = 'public'
+        -- AND c.relname = 'test'
+        -- AND a.attname = 'id'
+ AND n2.nspname = 's0'
+       ORDER BY starelid, staattnum)
+TO STDOUT
+(FORMAT 'binary');
+\o
+COMMIT;
+COPY dbms_stats.work FROM '@abs_srcdir@/export_stats.dmp' (FORMAT 'binary');
+SELECT * FROM work_v;
+ nspname | relname | relpages | reltuples | relallvisible | curpages | attname | nspname_of_typename | typname | atttypmod | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 |       stavalues1       | stavalues2 | stavalues3 | stavalues4 | stavalues5 
+---------+---------+----------+-----------+---------------+----------+---------+---------------------+---------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+------------------------+------------+------------+------------+------------
+ s0      | sft0    |        1 |        10 |             0 |        0 | id      | pg_catalog          | int4    |        -1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2,3,4,5,6,7,8,9,10} | (null)     | (null)     | (null)     | (null)
+ s0      | smv0    |        1 |         2 |             1 |        1 | id      | pg_catalog          | int4    |        -1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2}                  | (null)     | (null)     | (null)     | (null)
+ s0      | smv0    |        1 |         2 |             1 |        1 | num     | pg_catalog          | int4    |        -1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {10,20}                | (null)     | (null)     | (null)     | (null)
+ s0      | smv0    |        1 |         2 |             1 |        1 | txt     | pg_catalog          | text    |        -1 | f          |           0 |        3 |          -1 |        2 |        3 |        0 |        0 |        0 |    664 |    664 |      0 |      0 |      0 |      100 |      100 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,test}               | (null)     | (null)     | (null)     | (null)
+ s0      | st0     |        1 |         2 |             1 |        1 | id      | pg_catalog          | int4    |        -1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2}                  | (null)     | (null)     | (null)     | (null)
+ s0      | st0     |        1 |         2 |             1 |        1 | id      | pg_catalog          | int4    |        -1 | t          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2,4,5,6}            | (null)     | (null)     | (null)     | (null)
+ s0      | st0     |        1 |         2 |             1 |        1 | num     | pg_catalog          | int4    |        -1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {10,20}                | (null)     | (null)     | (null)     | (null)
+ s0      | st0     |        1 |         2 |             1 |        1 | num     | pg_catalog          | int4    |        -1 | t          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {10,20,40,50,60}       | (null)     | (null)     | (null)     | (null)
+ s0      | st0_idx |        2 |         2 |             0 |        2 |         | (null)              | (null)  |    (null) | (null)     |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)                 | (null)     | (null)     | (null)     | (null)
+ s0      | st1     |        1 |         3 |             1 |        1 | id      | pg_catalog          | int4    |        -1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {4,5,6}                | (null)     | (null)     | (null)     | (null)
+ s0      | st1     |        1 |         3 |             1 |        1 | num     | pg_catalog          | int4    |        -1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {40,50,60}             | (null)     | (null)     | (null)     | (null)
+ s0      | st1_idx |        2 |         3 |             0 |        2 |         | (null)              | (null)  |    (null) | (null)     |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)                 | (null)     | (null)     | (null)     | (null)
+ s0      | st2     |        1 |         3 |             1 |        1 | id      | pg_catalog          | int4    |        -1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2,3}                | (null)     | (null)     | (null)     | (null)
+ s0      | st2     |        1 |         3 |             1 |        1 | txt     | pg_catalog          | text    |        -1 | f          |           0 |        5 |          -1 |        2 |        3 |        0 |        0 |        0 |    664 |    664 |      0 |      0 |      0 |      100 |      100 |        0 |        0 |        0 | (null)      | {0.5}       | (null)      | (null)      | (null)      | {1,comment,test}       | (null)     | (null)     | (null)     | (null)
+ s0      | st2_idx |        2 |         3 |             0 |        2 |         | (null)              | (null)  |    (null) | (null)     |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)                 | (null)     | (null)     | (null)     | (null)
+ s0      | st3     |        0 |         0 |             0 |        0 |         | (null)              | (null)  |    (null) | (null)     |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)                 | (null)     | (null)     | (null)     | (null)
+(16 rows)
+
+TRUNCATE dbms_stats.work;
+\! rm doc/export_plain_stats-13.sql.sample_test
+-- No.16-1-3
+\! sed '/ORDER/i\\ AND c.relname = '"\'st0\'" doc/export_plain_stats-13.sql.sample > doc/export_plain_stats-13.sql.sample_test
+\i doc/export_plain_stats-13.sql.sample_test
+/*
+ * If you want the statistics of per-relation or per-column, please modify
+ * nspname, relname, and attname in 'WHERE' clause.
+ */
+BEGIN TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+/*
+ * If you want to chage the output file name, please modify the following name.
+ */
+\o export_stats.dmp
+COPY (SELECT n2.nspname,
+             c.relname,
+             c.relpages,
+             c.reltuples,
+             c.relallvisible,
+             (pg_relation_size(c.oid) / current_setting('block_size')::int4)::int4
+                 AS curpages,
+             pg_catalog.pg_stat_get_last_analyze_time(c.oid)
+                 AS last_analyze,
+             pg_catalog.pg_stat_get_last_autoanalyze_time(c.oid)
+                 AS last_autoanalyze,
+             COALESCE(a.attname, ''),
+             n1.nspname AS schemaname_of_atttype,
+             t.typname,
+             a.atttypmod,
+             s.stainherit,
+             s.stanullfrac,
+             s.stawidth,
+             s.stadistinct,
+             s.stakind1,
+             s.stakind2,
+             s.stakind3,
+             s.stakind4,
+             s.stakind5,
+             s.staop1,
+             s.staop2,
+             s.staop3,
+             s.staop4,
+             s.staop5,
+             s.stacoll1,
+             s.stacoll2,
+             s.stacoll3,
+             s.stacoll4,
+             s.stacoll5,
+             s.stanumbers1,
+             s.stanumbers2,
+             s.stanumbers3,
+             s.stanumbers4,
+             s.stanumbers5,
+             s.stavalues1,
+             s.stavalues2,
+             s.stavalues3,
+             s.stavalues4,
+             s.stavalues5
+        FROM pg_statistic s
+        JOIN pg_attribute a
+          ON (s.starelid = a.attrelid AND s.staattnum = a.attnum)
+        JOIN pg_type t
+          ON a.atttypid = t.oid
+        JOIN pg_namespace n1
+          ON t.typnamespace = n1.oid
+       RIGHT JOIN pg_catalog.pg_class c
+          ON s.starelid = c.oid
+        JOIN pg_catalog.pg_namespace n2
+          ON c.relnamespace = n2.oid
+       WHERE c.relkind IN ('r', 'i', 'f', 'm')
+         AND NOT n2.nspname IN ('pg_catalog',
+                                'pg_toast',
+                                'information_schema',
+                                'dbms_stats')
+        -- AND n2.nspname = 'public'
+        -- AND c.relname = 'test'
+        -- AND a.attname = 'id'
+ AND c.relname = 'st0'
+       ORDER BY starelid, staattnum)
+TO STDOUT
+(FORMAT 'binary');
+\o
+COMMIT;
+COPY dbms_stats.work FROM '@abs_srcdir@/export_stats.dmp' (FORMAT 'binary');
+SELECT * FROM work_v;
+ nspname | relname | relpages | reltuples | relallvisible | curpages | attname | nspname_of_typename | typname | atttypmod | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 |    stavalues1    | stavalues2 | stavalues3 | stavalues4 | stavalues5 
+---------+---------+----------+-----------+---------------+----------+---------+---------------------+---------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+------------------+------------+------------+------------+------------
+ public  | st0     |        1 |         2 |             1 |        1 | id      | pg_catalog          | int4    |        -1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2}            | (null)     | (null)     | (null)     | (null)
+ public  | st0     |        1 |         2 |             1 |        1 | name    | pg_catalog          | bpchar  |         9 | f          |           0 |        6 |        -0.5 |        1 |        3 |        0 |        0 |        0 |   1054 |   1058 |      0 |      0 |      0 |      100 |      100 |        0 |        0 |        0 | {1}         | {1}         | (null)      | (null)      | (null)      | {"test "}        | (null)     | (null)     | (null)     | (null)
+ s0      | st0     |        1 |         2 |             1 |        1 | id      | pg_catalog          | int4    |        -1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2}            | (null)     | (null)     | (null)     | (null)
+ s0      | st0     |        1 |         2 |             1 |        1 | id      | pg_catalog          | int4    |        -1 | t          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2,4,5,6}      | (null)     | (null)     | (null)     | (null)
+ s0      | st0     |        1 |         2 |             1 |        1 | num     | pg_catalog          | int4    |        -1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {10,20}          | (null)     | (null)     | (null)     | (null)
+ s0      | st0     |        1 |         2 |             1 |        1 | num     | pg_catalog          | int4    |        -1 | t          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {10,20,40,50,60} | (null)     | (null)     | (null)     | (null)
+ s1      | st0     |        1 |         4 |             1 |        1 | id      | pg_catalog          | int4    |        -1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2,3,4}        | (null)     | (null)     | (null)     | (null)
+ s1      | st0     |        1 |         4 |             1 |        1 | num     | pg_catalog          | int4    |        -1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {15,25,35,45}    | (null)     | (null)     | (null)     | (null)
+(8 rows)
+
+TRUNCATE dbms_stats.work;
+\! rm doc/export_plain_stats-13.sql.sample_test
+-- No.16-1-3-1 Actual import test
+select dbms_stats.import_database_stats('@abs_srcdir@/export_stats.dmp');
+ import_database_stats 
+-----------------------
+ 
+(1 row)
+
+-- No.16-1-4
+\! sed '/ORDER/i\\ AND c.relname = '"\'pg_toast_1262\'" doc/export_plain_stats-13.sql.sample > doc/export_plain_stats-13.sql.sample_test
+\i doc/export_plain_stats-13.sql.sample_test
+/*
+ * If you want the statistics of per-relation or per-column, please modify
+ * nspname, relname, and attname in 'WHERE' clause.
+ */
+BEGIN TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+/*
+ * If you want to chage the output file name, please modify the following name.
+ */
+\o export_stats.dmp
+COPY (SELECT n2.nspname,
+             c.relname,
+             c.relpages,
+             c.reltuples,
+             c.relallvisible,
+             (pg_relation_size(c.oid) / current_setting('block_size')::int4)::int4
+                 AS curpages,
+             pg_catalog.pg_stat_get_last_analyze_time(c.oid)
+                 AS last_analyze,
+             pg_catalog.pg_stat_get_last_autoanalyze_time(c.oid)
+                 AS last_autoanalyze,
+             COALESCE(a.attname, ''),
+             n1.nspname AS schemaname_of_atttype,
+             t.typname,
+             a.atttypmod,
+             s.stainherit,
+             s.stanullfrac,
+             s.stawidth,
+             s.stadistinct,
+             s.stakind1,
+             s.stakind2,
+             s.stakind3,
+             s.stakind4,
+             s.stakind5,
+             s.staop1,
+             s.staop2,
+             s.staop3,
+             s.staop4,
+             s.staop5,
+             s.stacoll1,
+             s.stacoll2,
+             s.stacoll3,
+             s.stacoll4,
+             s.stacoll5,
+             s.stanumbers1,
+             s.stanumbers2,
+             s.stanumbers3,
+             s.stanumbers4,
+             s.stanumbers5,
+             s.stavalues1,
+             s.stavalues2,
+             s.stavalues3,
+             s.stavalues4,
+             s.stavalues5
+        FROM pg_statistic s
+        JOIN pg_attribute a
+          ON (s.starelid = a.attrelid AND s.staattnum = a.attnum)
+        JOIN pg_type t
+          ON a.atttypid = t.oid
+        JOIN pg_namespace n1
+          ON t.typnamespace = n1.oid
+       RIGHT JOIN pg_catalog.pg_class c
+          ON s.starelid = c.oid
+        JOIN pg_catalog.pg_namespace n2
+          ON c.relnamespace = n2.oid
+       WHERE c.relkind IN ('r', 'i', 'f', 'm')
+         AND NOT n2.nspname IN ('pg_catalog',
+                                'pg_toast',
+                                'information_schema',
+                                'dbms_stats')
+        -- AND n2.nspname = 'public'
+        -- AND c.relname = 'test'
+        -- AND a.attname = 'id'
+ AND c.relname = 'pg_toast_1262'
+       ORDER BY starelid, staattnum)
+TO STDOUT
+(FORMAT 'binary');
+\o
+COMMIT;
+COPY dbms_stats.work FROM '@abs_srcdir@/export_stats.dmp' (FORMAT 'binary');
+SELECT * FROM work_v;
+ nspname | relname | relpages | reltuples | relallvisible | curpages | attname | nspname_of_typename | typname | atttypmod | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 | stavalues1 | stavalues2 | stavalues3 | stavalues4 | stavalues5 
+---------+---------+----------+-----------+---------------+----------+---------+---------------------+---------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+------------+------------+------------+------------+------------
+(0 rows)
+
+TRUNCATE dbms_stats.work;
+\! rm doc/export_plain_stats-13.sql.sample_test
+-- No.16-1-5
+\! sed '/ORDER/i\\ AND c.relname = '"\'st0_idx\'" doc/export_plain_stats-13.sql.sample > doc/export_plain_stats-13.sql.sample_test
+\i doc/export_plain_stats-13.sql.sample_test
+/*
+ * If you want the statistics of per-relation or per-column, please modify
+ * nspname, relname, and attname in 'WHERE' clause.
+ */
+BEGIN TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+/*
+ * If you want to chage the output file name, please modify the following name.
+ */
+\o export_stats.dmp
+COPY (SELECT n2.nspname,
+             c.relname,
+             c.relpages,
+             c.reltuples,
+             c.relallvisible,
+             (pg_relation_size(c.oid) / current_setting('block_size')::int4)::int4
+                 AS curpages,
+             pg_catalog.pg_stat_get_last_analyze_time(c.oid)
+                 AS last_analyze,
+             pg_catalog.pg_stat_get_last_autoanalyze_time(c.oid)
+                 AS last_autoanalyze,
+             COALESCE(a.attname, ''),
+             n1.nspname AS schemaname_of_atttype,
+             t.typname,
+             a.atttypmod,
+             s.stainherit,
+             s.stanullfrac,
+             s.stawidth,
+             s.stadistinct,
+             s.stakind1,
+             s.stakind2,
+             s.stakind3,
+             s.stakind4,
+             s.stakind5,
+             s.staop1,
+             s.staop2,
+             s.staop3,
+             s.staop4,
+             s.staop5,
+             s.stacoll1,
+             s.stacoll2,
+             s.stacoll3,
+             s.stacoll4,
+             s.stacoll5,
+             s.stanumbers1,
+             s.stanumbers2,
+             s.stanumbers3,
+             s.stanumbers4,
+             s.stanumbers5,
+             s.stavalues1,
+             s.stavalues2,
+             s.stavalues3,
+             s.stavalues4,
+             s.stavalues5
+        FROM pg_statistic s
+        JOIN pg_attribute a
+          ON (s.starelid = a.attrelid AND s.staattnum = a.attnum)
+        JOIN pg_type t
+          ON a.atttypid = t.oid
+        JOIN pg_namespace n1
+          ON t.typnamespace = n1.oid
+       RIGHT JOIN pg_catalog.pg_class c
+          ON s.starelid = c.oid
+        JOIN pg_catalog.pg_namespace n2
+          ON c.relnamespace = n2.oid
+       WHERE c.relkind IN ('r', 'i', 'f', 'm')
+         AND NOT n2.nspname IN ('pg_catalog',
+                                'pg_toast',
+                                'information_schema',
+                                'dbms_stats')
+        -- AND n2.nspname = 'public'
+        -- AND c.relname = 'test'
+        -- AND a.attname = 'id'
+ AND c.relname = 'st0_idx'
+       ORDER BY starelid, staattnum)
+TO STDOUT
+(FORMAT 'binary');
+\o
+COMMIT;
+COPY dbms_stats.work FROM '@abs_srcdir@/export_stats.dmp' (FORMAT 'binary');
+SELECT * FROM work_v;
+ nspname | relname | relpages | reltuples | relallvisible | curpages | attname | nspname_of_typename | typname | atttypmod | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 | stavalues1 | stavalues2 | stavalues3 | stavalues4 | stavalues5 
+---------+---------+----------+-----------+---------------+----------+---------+---------------------+---------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+------------+------------+------------+------------+------------
+ public  | st0_idx |        2 |         2 |             0 |        2 |         | (null)              | (null)  |    (null) | (null)     |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)     | (null)     | (null)     | (null)     | (null)
+ s0      | st0_idx |        2 |         2 |             0 |        2 |         | (null)              | (null)  |    (null) | (null)     |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)     | (null)     | (null)     | (null)     | (null)
+(2 rows)
+
+TRUNCATE dbms_stats.work;
+\! rm doc/export_plain_stats-13.sql.sample_test
+-- No.16-1-6
+\! sed '/ORDER/i\\ AND c.relname = '"\'ss0\'" doc/export_plain_stats-13.sql.sample > doc/export_plain_stats-13.sql.sample_test
+\i doc/export_plain_stats-13.sql.sample_test
+/*
+ * If you want the statistics of per-relation or per-column, please modify
+ * nspname, relname, and attname in 'WHERE' clause.
+ */
+BEGIN TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+/*
+ * If you want to chage the output file name, please modify the following name.
+ */
+\o export_stats.dmp
+COPY (SELECT n2.nspname,
+             c.relname,
+             c.relpages,
+             c.reltuples,
+             c.relallvisible,
+             (pg_relation_size(c.oid) / current_setting('block_size')::int4)::int4
+                 AS curpages,
+             pg_catalog.pg_stat_get_last_analyze_time(c.oid)
+                 AS last_analyze,
+             pg_catalog.pg_stat_get_last_autoanalyze_time(c.oid)
+                 AS last_autoanalyze,
+             COALESCE(a.attname, ''),
+             n1.nspname AS schemaname_of_atttype,
+             t.typname,
+             a.atttypmod,
+             s.stainherit,
+             s.stanullfrac,
+             s.stawidth,
+             s.stadistinct,
+             s.stakind1,
+             s.stakind2,
+             s.stakind3,
+             s.stakind4,
+             s.stakind5,
+             s.staop1,
+             s.staop2,
+             s.staop3,
+             s.staop4,
+             s.staop5,
+             s.stacoll1,
+             s.stacoll2,
+             s.stacoll3,
+             s.stacoll4,
+             s.stacoll5,
+             s.stanumbers1,
+             s.stanumbers2,
+             s.stanumbers3,
+             s.stanumbers4,
+             s.stanumbers5,
+             s.stavalues1,
+             s.stavalues2,
+             s.stavalues3,
+             s.stavalues4,
+             s.stavalues5
+        FROM pg_statistic s
+        JOIN pg_attribute a
+          ON (s.starelid = a.attrelid AND s.staattnum = a.attnum)
+        JOIN pg_type t
+          ON a.atttypid = t.oid
+        JOIN pg_namespace n1
+          ON t.typnamespace = n1.oid
+       RIGHT JOIN pg_catalog.pg_class c
+          ON s.starelid = c.oid
+        JOIN pg_catalog.pg_namespace n2
+          ON c.relnamespace = n2.oid
+       WHERE c.relkind IN ('r', 'i', 'f', 'm')
+         AND NOT n2.nspname IN ('pg_catalog',
+                                'pg_toast',
+                                'information_schema',
+                                'dbms_stats')
+        -- AND n2.nspname = 'public'
+        -- AND c.relname = 'test'
+        -- AND a.attname = 'id'
+ AND c.relname = 'ss0'
+       ORDER BY starelid, staattnum)
+TO STDOUT
+(FORMAT 'binary');
+\o
+COMMIT;
+COPY dbms_stats.work FROM '@abs_srcdir@/export_stats.dmp' (FORMAT 'binary');
+SELECT * FROM work_v;
+ nspname | relname | relpages | reltuples | relallvisible | curpages | attname | nspname_of_typename | typname | atttypmod | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 | stavalues1 | stavalues2 | stavalues3 | stavalues4 | stavalues5 
+---------+---------+----------+-----------+---------------+----------+---------+---------------------+---------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+------------+------------+------------+------------+------------
+(0 rows)
+
+TRUNCATE dbms_stats.work;
+\! rm doc/export_plain_stats-13.sql.sample_test
+-- No.16-1-7
+\! sed '/ORDER/i\\ AND c.relname = '"\'sc0\'" doc/export_plain_stats-13.sql.sample > doc/export_plain_stats-13.sql.sample_test
+\i doc/export_plain_stats-13.sql.sample_test
+/*
+ * If you want the statistics of per-relation or per-column, please modify
+ * nspname, relname, and attname in 'WHERE' clause.
+ */
+BEGIN TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+/*
+ * If you want to chage the output file name, please modify the following name.
+ */
+\o export_stats.dmp
+COPY (SELECT n2.nspname,
+             c.relname,
+             c.relpages,
+             c.reltuples,
+             c.relallvisible,
+             (pg_relation_size(c.oid) / current_setting('block_size')::int4)::int4
+                 AS curpages,
+             pg_catalog.pg_stat_get_last_analyze_time(c.oid)
+                 AS last_analyze,
+             pg_catalog.pg_stat_get_last_autoanalyze_time(c.oid)
+                 AS last_autoanalyze,
+             COALESCE(a.attname, ''),
+             n1.nspname AS schemaname_of_atttype,
+             t.typname,
+             a.atttypmod,
+             s.stainherit,
+             s.stanullfrac,
+             s.stawidth,
+             s.stadistinct,
+             s.stakind1,
+             s.stakind2,
+             s.stakind3,
+             s.stakind4,
+             s.stakind5,
+             s.staop1,
+             s.staop2,
+             s.staop3,
+             s.staop4,
+             s.staop5,
+             s.stacoll1,
+             s.stacoll2,
+             s.stacoll3,
+             s.stacoll4,
+             s.stacoll5,
+             s.stanumbers1,
+             s.stanumbers2,
+             s.stanumbers3,
+             s.stanumbers4,
+             s.stanumbers5,
+             s.stavalues1,
+             s.stavalues2,
+             s.stavalues3,
+             s.stavalues4,
+             s.stavalues5
+        FROM pg_statistic s
+        JOIN pg_attribute a
+          ON (s.starelid = a.attrelid AND s.staattnum = a.attnum)
+        JOIN pg_type t
+          ON a.atttypid = t.oid
+        JOIN pg_namespace n1
+          ON t.typnamespace = n1.oid
+       RIGHT JOIN pg_catalog.pg_class c
+          ON s.starelid = c.oid
+        JOIN pg_catalog.pg_namespace n2
+          ON c.relnamespace = n2.oid
+       WHERE c.relkind IN ('r', 'i', 'f', 'm')
+         AND NOT n2.nspname IN ('pg_catalog',
+                                'pg_toast',
+                                'information_schema',
+                                'dbms_stats')
+        -- AND n2.nspname = 'public'
+        -- AND c.relname = 'test'
+        -- AND a.attname = 'id'
+ AND c.relname = 'sc0'
+       ORDER BY starelid, staattnum)
+TO STDOUT
+(FORMAT 'binary');
+\o
+COMMIT;
+COPY dbms_stats.work FROM '@abs_srcdir@/export_stats.dmp' (FORMAT 'binary');
+SELECT * FROM work_v;
+ nspname | relname | relpages | reltuples | relallvisible | curpages | attname | nspname_of_typename | typname | atttypmod | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 | stavalues1 | stavalues2 | stavalues3 | stavalues4 | stavalues5 
+---------+---------+----------+-----------+---------------+----------+---------+---------------------+---------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+------------+------------+------------+------------+------------
+(0 rows)
+
+TRUNCATE dbms_stats.work;
+\! rm doc/export_plain_stats-13.sql.sample_test
+-- No.16-1-8
+\! sed '/ORDER/i\\ AND c.relname = '"\'sft0\'" doc/export_plain_stats-13.sql.sample > doc/export_plain_stats-13.sql.sample_test
+\i doc/export_plain_stats-13.sql.sample_test
+/*
+ * If you want the statistics of per-relation or per-column, please modify
+ * nspname, relname, and attname in 'WHERE' clause.
+ */
+BEGIN TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+/*
+ * If you want to chage the output file name, please modify the following name.
+ */
+\o export_stats.dmp
+COPY (SELECT n2.nspname,
+             c.relname,
+             c.relpages,
+             c.reltuples,
+             c.relallvisible,
+             (pg_relation_size(c.oid) / current_setting('block_size')::int4)::int4
+                 AS curpages,
+             pg_catalog.pg_stat_get_last_analyze_time(c.oid)
+                 AS last_analyze,
+             pg_catalog.pg_stat_get_last_autoanalyze_time(c.oid)
+                 AS last_autoanalyze,
+             COALESCE(a.attname, ''),
+             n1.nspname AS schemaname_of_atttype,
+             t.typname,
+             a.atttypmod,
+             s.stainherit,
+             s.stanullfrac,
+             s.stawidth,
+             s.stadistinct,
+             s.stakind1,
+             s.stakind2,
+             s.stakind3,
+             s.stakind4,
+             s.stakind5,
+             s.staop1,
+             s.staop2,
+             s.staop3,
+             s.staop4,
+             s.staop5,
+             s.stacoll1,
+             s.stacoll2,
+             s.stacoll3,
+             s.stacoll4,
+             s.stacoll5,
+             s.stanumbers1,
+             s.stanumbers2,
+             s.stanumbers3,
+             s.stanumbers4,
+             s.stanumbers5,
+             s.stavalues1,
+             s.stavalues2,
+             s.stavalues3,
+             s.stavalues4,
+             s.stavalues5
+        FROM pg_statistic s
+        JOIN pg_attribute a
+          ON (s.starelid = a.attrelid AND s.staattnum = a.attnum)
+        JOIN pg_type t
+          ON a.atttypid = t.oid
+        JOIN pg_namespace n1
+          ON t.typnamespace = n1.oid
+       RIGHT JOIN pg_catalog.pg_class c
+          ON s.starelid = c.oid
+        JOIN pg_catalog.pg_namespace n2
+          ON c.relnamespace = n2.oid
+       WHERE c.relkind IN ('r', 'i', 'f', 'm')
+         AND NOT n2.nspname IN ('pg_catalog',
+                                'pg_toast',
+                                'information_schema',
+                                'dbms_stats')
+        -- AND n2.nspname = 'public'
+        -- AND c.relname = 'test'
+        -- AND a.attname = 'id'
+ AND c.relname = 'sft0'
+       ORDER BY starelid, staattnum)
+TO STDOUT
+(FORMAT 'binary');
+\o
+COMMIT;
+COPY dbms_stats.work FROM '@abs_srcdir@/export_stats.dmp' (FORMAT 'binary');
+SELECT * FROM work_v;
+ nspname | relname | relpages | reltuples | relallvisible | curpages | attname | nspname_of_typename | typname | atttypmod | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 |       stavalues1       | stavalues2 | stavalues3 | stavalues4 | stavalues5 
+---------+---------+----------+-----------+---------------+----------+---------+---------------------+---------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+------------------------+------------+------------+------------+------------
+ s0      | sft0    |        1 |        10 |             0 |        0 | id      | pg_catalog          | int4    |        -1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2,3,4,5,6,7,8,9,10} | (null)     | (null)     | (null)     | (null)
+(1 row)
+
+TRUNCATE dbms_stats.work;
+\! rm doc/export_plain_stats-13.sql.sample_test
+-- No.16-1-9
+\! sed '/ORDER/i\\ AND c.relname = '"\'smv0\'" doc/export_plain_stats-13.sql.sample > doc/export_plain_stats-13.sql.sample_test
+\i doc/export_plain_stats-13.sql.sample_test
+/*
+ * If you want the statistics of per-relation or per-column, please modify
+ * nspname, relname, and attname in 'WHERE' clause.
+ */
+BEGIN TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+/*
+ * If you want to chage the output file name, please modify the following name.
+ */
+\o export_stats.dmp
+COPY (SELECT n2.nspname,
+             c.relname,
+             c.relpages,
+             c.reltuples,
+             c.relallvisible,
+             (pg_relation_size(c.oid) / current_setting('block_size')::int4)::int4
+                 AS curpages,
+             pg_catalog.pg_stat_get_last_analyze_time(c.oid)
+                 AS last_analyze,
+             pg_catalog.pg_stat_get_last_autoanalyze_time(c.oid)
+                 AS last_autoanalyze,
+             COALESCE(a.attname, ''),
+             n1.nspname AS schemaname_of_atttype,
+             t.typname,
+             a.atttypmod,
+             s.stainherit,
+             s.stanullfrac,
+             s.stawidth,
+             s.stadistinct,
+             s.stakind1,
+             s.stakind2,
+             s.stakind3,
+             s.stakind4,
+             s.stakind5,
+             s.staop1,
+             s.staop2,
+             s.staop3,
+             s.staop4,
+             s.staop5,
+             s.stacoll1,
+             s.stacoll2,
+             s.stacoll3,
+             s.stacoll4,
+             s.stacoll5,
+             s.stanumbers1,
+             s.stanumbers2,
+             s.stanumbers3,
+             s.stanumbers4,
+             s.stanumbers5,
+             s.stavalues1,
+             s.stavalues2,
+             s.stavalues3,
+             s.stavalues4,
+             s.stavalues5
+        FROM pg_statistic s
+        JOIN pg_attribute a
+          ON (s.starelid = a.attrelid AND s.staattnum = a.attnum)
+        JOIN pg_type t
+          ON a.atttypid = t.oid
+        JOIN pg_namespace n1
+          ON t.typnamespace = n1.oid
+       RIGHT JOIN pg_catalog.pg_class c
+          ON s.starelid = c.oid
+        JOIN pg_catalog.pg_namespace n2
+          ON c.relnamespace = n2.oid
+       WHERE c.relkind IN ('r', 'i', 'f', 'm')
+         AND NOT n2.nspname IN ('pg_catalog',
+                                'pg_toast',
+                                'information_schema',
+                                'dbms_stats')
+        -- AND n2.nspname = 'public'
+        -- AND c.relname = 'test'
+        -- AND a.attname = 'id'
+ AND c.relname = 'smv0'
+       ORDER BY starelid, staattnum)
+TO STDOUT
+(FORMAT 'binary');
+\o
+COMMIT;
+COPY dbms_stats.work FROM '@abs_srcdir@/export_stats.dmp' (FORMAT 'binary');
+SELECT * FROM work_v;
+ nspname | relname | relpages | reltuples | relallvisible | curpages | attname | nspname_of_typename | typname | atttypmod | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 | stavalues1 | stavalues2 | stavalues3 | stavalues4 | stavalues5 
+---------+---------+----------+-----------+---------------+----------+---------+---------------------+---------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+------------+------------+------------+------------+------------
+ s0      | smv0    |        1 |         2 |             1 |        1 | id      | pg_catalog          | int4    |        -1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2}      | (null)     | (null)     | (null)     | (null)
+ s0      | smv0    |        1 |         2 |             1 |        1 | num     | pg_catalog          | int4    |        -1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {10,20}    | (null)     | (null)     | (null)     | (null)
+ s0      | smv0    |        1 |         2 |             1 |        1 | txt     | pg_catalog          | text    |        -1 | f          |           0 |        3 |          -1 |        2 |        3 |        0 |        0 |        0 |    664 |    664 |      0 |      0 |      0 |      100 |      100 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,test}   | (null)     | (null)     | (null)     | (null)
+(3 rows)
+
+TRUNCATE dbms_stats.work;
+\! rm doc/export_plain_stats-13.sql.sample_test
+-- No.16-1-10
+\! sed '/ORDER/i\\ AND n2.nspname = '"\'s0\'"' AND a.attname = '\'id\' doc/export_plain_stats-13.sql.sample > doc/export_plain_stats-13.sql.sample_test
+\i doc/export_plain_stats-13.sql.sample_test
+/*
+ * If you want the statistics of per-relation or per-column, please modify
+ * nspname, relname, and attname in 'WHERE' clause.
+ */
+BEGIN TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+/*
+ * If you want to chage the output file name, please modify the following name.
+ */
+\o export_stats.dmp
+COPY (SELECT n2.nspname,
+             c.relname,
+             c.relpages,
+             c.reltuples,
+             c.relallvisible,
+             (pg_relation_size(c.oid) / current_setting('block_size')::int4)::int4
+                 AS curpages,
+             pg_catalog.pg_stat_get_last_analyze_time(c.oid)
+                 AS last_analyze,
+             pg_catalog.pg_stat_get_last_autoanalyze_time(c.oid)
+                 AS last_autoanalyze,
+             COALESCE(a.attname, ''),
+             n1.nspname AS schemaname_of_atttype,
+             t.typname,
+             a.atttypmod,
+             s.stainherit,
+             s.stanullfrac,
+             s.stawidth,
+             s.stadistinct,
+             s.stakind1,
+             s.stakind2,
+             s.stakind3,
+             s.stakind4,
+             s.stakind5,
+             s.staop1,
+             s.staop2,
+             s.staop3,
+             s.staop4,
+             s.staop5,
+             s.stacoll1,
+             s.stacoll2,
+             s.stacoll3,
+             s.stacoll4,
+             s.stacoll5,
+             s.stanumbers1,
+             s.stanumbers2,
+             s.stanumbers3,
+             s.stanumbers4,
+             s.stanumbers5,
+             s.stavalues1,
+             s.stavalues2,
+             s.stavalues3,
+             s.stavalues4,
+             s.stavalues5
+        FROM pg_statistic s
+        JOIN pg_attribute a
+          ON (s.starelid = a.attrelid AND s.staattnum = a.attnum)
+        JOIN pg_type t
+          ON a.atttypid = t.oid
+        JOIN pg_namespace n1
+          ON t.typnamespace = n1.oid
+       RIGHT JOIN pg_catalog.pg_class c
+          ON s.starelid = c.oid
+        JOIN pg_catalog.pg_namespace n2
+          ON c.relnamespace = n2.oid
+       WHERE c.relkind IN ('r', 'i', 'f', 'm')
+         AND NOT n2.nspname IN ('pg_catalog',
+                                'pg_toast',
+                                'information_schema',
+                                'dbms_stats')
+        -- AND n2.nspname = 'public'
+        -- AND c.relname = 'test'
+        -- AND a.attname = 'id'
+ AND n2.nspname = 's0' AND a.attname = 'id'
+       ORDER BY starelid, staattnum)
+TO STDOUT
+(FORMAT 'binary');
+\o
+COMMIT;
+COPY dbms_stats.work FROM '@abs_srcdir@/export_stats.dmp' (FORMAT 'binary');
+SELECT * FROM work_v;
+ nspname | relname | relpages | reltuples | relallvisible | curpages | attname | nspname_of_typename | typname | atttypmod | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 |       stavalues1       | stavalues2 | stavalues3 | stavalues4 | stavalues5 
+---------+---------+----------+-----------+---------------+----------+---------+---------------------+---------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+------------------------+------------+------------+------------+------------
+ s0      | sft0    |        1 |        10 |             0 |        0 | id      | pg_catalog          | int4    |        -1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2,3,4,5,6,7,8,9,10} | (null)     | (null)     | (null)     | (null)
+ s0      | smv0    |        1 |         2 |             1 |        1 | id      | pg_catalog          | int4    |        -1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2}                  | (null)     | (null)     | (null)     | (null)
+ s0      | st0     |        1 |         2 |             1 |        1 | id      | pg_catalog          | int4    |        -1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2}                  | (null)     | (null)     | (null)     | (null)
+ s0      | st0     |        1 |         2 |             1 |        1 | id      | pg_catalog          | int4    |        -1 | t          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2,4,5,6}            | (null)     | (null)     | (null)     | (null)
+ s0      | st1     |        1 |         3 |             1 |        1 | id      | pg_catalog          | int4    |        -1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {4,5,6}                | (null)     | (null)     | (null)     | (null)
+ s0      | st2     |        1 |         3 |             1 |        1 | id      | pg_catalog          | int4    |        -1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2,3}                | (null)     | (null)     | (null)     | (null)
+(6 rows)
+
+TRUNCATE dbms_stats.work;
+\! rm doc/export_plain_stats-13.sql.sample_test
+-- No.16-1-11
+\! sed '/ORDER/i\\ AND n2.nspname = '"\'s0\'"' AND a.attname IS NULL' doc/export_plain_stats-13.sql.sample > doc/export_plain_stats-13.sql.sample_test
+\i doc/export_plain_stats-13.sql.sample_test
+/*
+ * If you want the statistics of per-relation or per-column, please modify
+ * nspname, relname, and attname in 'WHERE' clause.
+ */
+BEGIN TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+/*
+ * If you want to chage the output file name, please modify the following name.
+ */
+\o export_stats.dmp
+COPY (SELECT n2.nspname,
+             c.relname,
+             c.relpages,
+             c.reltuples,
+             c.relallvisible,
+             (pg_relation_size(c.oid) / current_setting('block_size')::int4)::int4
+                 AS curpages,
+             pg_catalog.pg_stat_get_last_analyze_time(c.oid)
+                 AS last_analyze,
+             pg_catalog.pg_stat_get_last_autoanalyze_time(c.oid)
+                 AS last_autoanalyze,
+             COALESCE(a.attname, ''),
+             n1.nspname AS schemaname_of_atttype,
+             t.typname,
+             a.atttypmod,
+             s.stainherit,
+             s.stanullfrac,
+             s.stawidth,
+             s.stadistinct,
+             s.stakind1,
+             s.stakind2,
+             s.stakind3,
+             s.stakind4,
+             s.stakind5,
+             s.staop1,
+             s.staop2,
+             s.staop3,
+             s.staop4,
+             s.staop5,
+             s.stacoll1,
+             s.stacoll2,
+             s.stacoll3,
+             s.stacoll4,
+             s.stacoll5,
+             s.stanumbers1,
+             s.stanumbers2,
+             s.stanumbers3,
+             s.stanumbers4,
+             s.stanumbers5,
+             s.stavalues1,
+             s.stavalues2,
+             s.stavalues3,
+             s.stavalues4,
+             s.stavalues5
+        FROM pg_statistic s
+        JOIN pg_attribute a
+          ON (s.starelid = a.attrelid AND s.staattnum = a.attnum)
+        JOIN pg_type t
+          ON a.atttypid = t.oid
+        JOIN pg_namespace n1
+          ON t.typnamespace = n1.oid
+       RIGHT JOIN pg_catalog.pg_class c
+          ON s.starelid = c.oid
+        JOIN pg_catalog.pg_namespace n2
+          ON c.relnamespace = n2.oid
+       WHERE c.relkind IN ('r', 'i', 'f', 'm')
+         AND NOT n2.nspname IN ('pg_catalog',
+                                'pg_toast',
+                                'information_schema',
+                                'dbms_stats')
+        -- AND n2.nspname = 'public'
+        -- AND c.relname = 'test'
+        -- AND a.attname = 'id'
+ AND n2.nspname = 's0' AND a.attname IS NULL
+       ORDER BY starelid, staattnum)
+TO STDOUT
+(FORMAT 'binary');
+\o
+COMMIT;
+COPY dbms_stats.work FROM '@abs_srcdir@/export_stats.dmp' (FORMAT 'binary');
+SELECT * FROM work_v;
+ nspname | relname | relpages | reltuples | relallvisible | curpages | attname | nspname_of_typename | typname | atttypmod | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 | stavalues1 | stavalues2 | stavalues3 | stavalues4 | stavalues5 
+---------+---------+----------+-----------+---------------+----------+---------+---------------------+---------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+------------+------------+------------+------------+------------
+ s0      | st0_idx |        2 |         2 |             0 |        2 |         | (null)              | (null)  |    (null) | (null)     |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)     | (null)     | (null)     | (null)     | (null)
+ s0      | st1_idx |        2 |         3 |             0 |        2 |         | (null)              | (null)  |    (null) | (null)     |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)     | (null)     | (null)     | (null)     | (null)
+ s0      | st2_idx |        2 |         3 |             0 |        2 |         | (null)              | (null)  |    (null) | (null)     |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)     | (null)     | (null)     | (null)     | (null)
+ s0      | st3     |        0 |         0 |             0 |        0 |         | (null)              | (null)  |    (null) | (null)     |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)     | (null)     | (null)     | (null)     | (null)
+(4 rows)
+
+TRUNCATE dbms_stats.work;
+\! rm doc/export_plain_stats-13.sql.sample_test
+-- No.16-1-12
+\! sed '/ORDER/i\\ AND n2.nspname = '"\'s1\'"' AND c.relname IS NULL' doc/export_plain_stats-13.sql.sample > doc/export_plain_stats-13.sql.sample_test
+\i doc/export_plain_stats-13.sql.sample_test
+/*
+ * If you want the statistics of per-relation or per-column, please modify
+ * nspname, relname, and attname in 'WHERE' clause.
+ */
+BEGIN TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+/*
+ * If you want to chage the output file name, please modify the following name.
+ */
+\o export_stats.dmp
+COPY (SELECT n2.nspname,
+             c.relname,
+             c.relpages,
+             c.reltuples,
+             c.relallvisible,
+             (pg_relation_size(c.oid) / current_setting('block_size')::int4)::int4
+                 AS curpages,
+             pg_catalog.pg_stat_get_last_analyze_time(c.oid)
+                 AS last_analyze,
+             pg_catalog.pg_stat_get_last_autoanalyze_time(c.oid)
+                 AS last_autoanalyze,
+             COALESCE(a.attname, ''),
+             n1.nspname AS schemaname_of_atttype,
+             t.typname,
+             a.atttypmod,
+             s.stainherit,
+             s.stanullfrac,
+             s.stawidth,
+             s.stadistinct,
+             s.stakind1,
+             s.stakind2,
+             s.stakind3,
+             s.stakind4,
+             s.stakind5,
+             s.staop1,
+             s.staop2,
+             s.staop3,
+             s.staop4,
+             s.staop5,
+             s.stacoll1,
+             s.stacoll2,
+             s.stacoll3,
+             s.stacoll4,
+             s.stacoll5,
+             s.stanumbers1,
+             s.stanumbers2,
+             s.stanumbers3,
+             s.stanumbers4,
+             s.stanumbers5,
+             s.stavalues1,
+             s.stavalues2,
+             s.stavalues3,
+             s.stavalues4,
+             s.stavalues5
+        FROM pg_statistic s
+        JOIN pg_attribute a
+          ON (s.starelid = a.attrelid AND s.staattnum = a.attnum)
+        JOIN pg_type t
+          ON a.atttypid = t.oid
+        JOIN pg_namespace n1
+          ON t.typnamespace = n1.oid
+       RIGHT JOIN pg_catalog.pg_class c
+          ON s.starelid = c.oid
+        JOIN pg_catalog.pg_namespace n2
+          ON c.relnamespace = n2.oid
+       WHERE c.relkind IN ('r', 'i', 'f', 'm')
+         AND NOT n2.nspname IN ('pg_catalog',
+                                'pg_toast',
+                                'information_schema',
+                                'dbms_stats')
+        -- AND n2.nspname = 'public'
+        -- AND c.relname = 'test'
+        -- AND a.attname = 'id'
+ AND n2.nspname = 's1' AND c.relname IS NULL
+       ORDER BY starelid, staattnum)
+TO STDOUT
+(FORMAT 'binary');
+\o
+COMMIT;
+COPY dbms_stats.work FROM '@abs_srcdir@/export_stats.dmp' (FORMAT 'binary');
+SELECT * FROM work_v;
+ nspname | relname | relpages | reltuples | relallvisible | curpages | attname | nspname_of_typename | typname | atttypmod | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 | stavalues1 | stavalues2 | stavalues3 | stavalues4 | stavalues5 
+---------+---------+----------+-----------+---------------+----------+---------+---------------------+---------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+------------+------------+------------+------------+------------
+(0 rows)
+
+TRUNCATE dbms_stats.work;
+\! rm doc/export_plain_stats-13.sql.sample_test
+/*
+ * No.16-2 export_effective_stats-13.sql.sample
+ */
+-- No.16-2-1
+VACUUM ANALYZE;
+SELECT dbms_stats.lock_database_stats();
+ lock_database_stats 
+---------------------
+ pt0
+ pt0_idx
+ st0
+ st0_idx
+ st1
+ s0.st0
+ s0.st0_idx
+ s0.st1
+ s0.st1_idx
+ s0.st2
+ s0.st2_idx
+ st1_idx
+ st1_exp
+ s0.sft0
+ s0.smv0
+ s1.st0
+ s0.st3
+(17 rows)
+
+UPDATE dbms_stats.relation_stats_locked
+   SET (relpages, reltuples, relallvisible, curpages) = (NULL, NULL, NULL, NULL);
+UPDATE dbms_stats.column_stats_locked
+   SET (stanullfrac, stawidth, stadistinct,
+        stakind1, stakind2, stakind3, stakind4, stakind5,
+        staop1, staop2, staop3, staop4, staop5,
+        stacoll1, stacoll2, stacoll3, stacoll4, stacoll5,
+        stanumbers1, stanumbers2, stanumbers3, stanumbers4, stanumbers5,
+        stavalues1, stavalues2, stavalues3, stavalues4, stavalues5)
+     = (NULL, NULL, NULL,
+        NULL, NULL, NULL, NULL, NULL,
+        NULL, NULL, NULL, NULL, NULL,
+        NULL, NULL, NULL, NULL, NULL,
+        NULL, NULL, NULL, NULL, NULL,
+        NULL, NULL, NULL, NULL, NULL)
+ WHERE starelid = 's0.st0'::regclass;
+\i doc/export_effective_stats-13.sql.sample
+/*
+ * If you want the statistics of per-relation or per-column, please modify
+ * nspname, relname, and attname in 'WHERE' clause.
+ */
+BEGIN TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+/*
+ * If you want to chage the output file name, please modify the following name.
+ */
+\o export_stats.dmp
+COPY (SELECT n2.nspname,
+             cl.relname,
+             r.relpages,
+             r.reltuples,
+             r.relallvisible,
+             r.curpages,
+             r.last_analyze,
+             r.last_autoanalyze,
+             COALESCE(a.attname, ''),
+             n1.nspname AS schemaname_of_atttype,
+             t.typname,
+             a.atttypmod,
+             co.stainherit,
+             co.stanullfrac,
+             co.stawidth,
+             co.stadistinct,
+             co.stakind1,
+             co.stakind2,
+             co.stakind3,
+             co.stakind4,
+             co.stakind5,
+             co.staop1,
+             co.staop2,
+             co.staop3,
+             co.staop4,
+             co.staop5,
+             co.stacoll1,
+             co.stacoll2,
+             co.stacoll3,
+             co.stacoll4,
+             co.stacoll5,
+             co.stanumbers1,
+             co.stanumbers2,
+             co.stanumbers3,
+             co.stanumbers4,
+             co.stanumbers5,
+             co.stavalues1,
+             co.stavalues2,
+             co.stavalues3,
+             co.stavalues4,
+             co.stavalues5
+        FROM dbms_stats.column_stats_effective co
+        JOIN pg_attribute a
+          ON (co.starelid = a.attrelid AND co.staattnum = a.attnum)
+        JOIN pg_type t
+          ON a.atttypid = t.oid
+        JOIN pg_namespace n1
+          ON t.typnamespace = n1.oid
+       RIGHT JOIN dbms_stats.relation_stats_effective r
+          ON co.starelid = r.relid
+        JOIN pg_catalog.pg_class cl
+          ON r.relid = cl.oid
+        JOIN pg_catalog.pg_namespace n2
+          ON cl.relnamespace = n2.oid
+       -- WHERE n2.nspname = 'public'
+       -- AND cl.relname = 'test'
+       -- AND a.attname = 'id'
+       ORDER BY starelid, staattnum)
+TO STDOUT
+(FORMAT 'binary');
+\o
+COMMIT;
+COPY dbms_stats.work FROM '@abs_srcdir@/export_stats.dmp' (FORMAT 'binary');
+SELECT * FROM work_v;
+ nspname | relname | relpages | reltuples | relallvisible | curpages | attname | nspname_of_typename | typname | atttypmod | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 |    stavalues1    | stavalues2 |       stavalues3       | stavalues4 | stavalues5 
+---------+---------+----------+-----------+---------------+----------+---------+---------------------+---------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+------------------+------------+------------------------+------------+------------
+ public  | pt0     |        0 |         0 |             0 |        0 |         | (null)              | (null)  |    (null) | (null)     |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)           | (null)     | (null)                 | (null)     | (null)
+ public  | pt0_idx |        2 |         0 |             0 |        2 |         | (null)              | (null)  |    (null) | (null)     |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)           | (null)     | (null)                 | (null)     | (null)
+ public  | st0     |        1 |         2 |             1 |        1 | id      | pg_catalog          | int4    |        -1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2}            | (null)     | (null)                 | (null)     | (null)
+ public  | st0     |        1 |         2 |             1 |        1 | name    | pg_catalog          | bpchar  |         9 | f          |           0 |        6 |        -0.5 |        1 |        3 |        0 |        0 |        0 |   1054 |   1058 |      0 |      0 |      0 |      100 |      100 |        0 |        0 |        0 | {1}         | {1}         | (null)      | (null)      | (null)      | {"test "}        | (null)     | (null)                 | (null)     | (null)
+ public  | st0_idx |        2 |         2 |             0 |        2 |         | (null)              | (null)  |    (null) | (null)     |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)           | (null)     | (null)                 | (null)     | (null)
+ public  | st1     |       45 |     10000 |            45 |       45 | str     | pg_catalog          | text    |        -1 | f          |          -2 |       -2 |          -2 |        2 |        3 |        4 |        1 |        5 |     22 |     23 |     24 |     21 |     25 |       32 |       33 |       34 |       31 |       35 | {-2,22}     | {-2,23}     | {-2,24}     | {-2,21}     | {-2,25}     | (null)           | (null)     | {1,0,2}                | (null)     | (null)
+ public  | st1     |       45 |     10000 |            45 |       45 | val     | pg_catalog          | int4    |        -1 | f          |          -1 |       -1 |          -1 |        2 |        3 |        4 |        1 |        5 |     22 |     23 |     24 |     21 |     25 |       32 |       33 |       34 |       31 |       35 | {-1,22}     | {-1,23}     | {-1,24}     | {-1,21}     | {-1,25}     | (null)           | (null)     | {1,0,2}                | (null)     | (null)
+ public  | st1_exp |       11 |     10000 |             0 |       11 | lower   | pg_catalog          | text    |        -1 | f          |          -1 |       -1 |          -1 |        2 |        3 |        4 |        1 |        5 |     22 |     23 |     24 |     21 |     25 |       32 |       33 |       34 |       31 |       35 | {-1,22}     | {-1,23}     | {-1,24}     | {-1,21}     | {-1,25}     | (null)           | (null)     | {1,0,2}                | (null)     | (null)
+ public  | st1_idx |       11 |     10000 |             0 |       11 |         | (null)              | (null)  |    (null) | (null)     |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)           | (null)     | (null)                 | (null)     | (null)
+ s0      | sft0    |        1 |        10 |             0 |        0 | id      | pg_catalog          | int4    |        -1 | f          |          -1 |       -1 |          -1 |        2 |        3 |        4 |        1 |        5 |     22 |     23 |     24 |     21 |     25 |       32 |       33 |       34 |       31 |       35 | {-1,22}     | {-1,23}     | {-1,24}     | {-1,21}     | {-1,25}     | (null)           | (null)     | {1,2,3,4,5,6,7,8,9,10} | (null)     | (null)
+ s0      | smv0    |        1 |         2 |             1 |        1 | id      | pg_catalog          | int4    |        -1 | f          |          -1 |       -1 |          -1 |        2 |        3 |        4 |        1 |        5 |     22 |     23 |     24 |     21 |     25 |       32 |       33 |       34 |       31 |       35 | {-1,22}     | {-1,23}     | {-1,24}     | {-1,21}     | {-1,25}     | (null)           | (null)     | {1,2}                  | (null)     | (null)
+ s0      | smv0    |        1 |         2 |             1 |        1 | num     | pg_catalog          | int4    |        -1 | f          |          -2 |       -2 |          -2 |        2 |        3 |        4 |        1 |        5 |     22 |     23 |     24 |     21 |     25 |       32 |       33 |       34 |       31 |       35 | {-2,22}     | {-2,23}     | {-2,24}     | {-2,21}     | {-2,25}     | (null)           | (null)     | {10,20}                | (null)     | (null)
+ s0      | smv0    |        1 |         2 |             1 |        1 | txt     | pg_catalog          | text    |        -1 | f          |          -3 |       -3 |          -3 |        2 |        3 |        4 |        1 |        5 |     22 |     23 |     24 |     21 |     25 |       32 |       33 |       34 |       31 |       35 | {-3,22}     | {-3,23}     | {-3,24}     | {-3,21}     | {-3,25}     | (null)           | (null)     | {1,test}               | (null)     | (null)
+ s0      | st0     |        1 |         2 |             1 |        1 | id      | pg_catalog          | int4    |        -1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2}            | (null)     | (null)                 | (null)     | (null)
+ s0      | st0     |        1 |         2 |             1 |        1 | id      | pg_catalog          | int4    |        -1 | t          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2,4,5,6}      | (null)     | (null)                 | (null)     | (null)
+ s0      | st0     |        1 |         2 |             1 |        1 | num     | pg_catalog          | int4    |        -1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {10,20}          | (null)     | (null)                 | (null)     | (null)
+ s0      | st0     |        1 |         2 |             1 |        1 | num     | pg_catalog          | int4    |        -1 | t          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {10,20,40,50,60} | (null)     | (null)                 | (null)     | (null)
+ s0      | st0_idx |        2 |         2 |             0 |        2 |         | (null)              | (null)  |    (null) | (null)     |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)           | (null)     | (null)                 | (null)     | (null)
+ s0      | st1     |        1 |         3 |             1 |        1 | id      | pg_catalog          | int4    |        -1 | f          |          -1 |       -1 |          -1 |        2 |        3 |        4 |        1 |        5 |     22 |     23 |     24 |     21 |     25 |       32 |       33 |       34 |       31 |       35 | {-1,22}     | {-1,23}     | {-1,24}     | {-1,21}     | {-1,25}     | (null)           | (null)     | {4,5,6}                | (null)     | (null)
+ s0      | st1     |        1 |         3 |             1 |        1 | num     | pg_catalog          | int4    |        -1 | f          |          -2 |       -2 |          -2 |        2 |        3 |        4 |        1 |        5 |     22 |     23 |     24 |     21 |     25 |       32 |       33 |       34 |       31 |       35 | {-2,22}     | {-2,23}     | {-2,24}     | {-2,21}     | {-2,25}     | (null)           | (null)     | {40,50,60}             | (null)     | (null)
+ s0      | st1_idx |        2 |         3 |             0 |        2 |         | (null)              | (null)  |    (null) | (null)     |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)           | (null)     | (null)                 | (null)     | (null)
+ s0      | st2     |        1 |         3 |             1 |        1 | id      | pg_catalog          | int4    |        -1 | f          |          -1 |       -1 |          -1 |        2 |        3 |        4 |        1 |        5 |     22 |     23 |     24 |     21 |     25 |       32 |       33 |       34 |       31 |       35 | {-1,22}     | {-1,23}     | {-1,24}     | {-1,21}     | {-1,25}     | (null)           | (null)     | {1,2,3}                | (null)     | (null)
+ s0      | st2     |        1 |         3 |             1 |        1 | txt     | pg_catalog          | text    |        -1 | f          |          -2 |       -2 |          -2 |        2 |        3 |        4 |        1 |        5 |     22 |     23 |     24 |     21 |     25 |       32 |       33 |       34 |       31 |       35 | {-2,22}     | {-2,23}     | {-2,24}     | {-2,21}     | {-2,25}     | (null)           | (null)     | {1,comment,test}       | (null)     | (null)
+ s0      | st2_idx |        2 |         3 |             0 |        2 |         | (null)              | (null)  |    (null) | (null)     |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)           | (null)     | (null)                 | (null)     | (null)
+ s0      | st3     |        0 |         0 |             0 |        0 |         | (null)              | (null)  |    (null) | (null)     |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)           | (null)     | (null)                 | (null)     | (null)
+ s1      | st0     |        1 |         4 |             1 |        1 | id      | pg_catalog          | int4    |        -1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2,3,4}        | (null)     | (null)                 | (null)     | (null)
+ s1      | st0     |        1 |         4 |             1 |        1 | num     | pg_catalog          | int4    |        -1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {15,25,35,45}    | (null)     | (null)                 | (null)     | (null)
+(27 rows)
+
+TRUNCATE dbms_stats.work;
+-- No.16-2-2
+\! sed '/ORDER/i\\ WHERE n2.nspname = '"\'s0\'" doc/export_effective_stats-13.sql.sample > doc/export_effective_stats-13.sql.sample_test
+\i doc/export_effective_stats-13.sql.sample_test
+/*
+ * If you want the statistics of per-relation or per-column, please modify
+ * nspname, relname, and attname in 'WHERE' clause.
+ */
+BEGIN TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+/*
+ * If you want to chage the output file name, please modify the following name.
+ */
+\o export_stats.dmp
+COPY (SELECT n2.nspname,
+             cl.relname,
+             r.relpages,
+             r.reltuples,
+             r.relallvisible,
+             r.curpages,
+             r.last_analyze,
+             r.last_autoanalyze,
+             COALESCE(a.attname, ''),
+             n1.nspname AS schemaname_of_atttype,
+             t.typname,
+             a.atttypmod,
+             co.stainherit,
+             co.stanullfrac,
+             co.stawidth,
+             co.stadistinct,
+             co.stakind1,
+             co.stakind2,
+             co.stakind3,
+             co.stakind4,
+             co.stakind5,
+             co.staop1,
+             co.staop2,
+             co.staop3,
+             co.staop4,
+             co.staop5,
+             co.stacoll1,
+             co.stacoll2,
+             co.stacoll3,
+             co.stacoll4,
+             co.stacoll5,
+             co.stanumbers1,
+             co.stanumbers2,
+             co.stanumbers3,
+             co.stanumbers4,
+             co.stanumbers5,
+             co.stavalues1,
+             co.stavalues2,
+             co.stavalues3,
+             co.stavalues4,
+             co.stavalues5
+        FROM dbms_stats.column_stats_effective co
+        JOIN pg_attribute a
+          ON (co.starelid = a.attrelid AND co.staattnum = a.attnum)
+        JOIN pg_type t
+          ON a.atttypid = t.oid
+        JOIN pg_namespace n1
+          ON t.typnamespace = n1.oid
+       RIGHT JOIN dbms_stats.relation_stats_effective r
+          ON co.starelid = r.relid
+        JOIN pg_catalog.pg_class cl
+          ON r.relid = cl.oid
+        JOIN pg_catalog.pg_namespace n2
+          ON cl.relnamespace = n2.oid
+       -- WHERE n2.nspname = 'public'
+       -- AND cl.relname = 'test'
+       -- AND a.attname = 'id'
+ WHERE n2.nspname = 's0'
+       ORDER BY starelid, staattnum)
+TO STDOUT
+(FORMAT 'binary');
+\o
+COMMIT;
+COPY dbms_stats.work FROM '@abs_srcdir@/export_stats.dmp' (FORMAT 'binary');
+SELECT * FROM work_v;
+ nspname | relname | relpages | reltuples | relallvisible | curpages | attname | nspname_of_typename | typname | atttypmod | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 |    stavalues1    | stavalues2 |       stavalues3       | stavalues4 | stavalues5 
+---------+---------+----------+-----------+---------------+----------+---------+---------------------+---------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+------------------+------------+------------------------+------------+------------
+ s0      | sft0    |        1 |        10 |             0 |        0 | id      | pg_catalog          | int4    |        -1 | f          |          -1 |       -1 |          -1 |        2 |        3 |        4 |        1 |        5 |     22 |     23 |     24 |     21 |     25 |       32 |       33 |       34 |       31 |       35 | {-1,22}     | {-1,23}     | {-1,24}     | {-1,21}     | {-1,25}     | (null)           | (null)     | {1,2,3,4,5,6,7,8,9,10} | (null)     | (null)
+ s0      | smv0    |        1 |         2 |             1 |        1 | id      | pg_catalog          | int4    |        -1 | f          |          -1 |       -1 |          -1 |        2 |        3 |        4 |        1 |        5 |     22 |     23 |     24 |     21 |     25 |       32 |       33 |       34 |       31 |       35 | {-1,22}     | {-1,23}     | {-1,24}     | {-1,21}     | {-1,25}     | (null)           | (null)     | {1,2}                  | (null)     | (null)
+ s0      | smv0    |        1 |         2 |             1 |        1 | num     | pg_catalog          | int4    |        -1 | f          |          -2 |       -2 |          -2 |        2 |        3 |        4 |        1 |        5 |     22 |     23 |     24 |     21 |     25 |       32 |       33 |       34 |       31 |       35 | {-2,22}     | {-2,23}     | {-2,24}     | {-2,21}     | {-2,25}     | (null)           | (null)     | {10,20}                | (null)     | (null)
+ s0      | smv0    |        1 |         2 |             1 |        1 | txt     | pg_catalog          | text    |        -1 | f          |          -3 |       -3 |          -3 |        2 |        3 |        4 |        1 |        5 |     22 |     23 |     24 |     21 |     25 |       32 |       33 |       34 |       31 |       35 | {-3,22}     | {-3,23}     | {-3,24}     | {-3,21}     | {-3,25}     | (null)           | (null)     | {1,test}               | (null)     | (null)
+ s0      | st0     |        1 |         2 |             1 |        1 | id      | pg_catalog          | int4    |        -1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2}            | (null)     | (null)                 | (null)     | (null)
+ s0      | st0     |        1 |         2 |             1 |        1 | id      | pg_catalog          | int4    |        -1 | t          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2,4,5,6}      | (null)     | (null)                 | (null)     | (null)
+ s0      | st0     |        1 |         2 |             1 |        1 | num     | pg_catalog          | int4    |        -1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {10,20}          | (null)     | (null)                 | (null)     | (null)
+ s0      | st0     |        1 |         2 |             1 |        1 | num     | pg_catalog          | int4    |        -1 | t          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {10,20,40,50,60} | (null)     | (null)                 | (null)     | (null)
+ s0      | st0_idx |        2 |         2 |             0 |        2 |         | (null)              | (null)  |    (null) | (null)     |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)           | (null)     | (null)                 | (null)     | (null)
+ s0      | st1     |        1 |         3 |             1 |        1 | id      | pg_catalog          | int4    |        -1 | f          |          -1 |       -1 |          -1 |        2 |        3 |        4 |        1 |        5 |     22 |     23 |     24 |     21 |     25 |       32 |       33 |       34 |       31 |       35 | {-1,22}     | {-1,23}     | {-1,24}     | {-1,21}     | {-1,25}     | (null)           | (null)     | {4,5,6}                | (null)     | (null)
+ s0      | st1     |        1 |         3 |             1 |        1 | num     | pg_catalog          | int4    |        -1 | f          |          -2 |       -2 |          -2 |        2 |        3 |        4 |        1 |        5 |     22 |     23 |     24 |     21 |     25 |       32 |       33 |       34 |       31 |       35 | {-2,22}     | {-2,23}     | {-2,24}     | {-2,21}     | {-2,25}     | (null)           | (null)     | {40,50,60}             | (null)     | (null)
+ s0      | st1_idx |        2 |         3 |             0 |        2 |         | (null)              | (null)  |    (null) | (null)     |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)           | (null)     | (null)                 | (null)     | (null)
+ s0      | st2     |        1 |         3 |             1 |        1 | id      | pg_catalog          | int4    |        -1 | f          |          -1 |       -1 |          -1 |        2 |        3 |        4 |        1 |        5 |     22 |     23 |     24 |     21 |     25 |       32 |       33 |       34 |       31 |       35 | {-1,22}     | {-1,23}     | {-1,24}     | {-1,21}     | {-1,25}     | (null)           | (null)     | {1,2,3}                | (null)     | (null)
+ s0      | st2     |        1 |         3 |             1 |        1 | txt     | pg_catalog          | text    |        -1 | f          |          -2 |       -2 |          -2 |        2 |        3 |        4 |        1 |        5 |     22 |     23 |     24 |     21 |     25 |       32 |       33 |       34 |       31 |       35 | {-2,22}     | {-2,23}     | {-2,24}     | {-2,21}     | {-2,25}     | (null)           | (null)     | {1,comment,test}       | (null)     | (null)
+ s0      | st2_idx |        2 |         3 |             0 |        2 |         | (null)              | (null)  |    (null) | (null)     |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)           | (null)     | (null)                 | (null)     | (null)
+ s0      | st3     |        0 |         0 |             0 |        0 |         | (null)              | (null)  |    (null) | (null)     |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)           | (null)     | (null)                 | (null)     | (null)
+(16 rows)
+
+\! rm doc/export_effective_stats-13.sql.sample_test
+TRUNCATE dbms_stats.work;
+-- No.16-2-3
+\! sed '/ORDER/i\\ WHERE cl.relname = '"\'st0\'" doc/export_effective_stats-13.sql.sample > doc/export_effective_stats-13.sql.sample_test
+\i doc/export_effective_stats-13.sql.sample_test
+/*
+ * If you want the statistics of per-relation or per-column, please modify
+ * nspname, relname, and attname in 'WHERE' clause.
+ */
+BEGIN TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+/*
+ * If you want to chage the output file name, please modify the following name.
+ */
+\o export_stats.dmp
+COPY (SELECT n2.nspname,
+             cl.relname,
+             r.relpages,
+             r.reltuples,
+             r.relallvisible,
+             r.curpages,
+             r.last_analyze,
+             r.last_autoanalyze,
+             COALESCE(a.attname, ''),
+             n1.nspname AS schemaname_of_atttype,
+             t.typname,
+             a.atttypmod,
+             co.stainherit,
+             co.stanullfrac,
+             co.stawidth,
+             co.stadistinct,
+             co.stakind1,
+             co.stakind2,
+             co.stakind3,
+             co.stakind4,
+             co.stakind5,
+             co.staop1,
+             co.staop2,
+             co.staop3,
+             co.staop4,
+             co.staop5,
+             co.stacoll1,
+             co.stacoll2,
+             co.stacoll3,
+             co.stacoll4,
+             co.stacoll5,
+             co.stanumbers1,
+             co.stanumbers2,
+             co.stanumbers3,
+             co.stanumbers4,
+             co.stanumbers5,
+             co.stavalues1,
+             co.stavalues2,
+             co.stavalues3,
+             co.stavalues4,
+             co.stavalues5
+        FROM dbms_stats.column_stats_effective co
+        JOIN pg_attribute a
+          ON (co.starelid = a.attrelid AND co.staattnum = a.attnum)
+        JOIN pg_type t
+          ON a.atttypid = t.oid
+        JOIN pg_namespace n1
+          ON t.typnamespace = n1.oid
+       RIGHT JOIN dbms_stats.relation_stats_effective r
+          ON co.starelid = r.relid
+        JOIN pg_catalog.pg_class cl
+          ON r.relid = cl.oid
+        JOIN pg_catalog.pg_namespace n2
+          ON cl.relnamespace = n2.oid
+       -- WHERE n2.nspname = 'public'
+       -- AND cl.relname = 'test'
+       -- AND a.attname = 'id'
+ WHERE cl.relname = 'st0'
+       ORDER BY starelid, staattnum)
+TO STDOUT
+(FORMAT 'binary');
+\o
+COMMIT;
+COPY dbms_stats.work FROM '@abs_srcdir@/export_stats.dmp' (FORMAT 'binary');
+SELECT * FROM work_v;
+ nspname | relname | relpages | reltuples | relallvisible | curpages | attname | nspname_of_typename | typname | atttypmod | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 |    stavalues1    | stavalues2 | stavalues3 | stavalues4 | stavalues5 
+---------+---------+----------+-----------+---------------+----------+---------+---------------------+---------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+------------------+------------+------------+------------+------------
+ public  | st0     |        1 |         2 |             1 |        1 | id      | pg_catalog          | int4    |        -1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2}            | (null)     | (null)     | (null)     | (null)
+ public  | st0     |        1 |         2 |             1 |        1 | name    | pg_catalog          | bpchar  |         9 | f          |           0 |        6 |        -0.5 |        1 |        3 |        0 |        0 |        0 |   1054 |   1058 |      0 |      0 |      0 |      100 |      100 |        0 |        0 |        0 | {1}         | {1}         | (null)      | (null)      | (null)      | {"test "}        | (null)     | (null)     | (null)     | (null)
+ s0      | st0     |        1 |         2 |             1 |        1 | id      | pg_catalog          | int4    |        -1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2}            | (null)     | (null)     | (null)     | (null)
+ s0      | st0     |        1 |         2 |             1 |        1 | id      | pg_catalog          | int4    |        -1 | t          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2,4,5,6}      | (null)     | (null)     | (null)     | (null)
+ s0      | st0     |        1 |         2 |             1 |        1 | num     | pg_catalog          | int4    |        -1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {10,20}          | (null)     | (null)     | (null)     | (null)
+ s0      | st0     |        1 |         2 |             1 |        1 | num     | pg_catalog          | int4    |        -1 | t          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {10,20,40,50,60} | (null)     | (null)     | (null)     | (null)
+ s1      | st0     |        1 |         4 |             1 |        1 | id      | pg_catalog          | int4    |        -1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2,3,4}        | (null)     | (null)     | (null)     | (null)
+ s1      | st0     |        1 |         4 |             1 |        1 | num     | pg_catalog          | int4    |        -1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {15,25,35,45}    | (null)     | (null)     | (null)     | (null)
+(8 rows)
+
+\! rm doc/export_effective_stats-13.sql.sample_test
+TRUNCATE dbms_stats.work;
+-- No.16-2-4
+\! sed '/ORDER/i\\ WHERE cl.relname = '"\'pg_toast_1262\'" doc/export_effective_stats-13.sql.sample > doc/export_effective_stats-13.sql.sample_test
+\i doc/export_effective_stats-13.sql.sample_test
+/*
+ * If you want the statistics of per-relation or per-column, please modify
+ * nspname, relname, and attname in 'WHERE' clause.
+ */
+BEGIN TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+/*
+ * If you want to chage the output file name, please modify the following name.
+ */
+\o export_stats.dmp
+COPY (SELECT n2.nspname,
+             cl.relname,
+             r.relpages,
+             r.reltuples,
+             r.relallvisible,
+             r.curpages,
+             r.last_analyze,
+             r.last_autoanalyze,
+             COALESCE(a.attname, ''),
+             n1.nspname AS schemaname_of_atttype,
+             t.typname,
+             a.atttypmod,
+             co.stainherit,
+             co.stanullfrac,
+             co.stawidth,
+             co.stadistinct,
+             co.stakind1,
+             co.stakind2,
+             co.stakind3,
+             co.stakind4,
+             co.stakind5,
+             co.staop1,
+             co.staop2,
+             co.staop3,
+             co.staop4,
+             co.staop5,
+             co.stacoll1,
+             co.stacoll2,
+             co.stacoll3,
+             co.stacoll4,
+             co.stacoll5,
+             co.stanumbers1,
+             co.stanumbers2,
+             co.stanumbers3,
+             co.stanumbers4,
+             co.stanumbers5,
+             co.stavalues1,
+             co.stavalues2,
+             co.stavalues3,
+             co.stavalues4,
+             co.stavalues5
+        FROM dbms_stats.column_stats_effective co
+        JOIN pg_attribute a
+          ON (co.starelid = a.attrelid AND co.staattnum = a.attnum)
+        JOIN pg_type t
+          ON a.atttypid = t.oid
+        JOIN pg_namespace n1
+          ON t.typnamespace = n1.oid
+       RIGHT JOIN dbms_stats.relation_stats_effective r
+          ON co.starelid = r.relid
+        JOIN pg_catalog.pg_class cl
+          ON r.relid = cl.oid
+        JOIN pg_catalog.pg_namespace n2
+          ON cl.relnamespace = n2.oid
+       -- WHERE n2.nspname = 'public'
+       -- AND cl.relname = 'test'
+       -- AND a.attname = 'id'
+ WHERE cl.relname = 'pg_toast_1262'
+       ORDER BY starelid, staattnum)
+TO STDOUT
+(FORMAT 'binary');
+\o
+COMMIT;
+COPY dbms_stats.work FROM '@abs_srcdir@/export_stats.dmp' (FORMAT 'binary');
+SELECT * FROM work_v;
+ nspname | relname | relpages | reltuples | relallvisible | curpages | attname | nspname_of_typename | typname | atttypmod | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 | stavalues1 | stavalues2 | stavalues3 | stavalues4 | stavalues5 
+---------+---------+----------+-----------+---------------+----------+---------+---------------------+---------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+------------+------------+------------+------------+------------
+(0 rows)
+
+\! rm doc/export_effective_stats-13.sql.sample_test
+TRUNCATE dbms_stats.work;
+-- No.16-2-5
+\! sed '/ORDER/i\\ WHERE cl.relname = '"\'st0_idx\'" doc/export_effective_stats-13.sql.sample > doc/export_effective_stats-13.sql.sample_test
+\i doc/export_effective_stats-13.sql.sample_test
+/*
+ * If you want the statistics of per-relation or per-column, please modify
+ * nspname, relname, and attname in 'WHERE' clause.
+ */
+BEGIN TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+/*
+ * If you want to chage the output file name, please modify the following name.
+ */
+\o export_stats.dmp
+COPY (SELECT n2.nspname,
+             cl.relname,
+             r.relpages,
+             r.reltuples,
+             r.relallvisible,
+             r.curpages,
+             r.last_analyze,
+             r.last_autoanalyze,
+             COALESCE(a.attname, ''),
+             n1.nspname AS schemaname_of_atttype,
+             t.typname,
+             a.atttypmod,
+             co.stainherit,
+             co.stanullfrac,
+             co.stawidth,
+             co.stadistinct,
+             co.stakind1,
+             co.stakind2,
+             co.stakind3,
+             co.stakind4,
+             co.stakind5,
+             co.staop1,
+             co.staop2,
+             co.staop3,
+             co.staop4,
+             co.staop5,
+             co.stacoll1,
+             co.stacoll2,
+             co.stacoll3,
+             co.stacoll4,
+             co.stacoll5,
+             co.stanumbers1,
+             co.stanumbers2,
+             co.stanumbers3,
+             co.stanumbers4,
+             co.stanumbers5,
+             co.stavalues1,
+             co.stavalues2,
+             co.stavalues3,
+             co.stavalues4,
+             co.stavalues5
+        FROM dbms_stats.column_stats_effective co
+        JOIN pg_attribute a
+          ON (co.starelid = a.attrelid AND co.staattnum = a.attnum)
+        JOIN pg_type t
+          ON a.atttypid = t.oid
+        JOIN pg_namespace n1
+          ON t.typnamespace = n1.oid
+       RIGHT JOIN dbms_stats.relation_stats_effective r
+          ON co.starelid = r.relid
+        JOIN pg_catalog.pg_class cl
+          ON r.relid = cl.oid
+        JOIN pg_catalog.pg_namespace n2
+          ON cl.relnamespace = n2.oid
+       -- WHERE n2.nspname = 'public'
+       -- AND cl.relname = 'test'
+       -- AND a.attname = 'id'
+ WHERE cl.relname = 'st0_idx'
+       ORDER BY starelid, staattnum)
+TO STDOUT
+(FORMAT 'binary');
+\o
+COMMIT;
+COPY dbms_stats.work FROM '@abs_srcdir@/export_stats.dmp' (FORMAT 'binary');
+SELECT * FROM work_v;
+ nspname | relname | relpages | reltuples | relallvisible | curpages | attname | nspname_of_typename | typname | atttypmod | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 | stavalues1 | stavalues2 | stavalues3 | stavalues4 | stavalues5 
+---------+---------+----------+-----------+---------------+----------+---------+---------------------+---------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+------------+------------+------------+------------+------------
+ public  | st0_idx |        2 |         2 |             0 |        2 |         | (null)              | (null)  |    (null) | (null)     |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)     | (null)     | (null)     | (null)     | (null)
+ s0      | st0_idx |        2 |         2 |             0 |        2 |         | (null)              | (null)  |    (null) | (null)     |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)     | (null)     | (null)     | (null)     | (null)
+(2 rows)
+
+\! rm doc/export_effective_stats-13.sql.sample_test
+TRUNCATE dbms_stats.work;
+-- No.16-2-6
+\! sed '/ORDER/i\\ WHERE cl.relname = '"\'ss0\'" doc/export_effective_stats-13.sql.sample > doc/export_effective_stats-13.sql.sample_test
+\i doc/export_effective_stats-13.sql.sample_test
+/*
+ * If you want the statistics of per-relation or per-column, please modify
+ * nspname, relname, and attname in 'WHERE' clause.
+ */
+BEGIN TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+/*
+ * If you want to chage the output file name, please modify the following name.
+ */
+\o export_stats.dmp
+COPY (SELECT n2.nspname,
+             cl.relname,
+             r.relpages,
+             r.reltuples,
+             r.relallvisible,
+             r.curpages,
+             r.last_analyze,
+             r.last_autoanalyze,
+             COALESCE(a.attname, ''),
+             n1.nspname AS schemaname_of_atttype,
+             t.typname,
+             a.atttypmod,
+             co.stainherit,
+             co.stanullfrac,
+             co.stawidth,
+             co.stadistinct,
+             co.stakind1,
+             co.stakind2,
+             co.stakind3,
+             co.stakind4,
+             co.stakind5,
+             co.staop1,
+             co.staop2,
+             co.staop3,
+             co.staop4,
+             co.staop5,
+             co.stacoll1,
+             co.stacoll2,
+             co.stacoll3,
+             co.stacoll4,
+             co.stacoll5,
+             co.stanumbers1,
+             co.stanumbers2,
+             co.stanumbers3,
+             co.stanumbers4,
+             co.stanumbers5,
+             co.stavalues1,
+             co.stavalues2,
+             co.stavalues3,
+             co.stavalues4,
+             co.stavalues5
+        FROM dbms_stats.column_stats_effective co
+        JOIN pg_attribute a
+          ON (co.starelid = a.attrelid AND co.staattnum = a.attnum)
+        JOIN pg_type t
+          ON a.atttypid = t.oid
+        JOIN pg_namespace n1
+          ON t.typnamespace = n1.oid
+       RIGHT JOIN dbms_stats.relation_stats_effective r
+          ON co.starelid = r.relid
+        JOIN pg_catalog.pg_class cl
+          ON r.relid = cl.oid
+        JOIN pg_catalog.pg_namespace n2
+          ON cl.relnamespace = n2.oid
+       -- WHERE n2.nspname = 'public'
+       -- AND cl.relname = 'test'
+       -- AND a.attname = 'id'
+ WHERE cl.relname = 'ss0'
+       ORDER BY starelid, staattnum)
+TO STDOUT
+(FORMAT 'binary');
+\o
+COMMIT;
+COPY dbms_stats.work FROM '@abs_srcdir@/export_stats.dmp' (FORMAT 'binary');
+SELECT * FROM work_v;
+ nspname | relname | relpages | reltuples | relallvisible | curpages | attname | nspname_of_typename | typname | atttypmod | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 | stavalues1 | stavalues2 | stavalues3 | stavalues4 | stavalues5 
+---------+---------+----------+-----------+---------------+----------+---------+---------------------+---------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+------------+------------+------------+------------+------------
+(0 rows)
+
+\! rm doc/export_effective_stats-13.sql.sample_test
+TRUNCATE dbms_stats.work;
+-- No.16-2-7
+\! sed '/ORDER/i\\ WHERE cl.relname = '"\'sc0\'" doc/export_effective_stats-13.sql.sample > doc/export_effective_stats-13.sql.sample_test
+\i doc/export_effective_stats-13.sql.sample_test
+/*
+ * If you want the statistics of per-relation or per-column, please modify
+ * nspname, relname, and attname in 'WHERE' clause.
+ */
+BEGIN TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+/*
+ * If you want to chage the output file name, please modify the following name.
+ */
+\o export_stats.dmp
+COPY (SELECT n2.nspname,
+             cl.relname,
+             r.relpages,
+             r.reltuples,
+             r.relallvisible,
+             r.curpages,
+             r.last_analyze,
+             r.last_autoanalyze,
+             COALESCE(a.attname, ''),
+             n1.nspname AS schemaname_of_atttype,
+             t.typname,
+             a.atttypmod,
+             co.stainherit,
+             co.stanullfrac,
+             co.stawidth,
+             co.stadistinct,
+             co.stakind1,
+             co.stakind2,
+             co.stakind3,
+             co.stakind4,
+             co.stakind5,
+             co.staop1,
+             co.staop2,
+             co.staop3,
+             co.staop4,
+             co.staop5,
+             co.stacoll1,
+             co.stacoll2,
+             co.stacoll3,
+             co.stacoll4,
+             co.stacoll5,
+             co.stanumbers1,
+             co.stanumbers2,
+             co.stanumbers3,
+             co.stanumbers4,
+             co.stanumbers5,
+             co.stavalues1,
+             co.stavalues2,
+             co.stavalues3,
+             co.stavalues4,
+             co.stavalues5
+        FROM dbms_stats.column_stats_effective co
+        JOIN pg_attribute a
+          ON (co.starelid = a.attrelid AND co.staattnum = a.attnum)
+        JOIN pg_type t
+          ON a.atttypid = t.oid
+        JOIN pg_namespace n1
+          ON t.typnamespace = n1.oid
+       RIGHT JOIN dbms_stats.relation_stats_effective r
+          ON co.starelid = r.relid
+        JOIN pg_catalog.pg_class cl
+          ON r.relid = cl.oid
+        JOIN pg_catalog.pg_namespace n2
+          ON cl.relnamespace = n2.oid
+       -- WHERE n2.nspname = 'public'
+       -- AND cl.relname = 'test'
+       -- AND a.attname = 'id'
+ WHERE cl.relname = 'sc0'
+       ORDER BY starelid, staattnum)
+TO STDOUT
+(FORMAT 'binary');
+\o
+COMMIT;
+COPY dbms_stats.work FROM '@abs_srcdir@/export_stats.dmp' (FORMAT 'binary');
+SELECT * FROM work_v;
+ nspname | relname | relpages | reltuples | relallvisible | curpages | attname | nspname_of_typename | typname | atttypmod | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 | stavalues1 | stavalues2 | stavalues3 | stavalues4 | stavalues5 
+---------+---------+----------+-----------+---------------+----------+---------+---------------------+---------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+------------+------------+------------+------------+------------
+(0 rows)
+
+\! rm doc/export_effective_stats-13.sql.sample_test
+TRUNCATE dbms_stats.work;
+-- No.16-2-8
+\! sed '/ORDER/i\\ WHERE cl.relname = '"\'sft0\'" doc/export_effective_stats-13.sql.sample > doc/export_effective_stats-13.sql.sample_test
+\i doc/export_effective_stats-13.sql.sample_test
+/*
+ * If you want the statistics of per-relation or per-column, please modify
+ * nspname, relname, and attname in 'WHERE' clause.
+ */
+BEGIN TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+/*
+ * If you want to chage the output file name, please modify the following name.
+ */
+\o export_stats.dmp
+COPY (SELECT n2.nspname,
+             cl.relname,
+             r.relpages,
+             r.reltuples,
+             r.relallvisible,
+             r.curpages,
+             r.last_analyze,
+             r.last_autoanalyze,
+             COALESCE(a.attname, ''),
+             n1.nspname AS schemaname_of_atttype,
+             t.typname,
+             a.atttypmod,
+             co.stainherit,
+             co.stanullfrac,
+             co.stawidth,
+             co.stadistinct,
+             co.stakind1,
+             co.stakind2,
+             co.stakind3,
+             co.stakind4,
+             co.stakind5,
+             co.staop1,
+             co.staop2,
+             co.staop3,
+             co.staop4,
+             co.staop5,
+             co.stacoll1,
+             co.stacoll2,
+             co.stacoll3,
+             co.stacoll4,
+             co.stacoll5,
+             co.stanumbers1,
+             co.stanumbers2,
+             co.stanumbers3,
+             co.stanumbers4,
+             co.stanumbers5,
+             co.stavalues1,
+             co.stavalues2,
+             co.stavalues3,
+             co.stavalues4,
+             co.stavalues5
+        FROM dbms_stats.column_stats_effective co
+        JOIN pg_attribute a
+          ON (co.starelid = a.attrelid AND co.staattnum = a.attnum)
+        JOIN pg_type t
+          ON a.atttypid = t.oid
+        JOIN pg_namespace n1
+          ON t.typnamespace = n1.oid
+       RIGHT JOIN dbms_stats.relation_stats_effective r
+          ON co.starelid = r.relid
+        JOIN pg_catalog.pg_class cl
+          ON r.relid = cl.oid
+        JOIN pg_catalog.pg_namespace n2
+          ON cl.relnamespace = n2.oid
+       -- WHERE n2.nspname = 'public'
+       -- AND cl.relname = 'test'
+       -- AND a.attname = 'id'
+ WHERE cl.relname = 'sft0'
+       ORDER BY starelid, staattnum)
+TO STDOUT
+(FORMAT 'binary');
+\o
+COMMIT;
+COPY dbms_stats.work FROM '@abs_srcdir@/export_stats.dmp' (FORMAT 'binary');
+SELECT * FROM work_v;
+ nspname | relname | relpages | reltuples | relallvisible | curpages | attname | nspname_of_typename | typname | atttypmod | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 | stavalues1 | stavalues2 |       stavalues3       | stavalues4 | stavalues5 
+---------+---------+----------+-----------+---------------+----------+---------+---------------------+---------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+------------+------------+------------------------+------------+------------
+ s0      | sft0    |        1 |        10 |             0 |        0 | id      | pg_catalog          | int4    |        -1 | f          |          -1 |       -1 |          -1 |        2 |        3 |        4 |        1 |        5 |     22 |     23 |     24 |     21 |     25 |       32 |       33 |       34 |       31 |       35 | {-1,22}     | {-1,23}     | {-1,24}     | {-1,21}     | {-1,25}     | (null)     | (null)     | {1,2,3,4,5,6,7,8,9,10} | (null)     | (null)
+(1 row)
+
+\! rm doc/export_effective_stats-13.sql.sample_test
+TRUNCATE dbms_stats.work;
+-- No.16-2-9
+\! sed '/ORDER/i\\ WHERE cl.relname = '"\'smv0\'" doc/export_effective_stats-13.sql.sample > doc/export_effective_stats-13.sql.sample_test
+\i doc/export_effective_stats-13.sql.sample_test
+/*
+ * If you want the statistics of per-relation or per-column, please modify
+ * nspname, relname, and attname in 'WHERE' clause.
+ */
+BEGIN TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+/*
+ * If you want to chage the output file name, please modify the following name.
+ */
+\o export_stats.dmp
+COPY (SELECT n2.nspname,
+             cl.relname,
+             r.relpages,
+             r.reltuples,
+             r.relallvisible,
+             r.curpages,
+             r.last_analyze,
+             r.last_autoanalyze,
+             COALESCE(a.attname, ''),
+             n1.nspname AS schemaname_of_atttype,
+             t.typname,
+             a.atttypmod,
+             co.stainherit,
+             co.stanullfrac,
+             co.stawidth,
+             co.stadistinct,
+             co.stakind1,
+             co.stakind2,
+             co.stakind3,
+             co.stakind4,
+             co.stakind5,
+             co.staop1,
+             co.staop2,
+             co.staop3,
+             co.staop4,
+             co.staop5,
+             co.stacoll1,
+             co.stacoll2,
+             co.stacoll3,
+             co.stacoll4,
+             co.stacoll5,
+             co.stanumbers1,
+             co.stanumbers2,
+             co.stanumbers3,
+             co.stanumbers4,
+             co.stanumbers5,
+             co.stavalues1,
+             co.stavalues2,
+             co.stavalues3,
+             co.stavalues4,
+             co.stavalues5
+        FROM dbms_stats.column_stats_effective co
+        JOIN pg_attribute a
+          ON (co.starelid = a.attrelid AND co.staattnum = a.attnum)
+        JOIN pg_type t
+          ON a.atttypid = t.oid
+        JOIN pg_namespace n1
+          ON t.typnamespace = n1.oid
+       RIGHT JOIN dbms_stats.relation_stats_effective r
+          ON co.starelid = r.relid
+        JOIN pg_catalog.pg_class cl
+          ON r.relid = cl.oid
+        JOIN pg_catalog.pg_namespace n2
+          ON cl.relnamespace = n2.oid
+       -- WHERE n2.nspname = 'public'
+       -- AND cl.relname = 'test'
+       -- AND a.attname = 'id'
+ WHERE cl.relname = 'smv0'
+       ORDER BY starelid, staattnum)
+TO STDOUT
+(FORMAT 'binary');
+\o
+COMMIT;
+COPY dbms_stats.work FROM '@abs_srcdir@/export_stats.dmp' (FORMAT 'binary');
+SELECT * FROM work_v;
+ nspname | relname | relpages | reltuples | relallvisible | curpages | attname | nspname_of_typename | typname | atttypmod | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 | stavalues1 | stavalues2 | stavalues3 | stavalues4 | stavalues5 
+---------+---------+----------+-----------+---------------+----------+---------+---------------------+---------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+------------+------------+------------+------------+------------
+ s0      | smv0    |        1 |         2 |             1 |        1 | id      | pg_catalog          | int4    |        -1 | f          |          -1 |       -1 |          -1 |        2 |        3 |        4 |        1 |        5 |     22 |     23 |     24 |     21 |     25 |       32 |       33 |       34 |       31 |       35 | {-1,22}     | {-1,23}     | {-1,24}     | {-1,21}     | {-1,25}     | (null)     | (null)     | {1,2}      | (null)     | (null)
+ s0      | smv0    |        1 |         2 |             1 |        1 | num     | pg_catalog          | int4    |        -1 | f          |          -2 |       -2 |          -2 |        2 |        3 |        4 |        1 |        5 |     22 |     23 |     24 |     21 |     25 |       32 |       33 |       34 |       31 |       35 | {-2,22}     | {-2,23}     | {-2,24}     | {-2,21}     | {-2,25}     | (null)     | (null)     | {10,20}    | (null)     | (null)
+ s0      | smv0    |        1 |         2 |             1 |        1 | txt     | pg_catalog          | text    |        -1 | f          |          -3 |       -3 |          -3 |        2 |        3 |        4 |        1 |        5 |     22 |     23 |     24 |     21 |     25 |       32 |       33 |       34 |       31 |       35 | {-3,22}     | {-3,23}     | {-3,24}     | {-3,21}     | {-3,25}     | (null)     | (null)     | {1,test}   | (null)     | (null)
+(3 rows)
+
+\! rm doc/export_effective_stats-13.sql.sample_test
+TRUNCATE dbms_stats.work;
+-- No.16-2-10
+\! sed '/ORDER/i\\ WHERE n2.nspname = '"\'s0\'"' AND a.attname = '"\'id\'" doc/export_effective_stats-13.sql.sample > doc/export_effective_stats-13.sql.sample_test
+\i doc/export_effective_stats-13.sql.sample_test
+/*
+ * If you want the statistics of per-relation or per-column, please modify
+ * nspname, relname, and attname in 'WHERE' clause.
+ */
+BEGIN TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+/*
+ * If you want to chage the output file name, please modify the following name.
+ */
+\o export_stats.dmp
+COPY (SELECT n2.nspname,
+             cl.relname,
+             r.relpages,
+             r.reltuples,
+             r.relallvisible,
+             r.curpages,
+             r.last_analyze,
+             r.last_autoanalyze,
+             COALESCE(a.attname, ''),
+             n1.nspname AS schemaname_of_atttype,
+             t.typname,
+             a.atttypmod,
+             co.stainherit,
+             co.stanullfrac,
+             co.stawidth,
+             co.stadistinct,
+             co.stakind1,
+             co.stakind2,
+             co.stakind3,
+             co.stakind4,
+             co.stakind5,
+             co.staop1,
+             co.staop2,
+             co.staop3,
+             co.staop4,
+             co.staop5,
+             co.stacoll1,
+             co.stacoll2,
+             co.stacoll3,
+             co.stacoll4,
+             co.stacoll5,
+             co.stanumbers1,
+             co.stanumbers2,
+             co.stanumbers3,
+             co.stanumbers4,
+             co.stanumbers5,
+             co.stavalues1,
+             co.stavalues2,
+             co.stavalues3,
+             co.stavalues4,
+             co.stavalues5
+        FROM dbms_stats.column_stats_effective co
+        JOIN pg_attribute a
+          ON (co.starelid = a.attrelid AND co.staattnum = a.attnum)
+        JOIN pg_type t
+          ON a.atttypid = t.oid
+        JOIN pg_namespace n1
+          ON t.typnamespace = n1.oid
+       RIGHT JOIN dbms_stats.relation_stats_effective r
+          ON co.starelid = r.relid
+        JOIN pg_catalog.pg_class cl
+          ON r.relid = cl.oid
+        JOIN pg_catalog.pg_namespace n2
+          ON cl.relnamespace = n2.oid
+       -- WHERE n2.nspname = 'public'
+       -- AND cl.relname = 'test'
+       -- AND a.attname = 'id'
+ WHERE n2.nspname = 's0' AND a.attname = 'id'
+       ORDER BY starelid, staattnum)
+TO STDOUT
+(FORMAT 'binary');
+\o
+COMMIT;
+COPY dbms_stats.work FROM '@abs_srcdir@/export_stats.dmp' (FORMAT 'binary');
+SELECT * FROM work_v;
+ nspname | relname | relpages | reltuples | relallvisible | curpages | attname | nspname_of_typename | typname | atttypmod | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 | stavalues1  | stavalues2 |       stavalues3       | stavalues4 | stavalues5 
+---------+---------+----------+-----------+---------------+----------+---------+---------------------+---------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+-------------+------------+------------------------+------------+------------
+ s0      | sft0    |        1 |        10 |             0 |        0 | id      | pg_catalog          | int4    |        -1 | f          |          -1 |       -1 |          -1 |        2 |        3 |        4 |        1 |        5 |     22 |     23 |     24 |     21 |     25 |       32 |       33 |       34 |       31 |       35 | {-1,22}     | {-1,23}     | {-1,24}     | {-1,21}     | {-1,25}     | (null)      | (null)     | {1,2,3,4,5,6,7,8,9,10} | (null)     | (null)
+ s0      | smv0    |        1 |         2 |             1 |        1 | id      | pg_catalog          | int4    |        -1 | f          |          -1 |       -1 |          -1 |        2 |        3 |        4 |        1 |        5 |     22 |     23 |     24 |     21 |     25 |       32 |       33 |       34 |       31 |       35 | {-1,22}     | {-1,23}     | {-1,24}     | {-1,21}     | {-1,25}     | (null)      | (null)     | {1,2}                  | (null)     | (null)
+ s0      | st0     |        1 |         2 |             1 |        1 | id      | pg_catalog          | int4    |        -1 | f          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2}       | (null)     | (null)                 | (null)     | (null)
+ s0      | st0     |        1 |         2 |             1 |        1 | id      | pg_catalog          | int4    |        -1 | t          |           0 |        4 |          -1 |        2 |        3 |        0 |        0 |        0 |     97 |     97 |      0 |      0 |      0 |        0 |        0 |        0 |        0 |        0 | (null)      | {1}         | (null)      | (null)      | (null)      | {1,2,4,5,6} | (null)     | (null)                 | (null)     | (null)
+ s0      | st1     |        1 |         3 |             1 |        1 | id      | pg_catalog          | int4    |        -1 | f          |          -1 |       -1 |          -1 |        2 |        3 |        4 |        1 |        5 |     22 |     23 |     24 |     21 |     25 |       32 |       33 |       34 |       31 |       35 | {-1,22}     | {-1,23}     | {-1,24}     | {-1,21}     | {-1,25}     | (null)      | (null)     | {4,5,6}                | (null)     | (null)
+ s0      | st2     |        1 |         3 |             1 |        1 | id      | pg_catalog          | int4    |        -1 | f          |          -1 |       -1 |          -1 |        2 |        3 |        4 |        1 |        5 |     22 |     23 |     24 |     21 |     25 |       32 |       33 |       34 |       31 |       35 | {-1,22}     | {-1,23}     | {-1,24}     | {-1,21}     | {-1,25}     | (null)      | (null)     | {1,2,3}                | (null)     | (null)
+(6 rows)
+
+\! rm doc/export_effective_stats-13.sql.sample_test
+TRUNCATE dbms_stats.work;
+-- No.16-2-11
+\! sed '/ORDER/i\\ WHERE n2.nspname = '"\'s0\'"' AND a.attname IS NULL' doc/export_effective_stats-13.sql.sample > doc/export_effective_stats-13.sql.sample_test
+\i doc/export_effective_stats-13.sql.sample_test
+/*
+ * If you want the statistics of per-relation or per-column, please modify
+ * nspname, relname, and attname in 'WHERE' clause.
+ */
+BEGIN TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+/*
+ * If you want to chage the output file name, please modify the following name.
+ */
+\o export_stats.dmp
+COPY (SELECT n2.nspname,
+             cl.relname,
+             r.relpages,
+             r.reltuples,
+             r.relallvisible,
+             r.curpages,
+             r.last_analyze,
+             r.last_autoanalyze,
+             COALESCE(a.attname, ''),
+             n1.nspname AS schemaname_of_atttype,
+             t.typname,
+             a.atttypmod,
+             co.stainherit,
+             co.stanullfrac,
+             co.stawidth,
+             co.stadistinct,
+             co.stakind1,
+             co.stakind2,
+             co.stakind3,
+             co.stakind4,
+             co.stakind5,
+             co.staop1,
+             co.staop2,
+             co.staop3,
+             co.staop4,
+             co.staop5,
+             co.stacoll1,
+             co.stacoll2,
+             co.stacoll3,
+             co.stacoll4,
+             co.stacoll5,
+             co.stanumbers1,
+             co.stanumbers2,
+             co.stanumbers3,
+             co.stanumbers4,
+             co.stanumbers5,
+             co.stavalues1,
+             co.stavalues2,
+             co.stavalues3,
+             co.stavalues4,
+             co.stavalues5
+        FROM dbms_stats.column_stats_effective co
+        JOIN pg_attribute a
+          ON (co.starelid = a.attrelid AND co.staattnum = a.attnum)
+        JOIN pg_type t
+          ON a.atttypid = t.oid
+        JOIN pg_namespace n1
+          ON t.typnamespace = n1.oid
+       RIGHT JOIN dbms_stats.relation_stats_effective r
+          ON co.starelid = r.relid
+        JOIN pg_catalog.pg_class cl
+          ON r.relid = cl.oid
+        JOIN pg_catalog.pg_namespace n2
+          ON cl.relnamespace = n2.oid
+       -- WHERE n2.nspname = 'public'
+       -- AND cl.relname = 'test'
+       -- AND a.attname = 'id'
+ WHERE n2.nspname = 's0' AND a.attname IS NULL
+       ORDER BY starelid, staattnum)
+TO STDOUT
+(FORMAT 'binary');
+\o
+COMMIT;
+COPY dbms_stats.work FROM '@abs_srcdir@/export_stats.dmp' (FORMAT 'binary');
+SELECT * FROM work_v;
+ nspname | relname | relpages | reltuples | relallvisible | curpages | attname | nspname_of_typename | typname | atttypmod | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 | stavalues1 | stavalues2 | stavalues3 | stavalues4 | stavalues5 
+---------+---------+----------+-----------+---------------+----------+---------+---------------------+---------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+------------+------------+------------+------------+------------
+ s0      | st0_idx |        2 |         2 |             0 |        2 |         | (null)              | (null)  |    (null) | (null)     |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)     | (null)     | (null)     | (null)     | (null)
+ s0      | st1_idx |        2 |         3 |             0 |        2 |         | (null)              | (null)  |    (null) | (null)     |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)     | (null)     | (null)     | (null)     | (null)
+ s0      | st2_idx |        2 |         3 |             0 |        2 |         | (null)              | (null)  |    (null) | (null)     |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)     | (null)     | (null)     | (null)     | (null)
+ s0      | st3     |        0 |         0 |             0 |        0 |         | (null)              | (null)  |    (null) | (null)     |      (null) |   (null) |      (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null) | (null) | (null) | (null) | (null) |   (null) |   (null) |   (null) |   (null) |   (null) | (null)      | (null)      | (null)      | (null)      | (null)      | (null)     | (null)     | (null)     | (null)     | (null)
+(4 rows)
+
+\! rm doc/export_effective_stats-13.sql.sample_test
+TRUNCATE dbms_stats.work;
+-- No.16-2-12
+\! sed '/ORDER/i\\ WHERE n2.nspname = '"\'s0\'"' AND cl.relname IS NULL' doc/export_effective_stats-13.sql.sample > doc/export_effective_stats-13.sql.sample_test
+\i doc/export_effective_stats-13.sql.sample_test
+/*
+ * If you want the statistics of per-relation or per-column, please modify
+ * nspname, relname, and attname in 'WHERE' clause.
+ */
+BEGIN TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+/*
+ * If you want to chage the output file name, please modify the following name.
+ */
+\o export_stats.dmp
+COPY (SELECT n2.nspname,
+             cl.relname,
+             r.relpages,
+             r.reltuples,
+             r.relallvisible,
+             r.curpages,
+             r.last_analyze,
+             r.last_autoanalyze,
+             COALESCE(a.attname, ''),
+             n1.nspname AS schemaname_of_atttype,
+             t.typname,
+             a.atttypmod,
+             co.stainherit,
+             co.stanullfrac,
+             co.stawidth,
+             co.stadistinct,
+             co.stakind1,
+             co.stakind2,
+             co.stakind3,
+             co.stakind4,
+             co.stakind5,
+             co.staop1,
+             co.staop2,
+             co.staop3,
+             co.staop4,
+             co.staop5,
+             co.stacoll1,
+             co.stacoll2,
+             co.stacoll3,
+             co.stacoll4,
+             co.stacoll5,
+             co.stanumbers1,
+             co.stanumbers2,
+             co.stanumbers3,
+             co.stanumbers4,
+             co.stanumbers5,
+             co.stavalues1,
+             co.stavalues2,
+             co.stavalues3,
+             co.stavalues4,
+             co.stavalues5
+        FROM dbms_stats.column_stats_effective co
+        JOIN pg_attribute a
+          ON (co.starelid = a.attrelid AND co.staattnum = a.attnum)
+        JOIN pg_type t
+          ON a.atttypid = t.oid
+        JOIN pg_namespace n1
+          ON t.typnamespace = n1.oid
+       RIGHT JOIN dbms_stats.relation_stats_effective r
+          ON co.starelid = r.relid
+        JOIN pg_catalog.pg_class cl
+          ON r.relid = cl.oid
+        JOIN pg_catalog.pg_namespace n2
+          ON cl.relnamespace = n2.oid
+       -- WHERE n2.nspname = 'public'
+       -- AND cl.relname = 'test'
+       -- AND a.attname = 'id'
+ WHERE n2.nspname = 's0' AND cl.relname IS NULL
+       ORDER BY starelid, staattnum)
+TO STDOUT
+(FORMAT 'binary');
+\o
+COMMIT;
+COPY dbms_stats.work FROM '@abs_srcdir@/export_stats.dmp' (FORMAT 'binary');
+SELECT * FROM work_v;
+ nspname | relname | relpages | reltuples | relallvisible | curpages | attname | nspname_of_typename | typname | atttypmod | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 | stavalues1 | stavalues2 | stavalues3 | stavalues4 | stavalues5 
+---------+---------+----------+-----------+---------------+----------+---------+---------------------+---------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+------------+------------+------------+------------+------------
+(0 rows)
+
+\! rm doc/export_effective_stats-13.sql.sample_test
+TRUNCATE dbms_stats.work;
+/*
+ * Stab function dbms_stats.import
+ */
+ALTER FUNCTION dbms_stats.import(
+    nspname text,
+    relid regclass,
+    attname text,
+    src text
+) RENAME TO truth_import;
+CREATE FUNCTION dbms_stats.import(
+    nspname text,
+    relid regclass,
+    attname text,
+    src text
+) RETURNS void AS
+$$
+BEGIN
+    RAISE NOTICE 'arguments are "%", "%", "%", "%"', $1, $2, $3, $4;
+    RETURN;
+END
+$$
+LANGUAGE plpgsql;
+/*
+ * No.17-1 dbms_stats.import_database_stats(src)
+ */
+-- No.17-1-1
+SELECT dbms_stats.import_database_stats('@abs_srcdir@/export_stats.dmp');
+NOTICE:  arguments are "<NULL>", "<NULL>", "<NULL>", "@abs_srcdir@/export_stats.dmp"
+ import_database_stats 
+-----------------------
+ 
+(1 row)
+
+/*
+ * No.17-2 dbms_stats.import_schema_stats(schemaname, src)
+ */
+-- No.17-2-1
+SELECT dbms_stats.import_schema_stats('s0', '@abs_srcdir@/export_stats.dmp');
+NOTICE:  arguments are "s0", "<NULL>", "<NULL>", "@abs_srcdir@/export_stats.dmp"
+ import_schema_stats 
+---------------------
+ 
+(1 row)
+
+/*
+ * No.17-3 dbms_stats.import_table_stats(relid, src)
+ */
+-- No.17-3-1
+SELECT dbms_stats.import_table_stats('s0.st0', '@abs_srcdir@/export_stats.dmp');
+NOTICE:  arguments are "<NULL>", "s0.st0", "<NULL>", "@abs_srcdir@/export_stats.dmp"
+ import_table_stats 
+--------------------
+ 
+(1 row)
+
+/*
+ * No.17-4 dbms_stats.import_table_stats(schemaname, tablename, src)
+ */
+-- No.17-4-1
+SELECT dbms_stats.import_table_stats('s0', 'st0', '@abs_srcdir@/export_stats.dmp');
+NOTICE:  arguments are "<NULL>", "s0.st0", "<NULL>", "@abs_srcdir@/export_stats.dmp"
+ import_table_stats 
+--------------------
+ 
+(1 row)
+
+/*
+ * No.17-5 dbms_stats.import_column_stats (relid, attname, src)
+ */
+-- No.17-5-1
+SELECT dbms_stats.import_column_stats('s0.st0', 'id', '@abs_srcdir@/export_stats.dmp');
+NOTICE:  arguments are "<NULL>", "s0.st0", "id", "@abs_srcdir@/export_stats.dmp"
+ import_column_stats 
+---------------------
+ 
+(1 row)
+
+/*
+ * No.17-6 dbms_stats.import_column_stats (schemaname, tablename, attname, src)
+ */
+-- No.17-6-1
+SELECT dbms_stats.import_column_stats('s0', 'st0', 'id','@abs_srcdir@/export_stats.dmp');
+NOTICE:  arguments are "<NULL>", "s0.st0", "id", "@abs_srcdir@/export_stats.dmp"
+ import_column_stats 
+---------------------
+ 
+(1 row)
+
+/*
+ * Delete stab function dbms_stats.import
+ */
+DROP FUNCTION dbms_stats.import(
+    nspname text,
+    relid regclass,
+    attname text,
+    src text
+);
+ALTER FUNCTION dbms_stats.truth_import(
+    nspname text,
+    relid regclass,
+    attname text,
+    src text
+) RENAME TO import;

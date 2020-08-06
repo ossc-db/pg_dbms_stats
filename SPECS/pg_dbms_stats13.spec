@@ -1,7 +1,7 @@
-# SPEC file for pg_dbms_stats12
+# SPEC file for pg_dbms_stats13
 # Copyright(C) 2012-2020 NIPPON TELEGRAPH AND TELEPHONE CORPORATION
 
-%define _pgdir   /usr/pgsql-12
+%define _pgdir   /usr/pgsql-13
 %define _bindir  %{_pgdir}/bin
 %define _libdir  %{_pgdir}/lib
 %define _datadir %{_pgdir}/share
@@ -12,9 +12,9 @@
 %endif
 
 ## Set general information for pg_dbms_stats.
-Summary:    Plan Stabilizer for PostgreSQL 12
-Name:       pg_dbms_stats12
-Version:    1.4.0
+Summary:    Plan Stabilizer for PostgreSQL 13
+Name:       pg_dbms_stats13
+Version:    1.5.0b1
 Release:    1%{?dist}
 License:    BSD
 Group:      Applications/Databases
@@ -24,8 +24,8 @@ BuildRoot:  %{buildroot}
 Vendor:     NIPPON TELEGRAPH AND TELEPHONE CORPORATION
 
 ## postgresql-devel package required
-BuildRequires:  postgresql12
-Requires:  postgresql12-libs
+#BuildRequires:  postgresql13
+#Requires:  postgresql13-libs
 
 ## Description for "pg_dbms_stats"
 %description
@@ -37,17 +37,17 @@ pg_dbms_stats also provides following features:
   - backup multiple generations of planner statistics to reuse plans afterwards
   - import planner statistics from another system for tuning or testing.
 
-Note that this package is available for only PostgreSQL 12.
+Note that this package is available for only PostgreSQL 13.
 
 ## pre work for build pg_dbms_stats
 %prep
-PATH=/usr/pgsql-12/bin:$PATH
+PATH=/usr/pgsql-13/bin:$PATH
 if [ ! -d %{_rpmdir} ]; then mkdir -p %{_rpmdir}; fi
 %setup -q
 
 ## Set variables for build environment
 %build
-PATH=/usr/pgsql-12/bin:$PATH
+PATH=/usr/pgsql-13/bin:$PATH
 make USE_PGXS=1 %{?_smp_mflags}
 
 ## Set variables for install
@@ -56,11 +56,11 @@ rm -rf %{buildroot}
 install -d %{buildroot}%{_libdir}
 install -m 755 pg_dbms_stats.so %{buildroot}%{_libdir}/pg_dbms_stats.so
 install -d %{buildroot}%{_datadir}/extension
-install -m 644 pg_dbms_stats--1.4.0.sql %{buildroot}%{_datadir}/extension/pg_dbms_stats--1.4.0.sql
+install -m 644 pg_dbms_stats--%{version}.sql %{buildroot}%{_datadir}/extension/pg_dbms_stats--%{version}.sql
 install -m 644 pg_dbms_stats.control %{buildroot}%{_datadir}/extension/pg_dbms_stats.control
 install -d %{buildroot}%{_docdir}/extension
-install -m 644 doc/export_effective_stats-12.sql.sample %{buildroot}%{_docdir}/extension/export_effective_stats-12.sql.sample
-install -m 644 doc/export_plain_stats-12.sql.sample %{buildroot}%{_docdir}/extension/export_plain_stats-12.sql.sample
+install -m 644 doc/export_effective_stats-13.sql.sample %{buildroot}%{_docdir}/extension/export_effective_stats-13.sql.sample
+install -m 644 doc/export_plain_stats-13.sql.sample %{buildroot}%{_docdir}/extension/export_plain_stats-13.sql.sample
 
 %clean
 rm -rf %{buildroot}
@@ -69,13 +69,15 @@ rm -rf %{buildroot}
 %defattr(0755,root,root)
 %{_libdir}/pg_dbms_stats.so
 %defattr(0644,root,root)
-%{_datadir}/extension/pg_dbms_stats--1.4.0.sql
+%{_datadir}/extension/pg_dbms_stats--%{version}.sql
 %{_datadir}/extension/pg_dbms_stats.control
-%{_docdir}/extension/export_effective_stats-12.sql.sample
-%{_docdir}/extension/export_plain_stats-12.sql.sample
+%{_docdir}/extension/export_effective_stats-13.sql.sample
+%{_docdir}/extension/export_plain_stats-13.sql.sample
 
 # History of pg_dbms_stats.
 %changelog
+* Thu Aug 6 2020 Kyotaro Horiguchi
+- Update to 1.5.0b1. Support PG13.
 * Thu Aug 6 2020 Kyotaro Horiguchi
 - Update to 1.4.0. Support PG12.
 * Wed Sep 26 2018 Kyotaro Horiguchi

@@ -1,7 +1,7 @@
 # pg_dbms_stats/Makefile
 
-DBMSSTATSVER = 1.4.0
-PGVERS = 12
+DBMSSTATSVER = 1.5.0b1
+PGVERS = 13
 
 MODULE_big = pg_dbms_stats
 OBJS = pg_dbms_stats.o dump.o import.o
@@ -15,8 +15,7 @@ LAST_LIBPATH=$(shell echo $(LD_LIBRARY_PATH) | sed -e "s/^.*;//")
 CHECKING=$(shell echo $(LAST_LIBPATH)| grep './tmp_check/install/' | wc -l)
 EXTENSION = pg_dbms_stats
 
-REGRESS = init-common ut_fdw_init init-$(REGTESTVER) ut-common \
-		  ut-$(REGTESTVER)  ut_imp_exp-$(REGTESTVER)
+REGRESS = init-common ut_fdw_init init ut-common ut ut_imp_exp
 EXTRA_INSTALL = contrib/file_fdw
 
 REGRESS_OPTS = --encoding=UTF8 --temp-config=regress.conf
@@ -56,8 +55,6 @@ top_builddir = ../..
 include $(top_builddir)/src/Makefile.global
 include $(top_srcdir)/contrib/contrib-global.mk
 endif
-
-REGTESTVER = $(MAJORVERSION)
 
 TARSOURCES = Makefile *.c  *.h \
 	pg_dbms_stats.control COPYRIGHT ChangeLog ChangeLog.ja \

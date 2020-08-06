@@ -45,6 +45,8 @@ SELECT n.nspname, t.typname, t.typlen, t.typbyval, t.typtype,
 /*
  * No.5-1 dbms_stats.merge
  */
+ -- PostgreSQL no longer allows the use of array_cat in this test.
+ -- Skip tweaking of stavalues.
 UPDATE pg_statistic SET
     stanullfrac = staattnum,
     stawidth = staattnum,
@@ -68,11 +70,11 @@ UPDATE pg_statistic SET
     stanumbers2 = ARRAY[staattnum,1],
     stanumbers3 = ARRAY[staattnum,2],
     stanumbers4 = ARRAY[staattnum,3],
-    stanumbers5 = ARRAY[staattnum,5],
-    stavalues2 = array_cat(stavalues1,stavalues1),
-    stavalues3 = array_cat(array_cat(stavalues1,stavalues1),stavalues1),
-    stavalues4 = array_cat(array_cat(array_cat(stavalues1,stavalues1),stavalues1),stavalues1)
-   ,stavalues5 = array_cat(array_cat(array_cat(array_cat(stavalues1,stavalues1),stavalues1),stavalues1),stavalues1)
+    stanumbers5 = ARRAY[staattnum,5]
+--    stavalues2 = array_cat(stavalues1,stavalues1),
+--    stavalues3 = array_cat(array_cat(stavalues1,stavalues1),stavalues1),
+--    stavalues4 = array_cat(array_cat(array_cat(stavalues1,stavalues1),stavalues1),stavalues1),
+--    stavalues5 = array_cat(array_cat(array_cat(array_cat(stavalues1,stavalues1),stavalues1),stavalues1),stavalues1)
  WHERE starelid = 'st0'::regclass;
 SELECT dbms_stats.lock_table_stats('st0');
 UPDATE dbms_stats.column_stats_locked SET
@@ -103,8 +105,8 @@ UPDATE dbms_stats.column_stats_locked SET
     stavalues1 = stavalues3,
     stavalues2 = stavalues2,
     stavalues3 = stavalues1,
-    stavalues4 = stavalues4
-   ,stavalues5 = stavalues5
+    stavalues4 = stavalues4,
+	stavalues5 = stavalues5
 ;
 
 /*
@@ -879,7 +881,15 @@ SELECT (m.merge).starelid::regclass,
           AND s.staattnum = '1'::int2) m;
 
 -- No.5-1-21
-SELECT dbms_stats.merge((v.starelid::regclass, '2', v.stainherit,
+SELECT starelid::regclass,
+       staattnum, stainherit, stanullfrac, stawidth, stadistinct,
+       stakind1, stakind2, stakind3, stakind4, stakind5,
+       staop1, staop2, staop3, staop4, staop5,
+       stacoll1, stacoll2, stacoll3, stacoll4, stacoll5,
+       stanumbers1, stanumbers2, stanumbers3, stanumbers4, stanumbers5,
+       stavalues1, stavalues2, stavalues3, stavalues4, stavalues5
+FROM (
+  SELECT (dbms_stats.merge((v.starelid::regclass, '2', v.stainherit,
               v.stanullfrac, v.stawidth, v.stadistinct,
               '1', '1', '1', '1',
               '1',
@@ -900,16 +910,24 @@ SELECT dbms_stats.merge((v.starelid::regclass, '2', v.stainherit,
               s.stanumbers5,
               s.stavalues1, s.stavalues2, s.stavalues3, s.stavalues4
              ,s.stavalues5
-              ))
+              ))).*
          FROM dbms_stats.column_stats_locked v,
               pg_statistic s
         WHERE v.starelid = 'st0'::regclass
           AND v.staattnum = '1'::int2
           AND s.starelid = 'st0'::regclass
-          AND s.staattnum = '1'::int2;
+          AND s.staattnum = '1'::int2) as o;
 
 -- No.5-1-22
-SELECT dbms_stats.merge((v.starelid::regclass, '2', v.stainherit,
+SELECT starelid::regclass,
+       staattnum, stainherit, stanullfrac, stawidth, stadistinct,
+       stakind1, stakind2, stakind3, stakind4, stakind5,
+       staop1, staop2, staop3, staop4, staop5,
+       stacoll1, stacoll2, stacoll3, stacoll4, stacoll5,
+       stanumbers1, stanumbers2, stanumbers3, stanumbers4, stanumbers5,
+       stavalues1, stavalues2, stavalues3, stavalues4, stavalues5
+FROM (
+  SELECT (dbms_stats.merge((v.starelid::regclass, '2', v.stainherit,
               v.stanullfrac, v.stawidth, v.stadistinct,
               '2', '2', '2', '2',
               '2',
@@ -930,13 +948,13 @@ SELECT dbms_stats.merge((v.starelid::regclass, '2', v.stainherit,
               s.stanumbers5,
               s.stavalues1, s.stavalues2, s.stavalues3, s.stavalues4
              ,s.stavalues5
-              ))
+              ))).*
          FROM dbms_stats.column_stats_locked v,
               pg_statistic s
         WHERE v.starelid = 'st0'::regclass
           AND v.staattnum = '1'::int2
           AND s.starelid = 'st0'::regclass
-          AND s.staattnum = '1'::int2;
+          AND s.staattnum = '1'::int2) as o;
 RESET client_min_messages;
 SELECT dbms_stats.unlock_database_stats();
 
@@ -947,7 +965,6 @@ SELECT dbms_stats.unlock_database_stats();
 SELECT dbms_stats.is_target_relkind(k::"char")
  FROM (VALUES ('r'), ('i'), ('f'), ('m'),
  			  ('S'), ('t'), ('v'), ('c')) t(k);
-
 /*
  * No.7-1 dbms_stats.backup
  */

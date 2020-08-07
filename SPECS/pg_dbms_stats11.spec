@@ -6,9 +6,8 @@
 %define _libdir  %{_pgdir}/lib
 %define _datadir %{_pgdir}/share
 %define _bcdir %{_libdir}/bitcode
-%define _mybcdir %{_bcdir}/pg_dbms_stats
-
 %define _docdir  %{_pgdir}/doc
+
 %if "%(echo ${MAKE_ROOT})" != ""
   %define _rpmdir %(echo ${MAKE_ROOT})/RPMS
   %define _sourcedir %(echo ${MAKE_ROOT})
@@ -22,7 +21,7 @@ Release:    1%{?dist}
 License:    BSD
 Group:      Applications/Databases
 Source:     %{name}-%{version}.tar.gz
-URL:        http://sourceforge.jp/projects/pgdbmsstats/
+URL:        https://osdn.net/projects/pgdbmsstats/
 BuildRoot:  %{buildroot}
 Vendor:     NIPPON TELEGRAPH AND TELEPHONE CORPORATION
 

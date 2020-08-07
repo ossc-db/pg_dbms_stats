@@ -19,7 +19,7 @@ Release:    1%{?dist}
 License:    BSD
 Group:      Applications/Databases
 Source:     %{name}-%{version}.tar.gz
-URL:        http://sourceforge.jp/projects/pgdbmsstats/
+URL:        https://osdn.net/projects/pgdbmsstats/
 BuildRoot:  %{buildroot}
 Vendor:     NIPPON TELEGRAPH AND TELEPHONE CORPORATION
 

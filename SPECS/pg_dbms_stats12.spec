@@ -5,7 +5,9 @@
 %define _bindir  %{_pgdir}/bin
 %define _libdir  %{_pgdir}/lib
 %define _datadir %{_pgdir}/share
-%define _docdir  /usr/share/doc/pgsql
+%define _docdir  %{_pgdir}/doc
+%define _bcdir %{_libdir}/bitcode
+
 %if "%(echo ${MAKE_ROOT})" != ""
   %define _rpmdir %(echo ${MAKE_ROOT})/RPMS
   %define _sourcedir %(echo ${MAKE_ROOT})
@@ -15,17 +17,17 @@
 Summary:    Plan Stabilizer for PostgreSQL 12
 Name:       pg_dbms_stats12
 Version:    1.4.0
-Release:    1%{?dist}
+Release:    2%{?dist}
 License:    BSD
 Group:      Applications/Databases
 Source:     %{name}-%{version}.tar.gz
-URL:        http://sourceforge.jp/projects/pgdbmsstats/
+URL:        https://osdn.net/projects/pgdbmsstats/
 BuildRoot:  %{buildroot}
 Vendor:     NIPPON TELEGRAPH AND TELEPHONE CORPORATION
 
 ## postgresql-devel package required
-BuildRequires:  postgresql12
-Requires:  postgresql12-libs
+BuildRequires:  postgresql12-devel
+Requires:  postgresql12-server
 
 ## Description for "pg_dbms_stats"
 %description
@@ -38,6 +40,14 @@ pg_dbms_stats also provides following features:
   - import planner statistics from another system for tuning or testing.
 
 Note that this package is available for only PostgreSQL 12.
+
+%package llvmjit
+Requires: postgresql12-server, postgresql12-llvmjit
+Requires: pg_hint_plan12 = 1.4.0
+Summary:  Just-in-time compilation support for pg_hint_plan11
+
+%description llvmjit
+Just-in-time compilation support for pg_hint_plan11
 
 ## pre work for build pg_dbms_stats
 %prep
@@ -53,14 +63,7 @@ make USE_PGXS=1 %{?_smp_mflags}
 ## Set variables for install
 %install
 rm -rf %{buildroot}
-install -d %{buildroot}%{_libdir}
-install -m 755 pg_dbms_stats.so %{buildroot}%{_libdir}/pg_dbms_stats.so
-install -d %{buildroot}%{_datadir}/extension
-install -m 644 pg_dbms_stats--1.4.0.sql %{buildroot}%{_datadir}/extension/pg_dbms_stats--1.4.0.sql
-install -m 644 pg_dbms_stats.control %{buildroot}%{_datadir}/extension/pg_dbms_stats.control
-install -d %{buildroot}%{_docdir}/extension
-install -m 644 doc/export_effective_stats-12.sql.sample %{buildroot}%{_docdir}/extension/export_effective_stats-12.sql.sample
-install -m 644 doc/export_plain_stats-12.sql.sample %{buildroot}%{_docdir}/extension/export_plain_stats-12.sql.sample
+make install DESTDIR=%{buildroot}
 
 %clean
 rm -rf %{buildroot}
@@ -73,6 +76,9 @@ rm -rf %{buildroot}
 %{_datadir}/extension/pg_dbms_stats.control
 %{_docdir}/extension/export_effective_stats-12.sql.sample
 %{_docdir}/extension/export_plain_stats-12.sql.sample
+
+%files llvmjit
+%{_bcdir}
 
 # History of pg_dbms_stats.
 %changelog

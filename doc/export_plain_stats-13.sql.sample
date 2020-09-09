@@ -14,7 +14,8 @@ COPY (SELECT n2.nspname,
              c.relpages,
              c.reltuples,
              c.relallvisible,
-             (pg_relation_size(c.oid) / current_setting('block_size')::int4)::int4
+             (pg_catalog.pg_relation_size(c.oid) /
+			  pg_catalog.current_setting('block_size')::int4)::int4
                  AS curpages,
              pg_catalog.pg_stat_get_last_analyze_time(c.oid)
                  AS last_analyze,

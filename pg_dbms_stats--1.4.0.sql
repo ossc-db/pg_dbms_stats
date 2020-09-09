@@ -147,7 +147,7 @@ CREATE TABLE dbms_stats.column_stats_backup (
 
 CREATE FUNCTION dbms_stats.relname(nspname text, relname text)
 RETURNS text AS
-$$SELECT quote_ident($1) || '.' || quote_ident($2)$$
+$$SELECT pg_catalog.quote_ident($1) || '.' || pg_catalog.quote_ident($2)$$
 LANGUAGE sql STABLE STRICT;
 
 CREATE FUNCTION dbms_stats.is_system_schema(schemaname text)
@@ -180,7 +180,8 @@ CREATE VIEW dbms_stats.relation_stats_effective AS
         COALESCE(v.reltuples, c.reltuples) AS reltuples,
         COALESCE(v.relallvisible, c.relallvisible) AS relallvisible,
         COALESCE(v.curpages,
-            (pg_relation_size(c.oid) / current_setting('block_size')::int4)::int4)
+            (pg_catalog.pg_relation_size(c.oid) /
+			 pg_catalog.current_setting('block_size')::int4)::int4)
             AS curpages,
         COALESCE(v.last_analyze,
             pg_catalog.pg_stat_get_last_analyze_time(c.oid))
@@ -282,8 +283,8 @@ CREATE VIEW dbms_stats.stats with (security_barrier) AS
          JOIN pg_attribute a ON (c.oid = attrelid AND attnum = s.staattnum)
          LEFT JOIN pg_namespace n ON (n.oid = c.relnamespace)
     WHERE NOT attisdropped
-	AND has_column_privilege(c.oid, a.attnum, 'select')
-	AND (c.relrowsecurity = false OR NOT row_security_active(c.oid));
+	AND pg_catalog.has_column_privilege(c.oid, a.attnum, 'select')
+	AND (c.relrowsecurity = false OR NOT pg_catalog.row_security_active(c.oid));
 
 --
 -- Utility functions
@@ -545,7 +546,7 @@ BEGIN
     END IF;
 
     FOR restore_id, restore_relid IN
-	  SELECT max(id), coid FROM
+	  SELECT pg_catalog.max(id), coid FROM
         (SELECT b.id as id, c.oid as coid
            FROM pg_class c, dbms_stats.relation_stats_backup b
           WHERE (c.oid = $2 OR $2 IS NULL)
@@ -591,8 +592,9 @@ BEGIN
         SELECT t.id, t.oid, t.attnum, b.statypid, a.atttypid
           FROM pg_attribute a,
                dbms_stats.column_stats_backup b,
-               (SELECT max(b.id) AS id, c.oid, a.attnum
-                  FROM pg_class c, pg_attribute a, dbms_stats.column_stats_backup b
+               (SELECT pg_catalog.max(b.id) AS id, c.oid, a.attnum
+                  FROM pg_class c, pg_attribute a,
+				       dbms_stats.column_stats_backup b
                  WHERE (c.oid = $2 OR $2 IS NULL)
                    AND c.oid = a.attrelid
                    AND c.oid = b.starelid
@@ -645,7 +647,7 @@ CREATE FUNCTION dbms_stats.restore_database_stats(
 ) RETURNS SETOF regclass AS
 $$
 SELECT dbms_stats.restore(m.id, m.relid)
-  FROM (SELECT max(id) AS id, relid
+  FROM (SELECT pg_catalog.max(id) AS id, relid
         FROM (SELECT r.id, r.relid
               FROM pg_class c, dbms_stats.relation_stats_backup r,
                    dbms_stats.backup_history b
@@ -673,7 +675,7 @@ BEGIN
 
     RETURN QUERY
         SELECT dbms_stats.restore(m.id, m.relid)
-          FROM (SELECT max(id) AS id, relid
+          FROM (SELECT pg_catalog.max(id) AS id, relid
                 FROM (SELECT r.id, r.relid
                       FROM pg_class c, pg_namespace n,
                            dbms_stats.relation_stats_backup r,
@@ -695,7 +697,7 @@ CREATE FUNCTION dbms_stats.restore_table_stats(
     as_of_timestamp timestamp with time zone
 ) RETURNS SETOF regclass AS
 $$
-SELECT dbms_stats.restore(max(id), $1, NULL)
+SELECT dbms_stats.restore(pg_catalog.max(id), $1, NULL)
   FROM dbms_stats.backup_history WHERE time <= $2
 $$
 LANGUAGE sql STRICT;
@@ -716,7 +718,7 @@ CREATE FUNCTION dbms_stats.restore_column_stats(
     as_of_timestamp timestamp with time zone
 ) RETURNS SETOF regclass AS
 $$
-SELECT dbms_stats.restore(max(id), $1, $2)
+SELECT dbms_stats.restore(pg_catalog.max(id), $1, $2)
   FROM dbms_stats.backup_history WHERE time <= $3
 $$
 LANGUAGE sql STRICT;
@@ -728,7 +730,8 @@ CREATE FUNCTION dbms_stats.restore_column_stats(
     as_of_timestamp timestamp with time zone
 ) RETURNS SETOF regclass AS
 $$
-SELECT dbms_stats.restore(max(id), dbms_stats.relname($1, $2)::regclass, $3)
+SELECT dbms_stats.restore(pg_catalog.max(id),
+                          dbms_stats.relname($1, $2)::regclass, $3)
   FROM dbms_stats.backup_history WHERE time <= $4
 $$
 LANGUAGE sql STRICT;
@@ -1568,7 +1571,8 @@ DECLARE
   castdef varchar;
 BEGIN
   srctypname := $1 || '[]';
-  funcname := 'dbms_stats._' || replace($1::text, ' ', '_') || '_ary_anyarray';
+  funcname := 'dbms_stats._' || pg_catalog.replace($1::text, ' ', '_') ||
+              '_ary_anyarray';
   funcdef := funcname || '(' || srctypname || ')';
   castdef := '(' || srctypname || ' AS dbms_stats.anyarray)';
 
@@ -1581,7 +1585,7 @@ BEGIN
           ' AS ''pg_dbms_stats'', ''dbms_stats_anyary_anyary'''||
           ' LANGUAGE C STRICT IMMUTABLE';
   EXECUTE 'CREATE CAST '|| castdef ||
-	      ' WITH FUNCTION ' || funcdef ||
+  	      ' WITH FUNCTION ' || funcdef ||
 	      ' AS ASSIGNMENT';
   RETURN '(func ' || funcdef || ', cast ' || castdef || ')';
 EXCEPTION
@@ -1599,7 +1603,8 @@ DECLARE
   castdef varchar;
 BEGIN
   srctypname := $1 || '[]';
-  funcname := 'dbms_stats._' || replace($1::text, ' ', '_') || '_ary_anyarray';
+  funcname := 'dbms_stats._' || pg_catalog.replace($1::text, ' ', '_') ||
+              '_ary_anyarray';
   funcdef := funcname || '(' || srctypname || ')';
   castdef := '(' || srctypname || ' AS dbms_stats.anyarray)';
 

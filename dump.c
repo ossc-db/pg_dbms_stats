@@ -43,6 +43,7 @@ Datum
 dbms_stats_array_recv(PG_FUNCTION_ARGS)
 {
 	StringInfo	buf = (StringInfo) PG_GETARG_POINTER(0);
+	int32           typmod = PG_GETARG_INT32(2);
 	Oid			element_type;
 	int			typlen;
 	bool		typbyval;
@@ -145,7 +146,7 @@ dbms_stats_array_recv(PG_FUNCTION_ARGS)
 	dataPtr = (Datum *) palloc(nitems * sizeof(Datum));
 	nullsPtr = (bool *) palloc(nitems * sizeof(bool));
 	ReadArrayBinary(buf, nitems,
-					&my_extra->proc, typioparam, 0,
+					&my_extra->proc, typioparam, typmod,
 					typlen, typbyval, typalign,
 					dataPtr, nullsPtr,
 					&hasnulls, &nbytes);

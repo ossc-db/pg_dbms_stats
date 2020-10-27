@@ -1,6 +1,6 @@
 # pg_dbms_stats/Makefile
 
-DBMSSTATSVER = 1.4.0
+DBMSSTATSVER = 1.4.1
 PGVERS = 12
 
 MODULE_big = pg_dbms_stats
@@ -22,7 +22,7 @@ EXTRA_INSTALL = contrib/file_fdw
 REGRESS_OPTS = --encoding=UTF8 --temp-config=regress.conf
 
 # Pick up only the install scripts needed for the PG version.
-DATA = pg_dbms_stats--$(DBMSSTATSVER).sql
+DATA = pg_dbms_stats--*.sql
 
 DOCS = $(DOCDIR)/export_effective_stats-$(MAJORVERSION).sql.sample \
 	$(DOCDIR)/export_plain_stats-$(MAJORVERSION).sql.sample

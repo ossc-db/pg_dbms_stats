@@ -1,5 +1,5 @@
 # SPEC file for pg_dbms_stats93
-# Copyright(C) 2012-2018 NIPPON TELEGRAPH AND TELEPHONE CORPORATION
+# Copyright(C) 2012-2020 NIPPON TELEGRAPH AND TELEPHONE CORPORATION
 
 %define _pgdir   /usr/pgsql-9.3
 %define _bindir  %{_pgdir}/bin
@@ -14,7 +14,7 @@
 ## Set general information for pg_dbms_stats.
 Summary:    Plan Stabilizer for PostgreSQL 9.3
 Name:       pg_dbms_stats93
-Version:    1.3.11
+Version:    1.3.12
 Release:    1%{?dist}
 License:    BSD
 Group:      Applications/Databases
@@ -56,7 +56,7 @@ rm -rf %{buildroot}
 install -d %{buildroot}%{_libdir}
 install -m 755 pg_dbms_stats.so %{buildroot}%{_libdir}/pg_dbms_stats.so
 install -d %{buildroot}%{_datadir}/extension
-install -m 644 pg_dbms_stats--1.3.11.sql %{buildroot}%{_datadir}/extension/pg_dbms_stats--1.3.11.sql
+install -m 644 pg_dbms_stats--1.3.12.sql %{buildroot}%{_datadir}/extension/pg_dbms_stats--1.3.12.sql
 install -m 644 pg_dbms_stats--1.0--1.3.2.sql %{buildroot}%{_datadir}/extension/pg_dbms_stats--1.0--1.3.2.sql
 install -m 644 pg_dbms_stats--1.3.2--1.3.3.sql %{buildroot}%{_datadir}/extension/pg_dbms_stats--1.3.2--1.3.3.sql
 install -m 644 pg_dbms_stats--1.3.3--1.3.4.sql %{buildroot}%{_datadir}/extension/pg_dbms_stats--1.3.3--1.3.4.sql
@@ -66,6 +66,7 @@ install -m 644 pg_dbms_stats--1.3.6--1.3.7.sql %{buildroot}%{_datadir}/extension
 install -m 644 pg_dbms_stats--1.3.7--1.3.9.sql %{buildroot}%{_datadir}/extension/pg_dbms_stats--1.3.7--1.3.9.sql
 install -m 644 pg_dbms_stats--1.3.9--1.3.10.sql %{buildroot}%{_datadir}/extension/pg_dbms_stats--1.3.9--1.3.10.sql
 install -m 644 pg_dbms_stats--1.3.10--1.3.11.sql %{buildroot}%{_datadir}/extension/pg_dbms_stats--1.3.10--1.3.11.sql
+install -m 644 pg_dbms_stats--1.3.11--1.3.12.sql %{buildroot}%{_datadir}/extension/pg_dbms_stats--1.3.11--1.3.12.sql
 install -m 644 pg_dbms_stats.control %{buildroot}%{_datadir}/extension/pg_dbms_stats.control
 install -d %{buildroot}%{_docdir}/extension
 install -m 644 doc/export_effective_stats-9.3.sql.sample %{buildroot}%{_docdir}/extension/export_effective_stats-9.3.sql.sample
@@ -78,7 +79,7 @@ rm -rf %{buildroot}
 %defattr(0755,root,root)
 %{_libdir}/pg_dbms_stats.so
 %defattr(0644,root,root)
-%{_datadir}/extension/pg_dbms_stats--1.3.11.sql
+%{_datadir}/extension/pg_dbms_stats--1.3.12.sql
 %{_datadir}/extension/pg_dbms_stats--1.0--1.3.2.sql
 %{_datadir}/extension/pg_dbms_stats--1.3.2--1.3.3.sql
 %{_datadir}/extension/pg_dbms_stats--1.3.3--1.3.4.sql
@@ -88,12 +89,15 @@ rm -rf %{buildroot}
 %{_datadir}/extension/pg_dbms_stats--1.3.7--1.3.9.sql
 %{_datadir}/extension/pg_dbms_stats--1.3.9--1.3.10.sql
 %{_datadir}/extension/pg_dbms_stats--1.3.10--1.3.11.sql
+%{_datadir}/extension/pg_dbms_stats--1.3.11--1.3.12.sql
 %{_datadir}/extension/pg_dbms_stats.control
 %{_docdir}/extension/export_effective_stats-9.3.sql.sample
 %{_docdir}/extension/export_plain_stats-9.3.sql.sample
 
 # History of pg_dbms_stats.
 %changelog
+* Tue Oct 27 2020 Kyotaro Horiguchi
+- Update to 1.3.12. Bug fix.
 * Wed Sep 26 2018 Kyotaro Horiguchi
 - Update to 1.3.11. Bug fix.
 * Thu Apr 05 2018 Kyotaro Horiguchi

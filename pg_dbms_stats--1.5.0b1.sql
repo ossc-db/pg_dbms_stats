@@ -1562,7 +1562,7 @@ CREATE FUNCTION dbms_stats.type_is_analyzable(oid) returns bool
  * Create and drop a cast necessary to set column values of dbms_stats.anyarray
  * type.
  */
-CREATE OR REPLACE FUNCTION dbms_stats.prepare_statstweak(regtype)
+CREATE FUNCTION dbms_stats.prepare_statstweak(regtype)
 RETURNS text AS $$
 DECLARE
   srctypname varchar;
@@ -1594,7 +1594,7 @@ EXCEPTION
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION dbms_stats.drop_statstweak(regtype)
+CREATE FUNCTION dbms_stats.drop_statstweak(regtype)
 RETURNS text AS $$
 DECLARE
   srctypname varchar;

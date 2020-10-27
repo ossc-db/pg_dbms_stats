@@ -5,7 +5,7 @@
 %define _bindir  %{_pgdir}/bin
 %define _libdir  %{_pgdir}/lib
 %define _datadir %{_pgdir}/share
-%define _docdir  %{_datadir}/doc
+%define _docdir  %{_pgdir}/doc
 %define _bcdir %{_libdir}/bitcode
 
 %if "%(echo ${MAKE_ROOT})" != ""
@@ -16,7 +16,7 @@
 ## Set general information for pg_dbms_stats.
 Summary:    Plan Stabilizer for PostgreSQL 13
 Name:       pg_dbms_stats13
-Version:    1.5.0b1
+Version:    1.5.0
 Release:    1%{?dist}
 License:    BSD
 Group:      Applications/Databases
@@ -43,7 +43,7 @@ Note that this package is available for only PostgreSQL 13.
 
 %package llvmjit
 Requires: postgresql13-server, postgresql13-llvmjit
-Requires: pg_hint_plan13 = 1.5.0b1
+Requires: pg_hint_plan13 = 1.5.0
 Summary:  Just-in-time compilation support for pg_hint_plan11
 
 %description llvmjit
@@ -82,8 +82,8 @@ rm -rf %{buildroot}
 
 # History of pg_dbms_stats.
 %changelog
-* Thu Aug 6 2020 Kyotaro Horiguchi
-- Update to 1.5.0b1. Support PG13.
+* Tue Oct 27 2020 Kyotaro Horiguchi
+- Update to 1.5.0. Support PG13.
 * Thu Aug 6 2020 Kyotaro Horiguchi
 - Update to 1.4.0. Support PG12.
 * Wed Sep 26 2018 Kyotaro Horiguchi

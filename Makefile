@@ -1,6 +1,6 @@
 # pg_dbms_stats/Makefile
 
-DBMSSTATSVER = 1.5.0b1
+DBMSSTATSVER = 1.5.0
 PGVERS = 13
 
 MODULE_big = pg_dbms_stats

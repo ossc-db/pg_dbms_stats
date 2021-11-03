@@ -1,7 +1,7 @@
 /*
  * pg_dbms_stats.h
  *
- * Copyright (c) 2009-2020, NIPPON TELEGRAPH AND TELEPHONE CORPORATION
+ * Copyright (c) 2009-2021, NIPPON TELEGRAPH AND TELEPHONE CORPORATION
  * Portions Copyright (c) 1996-2013, PostgreSQL Global Development Group
  * Portions Copyright (c) 1994, Regents of the University of California
  */

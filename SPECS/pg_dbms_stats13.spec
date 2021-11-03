@@ -1,5 +1,5 @@
 # SPEC file for pg_dbms_stats13
-# Copyright(C) 2012-2020 NIPPON TELEGRAPH AND TELEPHONE CORPORATION
+# Copyright(c) 2012-2021, NIPPON TELEGRAPH AND TELEPHONE CORPORATION
 
 %define _pgdir   /usr/pgsql-13
 %define _bindir  %{_pgdir}/bin

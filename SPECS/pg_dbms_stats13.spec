@@ -43,11 +43,11 @@ Note that this package is available for only PostgreSQL 13.
 
 %package llvmjit
 Requires: postgresql13-server, postgresql13-llvmjit
-Requires: pg_hint_plan13 = 1.5.0
-Summary:  Just-in-time compilation support for pg_hint_plan11
+Requires: pg_dbms_stats13 = 1.5.0
+Summary:  Just-in-time compilation support for pg_dbms_stats13
 
 %description llvmjit
-Just-in-time compilation support for pg_hint_plan11
+Just-in-time compilation support for pg_dmbs_stats13
 
 ## pre work for build pg_dbms_stats
 %prep
@@ -82,7 +82,7 @@ rm -rf %{buildroot}
 
 # History of pg_dbms_stats.
 %changelog
-* Tue Oct 27 2020 Kyotaro Horiguchi
+* Tue Mar 1 2022 Kyotaro Horiguchi
 - Update to 1.5.0. Support PG13.
 * Thu Aug 6 2020 Kyotaro Horiguchi
 - Update to 1.4.0. Support PG12.

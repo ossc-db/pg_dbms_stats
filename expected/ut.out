@@ -10135,7 +10135,7 @@ SET pg_dbms_stats.use_locked_stats TO on;
 SELECT testfunc();
                     testfunc                    
 ------------------------------------------------
- Seq Scan on st4  (cost=xxx rows=713 width=xxx)+
+ Seq Scan on st4  (cost=xxx rows=753 width=xxx)+
    Filter: (a < '0'::double precision)         +
  
 (1 row)

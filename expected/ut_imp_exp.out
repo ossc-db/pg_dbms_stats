@@ -139,7 +139,7 @@ TO STDOUT
 (FORMAT 'binary');
 \o
 COMMIT;
-COPY dbms_stats.work FROM '@abs_srcdir@/export_stats.dmp' (FORMAT 'binary');
+COPY dbms_stats.work FROM '/home/postgres/git_repos/internal/pg_dbms_stats/export_stats.dmp' (FORMAT 'binary');
 SELECT * FROM work_v;
  nspname | relname | relpages | reltuples | relallvisible | curpages | attname | nspname_of_typename | typname | atttypmod | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 |      stanumbers1       | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 |       stavalues1       | stavalues2 | stavalues3 | stavalues4 | stavalues5 
 ---------+---------+----------+-----------+---------------+----------+---------+---------------------+---------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+------------------------+-------------+-------------+-------------+-------------+------------------------+------------+------------+------------+------------
@@ -255,7 +255,7 @@ TO STDOUT
 (FORMAT 'binary');
 \o
 COMMIT;
-COPY dbms_stats.work FROM '@abs_srcdir@/export_stats.dmp' (FORMAT 'binary');
+COPY dbms_stats.work FROM '/home/postgres/git_repos/internal/pg_dbms_stats/export_stats.dmp' (FORMAT 'binary');
 SELECT * FROM work_v;
  nspname | relname | relpages | reltuples | relallvisible | curpages | attname | nspname_of_typename | typname | atttypmod | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 |       stavalues1       | stavalues2 | stavalues3 | stavalues4 | stavalues5 
 ---------+---------+----------+-----------+---------------+----------+---------+---------------------+---------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+------------------------+------------+------------+------------+------------
@@ -361,7 +361,7 @@ TO STDOUT
 (FORMAT 'binary');
 \o
 COMMIT;
-COPY dbms_stats.work FROM '@abs_srcdir@/export_stats.dmp' (FORMAT 'binary');
+COPY dbms_stats.work FROM '/home/postgres/git_repos/internal/pg_dbms_stats/export_stats.dmp' (FORMAT 'binary');
 SELECT * FROM work_v;
  nspname | relname | relpages | reltuples | relallvisible | curpages | attname | nspname_of_typename | typname | atttypmod | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 |    stavalues1    | stavalues2 | stavalues3 | stavalues4 | stavalues5 
 ---------+---------+----------+-----------+---------------+----------+---------+---------------------+---------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+------------------+------------+------------+------------+------------
@@ -378,7 +378,7 @@ SELECT * FROM work_v;
 TRUNCATE dbms_stats.work;
 \! rm doc/export_plain_stats-14.sql.sample_test
 -- No.16-1-3-1 Actual import test
-select dbms_stats.import_database_stats('@abs_srcdir@/export_stats.dmp');
+select dbms_stats.import_database_stats('/home/postgres/git_repos/internal/pg_dbms_stats/export_stats.dmp');
  import_database_stats 
 -----------------------
  
@@ -466,7 +466,7 @@ TO STDOUT
 (FORMAT 'binary');
 \o
 COMMIT;
-COPY dbms_stats.work FROM '@abs_srcdir@/export_stats.dmp' (FORMAT 'binary');
+COPY dbms_stats.work FROM '/home/postgres/git_repos/internal/pg_dbms_stats/export_stats.dmp' (FORMAT 'binary');
 SELECT * FROM work_v;
  nspname | relname | relpages | reltuples | relallvisible | curpages | attname | nspname_of_typename | typname | atttypmod | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 | stavalues1 | stavalues2 | stavalues3 | stavalues4 | stavalues5 
 ---------+---------+----------+-----------+---------------+----------+---------+---------------------+---------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+------------+------------+------------+------------+------------
@@ -556,7 +556,7 @@ TO STDOUT
 (FORMAT 'binary');
 \o
 COMMIT;
-COPY dbms_stats.work FROM '@abs_srcdir@/export_stats.dmp' (FORMAT 'binary');
+COPY dbms_stats.work FROM '/home/postgres/git_repos/internal/pg_dbms_stats/export_stats.dmp' (FORMAT 'binary');
 SELECT * FROM work_v;
  nspname | relname | relpages | reltuples | relallvisible | curpages | attname | nspname_of_typename | typname | atttypmod | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 | stavalues1 | stavalues2 | stavalues3 | stavalues4 | stavalues5 
 ---------+---------+----------+-----------+---------------+----------+---------+---------------------+---------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+------------+------------+------------+------------+------------
@@ -648,7 +648,7 @@ TO STDOUT
 (FORMAT 'binary');
 \o
 COMMIT;
-COPY dbms_stats.work FROM '@abs_srcdir@/export_stats.dmp' (FORMAT 'binary');
+COPY dbms_stats.work FROM '/home/postgres/git_repos/internal/pg_dbms_stats/export_stats.dmp' (FORMAT 'binary');
 SELECT * FROM work_v;
  nspname | relname | relpages | reltuples | relallvisible | curpages | attname | nspname_of_typename | typname | atttypmod | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 | stavalues1 | stavalues2 | stavalues3 | stavalues4 | stavalues5 
 ---------+---------+----------+-----------+---------------+----------+---------+---------------------+---------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+------------+------------+------------+------------+------------
@@ -738,7 +738,7 @@ TO STDOUT
 (FORMAT 'binary');
 \o
 COMMIT;
-COPY dbms_stats.work FROM '@abs_srcdir@/export_stats.dmp' (FORMAT 'binary');
+COPY dbms_stats.work FROM '/home/postgres/git_repos/internal/pg_dbms_stats/export_stats.dmp' (FORMAT 'binary');
 SELECT * FROM work_v;
  nspname | relname | relpages | reltuples | relallvisible | curpages | attname | nspname_of_typename | typname | atttypmod | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 | stavalues1 | stavalues2 | stavalues3 | stavalues4 | stavalues5 
 ---------+---------+----------+-----------+---------------+----------+---------+---------------------+---------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+------------+------------+------------+------------+------------
@@ -828,7 +828,7 @@ TO STDOUT
 (FORMAT 'binary');
 \o
 COMMIT;
-COPY dbms_stats.work FROM '@abs_srcdir@/export_stats.dmp' (FORMAT 'binary');
+COPY dbms_stats.work FROM '/home/postgres/git_repos/internal/pg_dbms_stats/export_stats.dmp' (FORMAT 'binary');
 SELECT * FROM work_v;
  nspname | relname | relpages | reltuples | relallvisible | curpages | attname | nspname_of_typename | typname | atttypmod | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 |       stavalues1       | stavalues2 | stavalues3 | stavalues4 | stavalues5 
 ---------+---------+----------+-----------+---------------+----------+---------+---------------------+---------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+------------------------+------------+------------+------------+------------
@@ -919,7 +919,7 @@ TO STDOUT
 (FORMAT 'binary');
 \o
 COMMIT;
-COPY dbms_stats.work FROM '@abs_srcdir@/export_stats.dmp' (FORMAT 'binary');
+COPY dbms_stats.work FROM '/home/postgres/git_repos/internal/pg_dbms_stats/export_stats.dmp' (FORMAT 'binary');
 SELECT * FROM work_v;
  nspname | relname | relpages | reltuples | relallvisible | curpages | attname | nspname_of_typename | typname | atttypmod | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 | stavalues1 | stavalues2 | stavalues3 | stavalues4 | stavalues5 
 ---------+---------+----------+-----------+---------------+----------+---------+---------------------+---------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+------------+------------+------------+------------+------------
@@ -1012,7 +1012,7 @@ TO STDOUT
 (FORMAT 'binary');
 \o
 COMMIT;
-COPY dbms_stats.work FROM '@abs_srcdir@/export_stats.dmp' (FORMAT 'binary');
+COPY dbms_stats.work FROM '/home/postgres/git_repos/internal/pg_dbms_stats/export_stats.dmp' (FORMAT 'binary');
 SELECT * FROM work_v;
  nspname | relname | relpages | reltuples | relallvisible | curpages | attname | nspname_of_typename | typname | atttypmod | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 |       stavalues1       | stavalues2 | stavalues3 | stavalues4 | stavalues5 
 ---------+---------+----------+-----------+---------------+----------+---------+---------------------+---------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+------------------------+------------+------------+------------+------------
@@ -1108,7 +1108,7 @@ TO STDOUT
 (FORMAT 'binary');
 \o
 COMMIT;
-COPY dbms_stats.work FROM '@abs_srcdir@/export_stats.dmp' (FORMAT 'binary');
+COPY dbms_stats.work FROM '/home/postgres/git_repos/internal/pg_dbms_stats/export_stats.dmp' (FORMAT 'binary');
 SELECT * FROM work_v;
  nspname | relname | relpages | reltuples | relallvisible | curpages | attname | nspname_of_typename | typname | atttypmod | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 | stavalues1 | stavalues2 | stavalues3 | stavalues4 | stavalues5 
 ---------+---------+----------+-----------+---------------+----------+---------+---------------------+---------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+------------+------------+------------+------------+------------
@@ -1202,7 +1202,7 @@ TO STDOUT
 (FORMAT 'binary');
 \o
 COMMIT;
-COPY dbms_stats.work FROM '@abs_srcdir@/export_stats.dmp' (FORMAT 'binary');
+COPY dbms_stats.work FROM '/home/postgres/git_repos/internal/pg_dbms_stats/export_stats.dmp' (FORMAT 'binary');
 SELECT * FROM work_v;
  nspname | relname | relpages | reltuples | relallvisible | curpages | attname | nspname_of_typename | typname | atttypmod | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 | stavalues1 | stavalues2 | stavalues3 | stavalues4 | stavalues5 
 ---------+---------+----------+-----------+---------------+----------+---------+---------------------+---------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+------------+------------+------------+------------+------------
@@ -1325,7 +1325,7 @@ TO STDOUT
 (FORMAT 'binary');
 \o
 COMMIT;
-COPY dbms_stats.work FROM '@abs_srcdir@/export_stats.dmp' (FORMAT 'binary');
+COPY dbms_stats.work FROM '/home/postgres/git_repos/internal/pg_dbms_stats/export_stats.dmp' (FORMAT 'binary');
 SELECT * FROM work_v;
  nspname | relname | relpages | reltuples | relallvisible | curpages | attname | nspname_of_typename | typname | atttypmod | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 |    stavalues1    | stavalues2 |       stavalues3       | stavalues4 | stavalues5 
 ---------+---------+----------+-----------+---------------+----------+---------+---------------------+---------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+------------------+------------+------------------------+------------+------------
@@ -1434,7 +1434,7 @@ TO STDOUT
 (FORMAT 'binary');
 \o
 COMMIT;
-COPY dbms_stats.work FROM '@abs_srcdir@/export_stats.dmp' (FORMAT 'binary');
+COPY dbms_stats.work FROM '/home/postgres/git_repos/internal/pg_dbms_stats/export_stats.dmp' (FORMAT 'binary');
 SELECT * FROM work_v;
  nspname | relname | relpages | reltuples | relallvisible | curpages | attname | nspname_of_typename | typname | atttypmod | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 |    stavalues1    | stavalues2 |       stavalues3       | stavalues4 | stavalues5 
 ---------+---------+----------+-----------+---------------+----------+---------+---------------------+---------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+------------------+------------+------------------------+------------+------------
@@ -1533,7 +1533,7 @@ TO STDOUT
 (FORMAT 'binary');
 \o
 COMMIT;
-COPY dbms_stats.work FROM '@abs_srcdir@/export_stats.dmp' (FORMAT 'binary');
+COPY dbms_stats.work FROM '/home/postgres/git_repos/internal/pg_dbms_stats/export_stats.dmp' (FORMAT 'binary');
 SELECT * FROM work_v;
  nspname | relname | relpages | reltuples | relallvisible | curpages | attname | nspname_of_typename | typname | atttypmod | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 |    stavalues1    | stavalues2 | stavalues3 | stavalues4 | stavalues5 
 ---------+---------+----------+-----------+---------------+----------+---------+---------------------+---------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+------------------+------------+------------+------------+------------
@@ -1624,7 +1624,7 @@ TO STDOUT
 (FORMAT 'binary');
 \o
 COMMIT;
-COPY dbms_stats.work FROM '@abs_srcdir@/export_stats.dmp' (FORMAT 'binary');
+COPY dbms_stats.work FROM '/home/postgres/git_repos/internal/pg_dbms_stats/export_stats.dmp' (FORMAT 'binary');
 SELECT * FROM work_v;
  nspname | relname | relpages | reltuples | relallvisible | curpages | attname | nspname_of_typename | typname | atttypmod | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 | stavalues1 | stavalues2 | stavalues3 | stavalues4 | stavalues5 
 ---------+---------+----------+-----------+---------------+----------+---------+---------------------+---------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+------------+------------+------------+------------+------------
@@ -1707,7 +1707,7 @@ TO STDOUT
 (FORMAT 'binary');
 \o
 COMMIT;
-COPY dbms_stats.work FROM '@abs_srcdir@/export_stats.dmp' (FORMAT 'binary');
+COPY dbms_stats.work FROM '/home/postgres/git_repos/internal/pg_dbms_stats/export_stats.dmp' (FORMAT 'binary');
 SELECT * FROM work_v;
  nspname | relname | relpages | reltuples | relallvisible | curpages | attname | nspname_of_typename | typname | atttypmod | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 | stavalues1 | stavalues2 | stavalues3 | stavalues4 | stavalues5 
 ---------+---------+----------+-----------+---------------+----------+---------+---------------------+---------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+------------+------------+------------+------------+------------
@@ -1792,7 +1792,7 @@ TO STDOUT
 (FORMAT 'binary');
 \o
 COMMIT;
-COPY dbms_stats.work FROM '@abs_srcdir@/export_stats.dmp' (FORMAT 'binary');
+COPY dbms_stats.work FROM '/home/postgres/git_repos/internal/pg_dbms_stats/export_stats.dmp' (FORMAT 'binary');
 SELECT * FROM work_v;
  nspname | relname | relpages | reltuples | relallvisible | curpages | attname | nspname_of_typename | typname | atttypmod | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 | stavalues1 | stavalues2 | stavalues3 | stavalues4 | stavalues5 
 ---------+---------+----------+-----------+---------------+----------+---------+---------------------+---------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+------------+------------+------------+------------+------------
@@ -1875,7 +1875,7 @@ TO STDOUT
 (FORMAT 'binary');
 \o
 COMMIT;
-COPY dbms_stats.work FROM '@abs_srcdir@/export_stats.dmp' (FORMAT 'binary');
+COPY dbms_stats.work FROM '/home/postgres/git_repos/internal/pg_dbms_stats/export_stats.dmp' (FORMAT 'binary');
 SELECT * FROM work_v;
  nspname | relname | relpages | reltuples | relallvisible | curpages | attname | nspname_of_typename | typname | atttypmod | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 | stavalues1 | stavalues2 | stavalues3 | stavalues4 | stavalues5 
 ---------+---------+----------+-----------+---------------+----------+---------+---------------------+---------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+------------+------------+------------+------------+------------
@@ -1958,7 +1958,7 @@ TO STDOUT
 (FORMAT 'binary');
 \o
 COMMIT;
-COPY dbms_stats.work FROM '@abs_srcdir@/export_stats.dmp' (FORMAT 'binary');
+COPY dbms_stats.work FROM '/home/postgres/git_repos/internal/pg_dbms_stats/export_stats.dmp' (FORMAT 'binary');
 SELECT * FROM work_v;
  nspname | relname | relpages | reltuples | relallvisible | curpages | attname | nspname_of_typename | typname | atttypmod | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 | stavalues1 | stavalues2 |       stavalues3       | stavalues4 | stavalues5 
 ---------+---------+----------+-----------+---------------+----------+---------+---------------------+---------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+------------+------------+------------------------+------------+------------
@@ -2042,7 +2042,7 @@ TO STDOUT
 (FORMAT 'binary');
 \o
 COMMIT;
-COPY dbms_stats.work FROM '@abs_srcdir@/export_stats.dmp' (FORMAT 'binary');
+COPY dbms_stats.work FROM '/home/postgres/git_repos/internal/pg_dbms_stats/export_stats.dmp' (FORMAT 'binary');
 SELECT * FROM work_v;
  nspname | relname | relpages | reltuples | relallvisible | curpages | attname | nspname_of_typename | typname | atttypmod | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 | stavalues1 | stavalues2 | stavalues3 | stavalues4 | stavalues5 
 ---------+---------+----------+-----------+---------------+----------+---------+---------------------+---------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+------------+------------+------------+------------+------------
@@ -2128,7 +2128,7 @@ TO STDOUT
 (FORMAT 'binary');
 \o
 COMMIT;
-COPY dbms_stats.work FROM '@abs_srcdir@/export_stats.dmp' (FORMAT 'binary');
+COPY dbms_stats.work FROM '/home/postgres/git_repos/internal/pg_dbms_stats/export_stats.dmp' (FORMAT 'binary');
 SELECT * FROM work_v;
  nspname | relname | relpages | reltuples | relallvisible | curpages | attname | nspname_of_typename | typname | atttypmod | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 | stavalues1  | stavalues2 |       stavalues3       | stavalues4 | stavalues5 
 ---------+---------+----------+-----------+---------------+----------+---------+---------------------+---------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+-------------+------------+------------------------+------------+------------
@@ -2217,7 +2217,7 @@ TO STDOUT
 (FORMAT 'binary');
 \o
 COMMIT;
-COPY dbms_stats.work FROM '@abs_srcdir@/export_stats.dmp' (FORMAT 'binary');
+COPY dbms_stats.work FROM '/home/postgres/git_repos/internal/pg_dbms_stats/export_stats.dmp' (FORMAT 'binary');
 SELECT * FROM work_v;
  nspname | relname | relpages | reltuples | relallvisible | curpages | attname | nspname_of_typename | typname | atttypmod | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 | stavalues1 | stavalues2 | stavalues3 | stavalues4 | stavalues5 
 ---------+---------+----------+-----------+---------------+----------+---------+---------------------+---------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+------------+------------+------------+------------+------------
@@ -2304,7 +2304,7 @@ TO STDOUT
 (FORMAT 'binary');
 \o
 COMMIT;
-COPY dbms_stats.work FROM '@abs_srcdir@/export_stats.dmp' (FORMAT 'binary');
+COPY dbms_stats.work FROM '/home/postgres/git_repos/internal/pg_dbms_stats/export_stats.dmp' (FORMAT 'binary');
 SELECT * FROM work_v;
  nspname | relname | relpages | reltuples | relallvisible | curpages | attname | nspname_of_typename | typname | atttypmod | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stacoll1 | stacoll2 | stacoll3 | stacoll4 | stacoll5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 | stavalues1 | stavalues2 | stavalues3 | stavalues4 | stavalues5 
 ---------+---------+----------+-----------+---------------+----------+---------+---------------------+---------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+----------+----------+----------+----------+----------+-------------+-------------+-------------+-------------+-------------+------------+------------+------------+------------+------------
@@ -2338,8 +2338,8 @@ LANGUAGE plpgsql;
  * No.17-1 dbms_stats.import_database_stats(src)
  */
 -- No.17-1-1
-SELECT dbms_stats.import_database_stats('@abs_srcdir@/export_stats.dmp');
-NOTICE:  arguments are "<NULL>", "<NULL>", "<NULL>", "@abs_srcdir@/export_stats.dmp"
+SELECT dbms_stats.import_database_stats('/home/postgres/git_repos/internal/pg_dbms_stats/export_stats.dmp');
+NOTICE:  arguments are "<NULL>", "<NULL>", "<NULL>", "/home/postgres/git_repos/internal/pg_dbms_stats/export_stats.dmp"
  import_database_stats 
 -----------------------
  
@@ -2349,8 +2349,8 @@ NOTICE:  arguments are "<NULL>", "<NULL>", "<NULL>", "@abs_srcdir@/export_stats.
  * No.17-2 dbms_stats.import_schema_stats(schemaname, src)
  */
 -- No.17-2-1
-SELECT dbms_stats.import_schema_stats('s0', '@abs_srcdir@/export_stats.dmp');
-NOTICE:  arguments are "s0", "<NULL>", "<NULL>", "@abs_srcdir@/export_stats.dmp"
+SELECT dbms_stats.import_schema_stats('s0', '/home/postgres/git_repos/internal/pg_dbms_stats/export_stats.dmp');
+NOTICE:  arguments are "s0", "<NULL>", "<NULL>", "/home/postgres/git_repos/internal/pg_dbms_stats/export_stats.dmp"
  import_schema_stats 
 ---------------------
  
@@ -2360,8 +2360,8 @@ NOTICE:  arguments are "s0", "<NULL>", "<NULL>", "@abs_srcdir@/export_stats.dmp"
  * No.17-3 dbms_stats.import_table_stats(relid, src)
  */
 -- No.17-3-1
-SELECT dbms_stats.import_table_stats('s0.st0', '@abs_srcdir@/export_stats.dmp');
-NOTICE:  arguments are "<NULL>", "s0.st0", "<NULL>", "@abs_srcdir@/export_stats.dmp"
+SELECT dbms_stats.import_table_stats('s0.st0', '/home/postgres/git_repos/internal/pg_dbms_stats/export_stats.dmp');
+NOTICE:  arguments are "<NULL>", "s0.st0", "<NULL>", "/home/postgres/git_repos/internal/pg_dbms_stats/export_stats.dmp"
  import_table_stats 
 --------------------
  
@@ -2371,8 +2371,8 @@ NOTICE:  arguments are "<NULL>", "s0.st0", "<NULL>", "@abs_srcdir@/export_stats.
  * No.17-4 dbms_stats.import_table_stats(schemaname, tablename, src)
  */
 -- No.17-4-1
-SELECT dbms_stats.import_table_stats('s0', 'st0', '@abs_srcdir@/export_stats.dmp');
-NOTICE:  arguments are "<NULL>", "s0.st0", "<NULL>", "@abs_srcdir@/export_stats.dmp"
+SELECT dbms_stats.import_table_stats('s0', 'st0', '/home/postgres/git_repos/internal/pg_dbms_stats/export_stats.dmp');
+NOTICE:  arguments are "<NULL>", "s0.st0", "<NULL>", "/home/postgres/git_repos/internal/pg_dbms_stats/export_stats.dmp"
  import_table_stats 
 --------------------
  
@@ -2382,8 +2382,8 @@ NOTICE:  arguments are "<NULL>", "s0.st0", "<NULL>", "@abs_srcdir@/export_stats.
  * No.17-5 dbms_stats.import_column_stats (relid, attname, src)
  */
 -- No.17-5-1
-SELECT dbms_stats.import_column_stats('s0.st0', 'id', '@abs_srcdir@/export_stats.dmp');
-NOTICE:  arguments are "<NULL>", "s0.st0", "id", "@abs_srcdir@/export_stats.dmp"
+SELECT dbms_stats.import_column_stats('s0.st0', 'id', '/home/postgres/git_repos/internal/pg_dbms_stats/export_stats.dmp');
+NOTICE:  arguments are "<NULL>", "s0.st0", "id", "/home/postgres/git_repos/internal/pg_dbms_stats/export_stats.dmp"
  import_column_stats 
 ---------------------
  
@@ -2393,8 +2393,8 @@ NOTICE:  arguments are "<NULL>", "s0.st0", "id", "@abs_srcdir@/export_stats.dmp"
  * No.17-6 dbms_stats.import_column_stats (schemaname, tablename, attname, src)
  */
 -- No.17-6-1
-SELECT dbms_stats.import_column_stats('s0', 'st0', 'id','@abs_srcdir@/export_stats.dmp');
-NOTICE:  arguments are "<NULL>", "s0.st0", "id", "@abs_srcdir@/export_stats.dmp"
+SELECT dbms_stats.import_column_stats('s0', 'st0', 'id','/home/postgres/git_repos/internal/pg_dbms_stats/export_stats.dmp');
+NOTICE:  arguments are "<NULL>", "s0.st0", "id", "/home/postgres/git_repos/internal/pg_dbms_stats/export_stats.dmp"
  import_column_stats 
 ---------------------
  

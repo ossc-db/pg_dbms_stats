@@ -1,7 +1,7 @@
-# SPEC file for pg_dbms_stats13
-# Copyright(c) 2012-2021, NIPPON TELEGRAPH AND TELEPHONE CORPORATION
+# SPEC file for pg_dbms_stats14
+# Copyright(c) 2012-2022, NIPPON TELEGRAPH AND TELEPHONE CORPORATION
 
-%define _pgdir   /usr/pgsql-13
+%define _pgdir   /usr/pgsql-14
 %define _bindir  %{_pgdir}/bin
 %define _libdir  %{_pgdir}/lib
 %define _datadir %{_pgdir}/share
@@ -14,9 +14,9 @@
 %endif
 
 ## Set general information for pg_dbms_stats.
-Summary:    Plan Stabilizer for PostgreSQL 13
-Name:       pg_dbms_stats13
-Version:    1.5.0
+Summary:    Plan Stabilizer for PostgreSQL 14
+Name:       pg_dbms_stats
+Version:    14.0
 Release:    1%{?dist}
 License:    BSD
 Group:      Applications/Databases
@@ -26,8 +26,8 @@ BuildRoot:  %{buildroot}
 Vendor:     NIPPON TELEGRAPH AND TELEPHONE CORPORATION
 
 ## postgresql-devel package required
-#BuildRequires:  postgresql13-devel
-#Requires:  postgresql13-server
+#BuildRequires:  postgresql14-devel
+#Requires:  postgresql14-server
 
 ## Description for "pg_dbms_stats"
 %description
@@ -39,25 +39,25 @@ pg_dbms_stats also provides following features:
   - backup multiple generations of planner statistics to reuse plans afterwards
   - import planner statistics from another system for tuning or testing.
 
-Note that this package is available for only PostgreSQL 13.
+Note that this package is available for only PostgreSQL 14.
 
 %package llvmjit
-Requires: postgresql13-server, postgresql13-llvmjit
-Requires: pg_dbms_stats13 = 1.5.0
-Summary:  Just-in-time compilation support for pg_dbms_stats13
+Requires: postgresql14-server, postgresql14-llvmjit
+Requires: pg_dbms_stats = 14.0
+Summary:  Just-in-time compilation support for pg_dbms_stats 14
 
 %description llvmjit
-Just-in-time compilation support for pg_dmbs_stats13
+Just-in-time compilation support for pg_dmbs_stats 14
 
 ## pre work for build pg_dbms_stats
 %prep
-PATH=/usr/pgsql-13/bin:$PATH
+PATH=/usr/pgsql-14/bin:$PATH
 if [ ! -d %{_rpmdir} ]; then mkdir -p %{_rpmdir}; fi
 %setup -q
 
 ## Set variables for build environment
 %build
-PATH=/usr/pgsql-13/bin:$PATH
+PATH=/usr/pgsql-14/bin:$PATH
 make USE_PGXS=1 %{?_smp_mflags}
 
 ## Set variables for install
@@ -74,14 +74,16 @@ rm -rf %{buildroot}
 %defattr(0644,root,root)
 %{_datadir}/extension/pg_dbms_stats--%{version}.sql
 %{_datadir}/extension/pg_dbms_stats.control
-%{_docdir}/extension/export_effective_stats-13.sql.sample
-%{_docdir}/extension/export_plain_stats-13.sql.sample
+%{_docdir}/extension/export_effective_stats-14.sql.sample
+%{_docdir}/extension/export_plain_stats-14.sql.sample
 
 %files llvmjit
 %{_bcdir}
 
 # History of pg_dbms_stats.
 %changelog
+* Tue Mar 22 2022 Hisashi Tashiro
+- Update to 14.0. Support PG14.
 * Tue Mar 1 2022 Kyotaro Horiguchi
 - Update to 1.5.0. Support PG13.
 * Thu Aug 6 2020 Kyotaro Horiguchi

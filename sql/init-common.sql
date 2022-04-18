@@ -77,14 +77,35 @@ END;
 $$LANGUAGE plpgsql;
 
 -- Table or index fetches will take place if stats merge performed.
+-- Since PostgreSQL14, relpages are now treated as 0 when ANALYZE is performed on an empty table.
+-- This makes the method of checking accessibility to relation_stats_locked a bit tricky.
+-- If IO was detected by pg_statio_user_tables, it returns true as previous done.
+-- Otherwise, use pg_stat_user_tables. 
+-- In the current test flow (ut-common.sql), relation_stats_locked has a different scan count
+-- condition than column_stats_locked because it has been sequentially scanned once.
 CREATE VIEW lockd_io AS
-       SELECT relname,
-              heap_blks_read + heap_blks_hit +
-              idx_blks_read  + idx_blks_hit  > 0  fetches
-         FROM pg_statio_user_tables
-        WHERE schemaname = 'dbms_stats'
-          AND relname LIKE '%\_stats_locked'
-        ORDER BY relid;
+       SELECT t.relname,
+              CASE t.relname WHEN 'relation_stats_locked' THEN
+                CASE WHEN
+                  (io.heap_blks_read + io.heap_blks_hit + 
+                   io.idx_blks_read  + io.idx_blks_hit) > 0 THEN true
+                ELSE
+                  (t.seq_scan + t.idx_scan) > 1
+                END
+              ELSE
+                CASE WHEN
+                  (io.heap_blks_read + io.heap_blks_hit + 
+                   io.idx_blks_read  + io.idx_blks_hit) > 0 THEN true
+                ELSE
+                  (t.seq_scan + t.idx_scan) > 0
+                END
+              END fetches
+         FROM pg_stat_user_tables t, pg_statio_user_tables io 
+        WHERE t.schemaname = 'dbms_stats'
+          AND t.relname LIKE '%\_stats_locked'
+          AND t.schemaname = io.schemaname
+          AND t.relname = io.relname
+        ORDER BY t.relid;
 
 CREATE VIEW internal_locks AS
     SELECT relation::regclass, mode

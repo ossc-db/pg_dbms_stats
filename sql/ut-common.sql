@@ -1246,3 +1246,28 @@ ORDER BY proname;
 /* Immediately unlock for safety */
 SELECT dbms_stats.unlock('st_ary');
 DROP TABLE st_ary;
+
+/* Check empty relation stats handling */
+CREATE TABLE empty_dummy (c1 int primary key, c2 text)
+ WITH (autovacuum_enabled = 'false');
+INSERT INTO empty_dummy VALUES(1,'AAA'),(2,'BBB');
+/* Expected index scan because relpages will be estimated 10 */
+EXPLAIN (costs false) SELECT * FROM empty_dummy WHERE c1 = 1;
+SELECT dbms_stats.lock_table_stats('empty_dummy');
+SELECT relname, relpages, reltuples, curpages FROM dbms_stats.relation_stats_locked
+ WHERE relname LIKE  '%empty_dummy';
+/* Expected same as previous */
+EXPLAIN (costs false) SELECT * FROM empty_dummy WHERE c1 = 1;
+DELETE FROM empty_dummy;
+VACUUM ANALYZE empty_dummy;
+SELECT dbms_stats.unlock_table_stats('empty_dummy');
+/* Expected Seq Scan because relpages will be estimated 0 */
+EXPLAIN (costs false) SELECT * FROM empty_dummy WHERE c1 = 1;
+SELECT dbms_stats.lock_table_stats('empty_dummy');
+SELECT relname, relpages, reltuples, curpages FROM dbms_stats.relation_stats_locked
+ WHERE relname LIKE '%empty_dummy';
+/* Expected same as previous */
+EXPLAIN (costs false) SELECT * FROM empty_dummy WHERE c1 = 1;
+/*i Cleanup */
+SELECT dbms_stats.unlock_table_stats('empty_dummy');
+DROP TABLE empty_dummy;

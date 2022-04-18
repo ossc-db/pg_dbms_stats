@@ -1,7 +1,7 @@
 # pg_dbms_stats/Makefile
 
-DBMSSTATSVER = 1.5.0
-PGVERS = 13
+DBMSSTATSVER = 14.0
+PGVERS = 14
 
 MODULE_big = pg_dbms_stats
 OBJS = pg_dbms_stats.o dump.o import.o
@@ -28,7 +28,7 @@ DOCS = $(DOCDIR)/export_effective_stats-$(MAJORVERSION).sql.sample \
 
 # Source tarballs required for rpmbuild
 STARBALL = pg_dbms_stats-$(DBMSSTATSVER).tar.gz
-STARBALLS = $(STARBALL) $(foreach v,$(PGVERS),pg_dbms_stats$(v)-$(DBMSSTATSVER).tar.gz)
+STARBALLS = $(STARBALL) $(foreach v,$(PGVERS),pg_dbms_stats$(v).tar.gz)
 
 # Generate RPM target names for all target PG versions
 RPMS = $(foreach v,$(PGVERS),rpm$(v))
@@ -84,6 +84,6 @@ $(STARBALLS): $(TARSOURCES)
 	tar -chzf $@ $(addprefix $(subst .tar.gz,,$@)/, $^)
 	rm $(subst .tar.gz,,$@)
 
-$(RPMS): rpm% : SPECS/pg_dbms_stats%.spec pg_dbms_stats%-$(DBMSSTATSVER).tar.gz
+$(RPMS): rpm% : SPECS/pg_dbms_stats.spec pg_dbms_stats-$(DBMSSTATSVER).tar.gz
 	MAKE_ROOT=`pwd` rpmbuild -bb $<
 

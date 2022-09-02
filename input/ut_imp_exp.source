@@ -1,5 +1,8 @@
 \pset null '(null)'
 CREATE TABLE s0.st3();
+CREATE TABLE s0.st5(a timestamp);
+INSERT INTO s0.st5 VALUES ('2020-10-01 10:00:00.55555'), ('2020-10-01 10:00:00.55555'),
+  ('2020-11-21 03:30:29.111'), ('2020-11-21 03:30:29.111');
 /*
  * No.16-1 export_plain_stats-14.sql.sample
  */
@@ -300,3 +303,5 @@ ALTER FUNCTION dbms_stats.truth_import(
     attname text,
     src text
 ) RENAME TO import;
+
+DROP TABLE s0.st5;

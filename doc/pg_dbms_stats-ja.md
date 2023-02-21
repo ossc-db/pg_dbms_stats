@@ -18,7 +18,7 @@
 
 </div>
 
-# pg_dbms_stats 14.0
+# pg_dbms_stats 15.0
 
 ## 名前
 
@@ -449,7 +449,7 @@ pg_dbms_statsの各機能は、前節で説明した独自の統計情報テー�
 ## 動作環境
 
 PostgreSQLバージョン  
-PostgreSQL 14
+PostgreSQL 15
 
 OS  
 RHEL 7/8

@@ -1,7 +1,7 @@
 # pg_dbms_stats/Makefile
 
-DBMSSTATSVER = 14.0
-PGVERS = 14
+DBMSSTATSVER = 15.0
+PGVERS = 15
 
 MODULE_big = pg_dbms_stats
 OBJS = pg_dbms_stats.o dump.o import.o

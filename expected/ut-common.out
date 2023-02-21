@@ -643,7 +643,7 @@ SELECT relname, curpages FROM dbms_stats.relation_stats_locked
  public.st1 |       45
 (1 row)
 
-SELECT pg_sleep(0.7);
+SELECT pg_sleep(1.2);
  pg_sleep 
 ----------
  
@@ -664,7 +664,7 @@ SELECT pg_stat_reset();
 VACUUM ANALYZE;
 UPDATE dbms_stats.relation_stats_locked SET curpages = 1000
  WHERE relid = 'st1_exp'::regclass;
-SELECT pg_sleep(0.7);
+SELECT pg_sleep(1.2);
  pg_sleep 
 ----------
  
@@ -696,7 +696,7 @@ SELECT relname, curpages FROM dbms_stats.relation_stats_locked
  public.st1 |       45
 (1 row)
 
-SELECT pg_sleep(0.7);
+SELECT pg_sleep(1.2);
  pg_sleep 
 ----------
  
@@ -820,7 +820,7 @@ SELECT * FROM s0.droptest
   1
 (1 row)
 
-SELECT pg_sleep(0.7);
+SELECT pg_sleep(1.2);
  pg_sleep 
 ----------
  
@@ -839,7 +839,7 @@ SELECT pg_stat_reset();
 (1 row)
 
 ALTER TABLE s0.droptest RENAME TO test;
-SELECT pg_sleep(0.7);
+SELECT pg_sleep(1.2);
  pg_sleep 
 ----------
  
@@ -871,7 +871,7 @@ SELECT * FROM s0.test
   1
 (1 row)
 
-SELECT pg_sleep(0.7);
+SELECT pg_sleep(1.2);
  pg_sleep 
 ----------
  
@@ -894,7 +894,7 @@ SELECT * FROM s0.droptest
   1
 (1 row)
 
-SELECT pg_sleep(0.7);
+SELECT pg_sleep(1.2);
  pg_sleep 
 ----------
  
@@ -913,7 +913,7 @@ SELECT pg_stat_reset();
 (1 row)
 
 ALTER TABLE s0.droptest RENAME id TO test;
-SELECT pg_sleep(0.7);
+SELECT pg_sleep(1.2);
  pg_sleep 
 ----------
  
@@ -945,7 +945,7 @@ SELECT * FROM s0.droptest
     1
 (1 row)
 
-SELECT pg_sleep(0.7);
+SELECT pg_sleep(1.2);
  pg_sleep 
 ----------
  
@@ -968,7 +968,7 @@ SELECT * FROM s0.droptest
   1
 (1 row)
 
-SELECT pg_sleep(0.7);
+SELECT pg_sleep(1.2);
  pg_sleep 
 ----------
  
@@ -987,7 +987,7 @@ SELECT pg_stat_reset();
 (1 row)
 
 ANALYZE;
-SELECT pg_sleep(0.7);
+SELECT pg_sleep(1.2);
  pg_sleep 
 ----------
  
@@ -1042,7 +1042,7 @@ SELECT * FROM s0.droptest
   4
 (1 row)
 
-SELECT pg_sleep(0.7);
+SELECT pg_sleep(1.2);
  pg_sleep 
 ----------
  
@@ -1061,7 +1061,7 @@ SELECT pg_stat_reset();
 (1 row)
 
 VACUUM ANALYZE;
-SELECT pg_sleep(0.7);
+SELECT pg_sleep(1.2);
  pg_sleep 
 ----------
  
@@ -1093,7 +1093,7 @@ SELECT * FROM s0.droptest
   4
 (1 row)
 
-SELECT pg_sleep(0.7);
+SELECT pg_sleep(1.2);
  pg_sleep 
 ----------
  

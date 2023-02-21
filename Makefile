@@ -34,8 +34,6 @@ STARBALLS = $(STARBALL) $(foreach v,$(PGVERS),pg_dbms_stats$(v).tar.gz)
 RPMS = $(foreach v,$(PGVERS),rpm$(v))
 
 EXTRA_CLEAN = sql/ut_anyarray-*.sql expected/ut_anyarray-*.out \
-	sql/ut_imp_exp-*.sql expected/ut_imp_exp-*.out \
-	sql/ut_fdw_init.sql expected/ut_fdw_init.out \
 	export_stats.dmp ut-fdw.csv $(STARBALLS) RPMS/*/* \
 	*~
 

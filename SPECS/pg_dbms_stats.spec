@@ -1,4 +1,4 @@
-# SPEC file for pg_dbms_stats14
+# SPEC file for pg_dbms_stats15
 # Copyright(c) 2012-2022, NIPPON TELEGRAPH AND TELEPHONE CORPORATION
 
 %define _pgdir   /usr/pgsql-15

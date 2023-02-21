@@ -321,19 +321,19 @@ SELECT dbms_stats.unlock_database_stats();
 SELECT dbms_stats.lock_table_stats('st1');
 SELECT relname, curpages FROM dbms_stats.relation_stats_locked
  WHERE relid = 'st1'::regclass;
-SELECT pg_sleep(0.7);
+SELECT pg_sleep(1.2);
 SELECT load_merged_stats();
 SELECT pg_stat_reset();
 VACUUM ANALYZE;
 UPDATE dbms_stats.relation_stats_locked SET curpages = 1000
  WHERE relid = 'st1_exp'::regclass;
-SELECT pg_sleep(0.7);
+SELECT pg_sleep(1.2);
 SELECT * FROM lockd_io;
 SELECT load_merged_stats();
 SELECT pg_stat_reset();
 SELECT relname, curpages FROM dbms_stats.relation_stats_locked
  WHERE relid = 'st1'::regclass;
-SELECT pg_sleep(0.7);
+SELECT pg_sleep(1.2);
 SELECT * FROM lockd_io;
 
 /*
@@ -375,17 +375,17 @@ INSERT INTO s0.droptest VALUES (1),(2),(3);
 VACUUM ANALYZE;
 SELECT * FROM s0.droptest
  WHERE id = 1;
-SELECT pg_sleep(0.7);
+SELECT pg_sleep(1.2);
 SELECT load_merged_stats();
 SELECT pg_stat_reset();
 ALTER TABLE s0.droptest RENAME TO test;
-SELECT pg_sleep(0.7);
+SELECT pg_sleep(1.2);
 SELECT * FROM lockd_io;
 SELECT load_merged_stats();
 SELECT pg_stat_reset();
 SELECT * FROM s0.test
  WHERE id = 1;
-SELECT pg_sleep(0.7);
+SELECT pg_sleep(1.2);
 SELECT * FROM lockd_io;
 ALTER TABLE s0.test RENAME TO droptest;
 
@@ -393,17 +393,17 @@ ALTER TABLE s0.test RENAME TO droptest;
 VACUUM ANALYZE;
 SELECT * FROM s0.droptest
  WHERE id = 1;
-SELECT pg_sleep(0.7);
+SELECT pg_sleep(1.2);
 SELECT load_merged_stats();
 SELECT pg_stat_reset();
 ALTER TABLE s0.droptest RENAME id TO test;
-SELECT pg_sleep(0.7);
+SELECT pg_sleep(1.2);
 SELECT * FROM lockd_io;
 SELECT load_merged_stats();
 SELECT pg_stat_reset();
 SELECT * FROM s0.droptest
  WHERE test = 1;
-SELECT pg_sleep(0.7);
+SELECT pg_sleep(1.2);
 SELECT * FROM lockd_io;
 ALTER TABLE s0.droptest RENAME test TO id;
 
@@ -411,11 +411,11 @@ ALTER TABLE s0.droptest RENAME test TO id;
 INSERT INTO s0.droptest VALUES (4);
 SELECT * FROM s0.droptest
  WHERE id = 1;
-SELECT pg_sleep(0.7);
+SELECT pg_sleep(1.2);
 SELECT load_merged_stats();
 SELECT pg_stat_reset();
 ANALYZE;
-SELECT pg_sleep(0.7);
+SELECT pg_sleep(1.2);
 SELECT * FROM lockd_io;
 SELECT load_merged_stats();
 SELECT pg_stat_reset();
@@ -429,17 +429,17 @@ DELETE FROM s0.droptest;
 INSERT INTO s0.droptest VALUES (4),(5);
 SELECT * FROM s0.droptest
  WHERE id = 4;
-SELECT pg_sleep(0.7);
+SELECT pg_sleep(1.2);
 SELECT load_merged_stats();
 SELECT pg_stat_reset();
 VACUUM ANALYZE;
-SELECT pg_sleep(0.7);
+SELECT pg_sleep(1.2);
 SELECT * FROM lockd_io;
 SELECT load_merged_stats();
 SELECT pg_stat_reset();
 SELECT * FROM s0.droptest
  WHERE id = 4;
-SELECT pg_sleep(0.7);
+SELECT pg_sleep(1.2);
 SELECT * FROM lockd_io;
 
 -- clean up

@@ -251,7 +251,7 @@ dbms_stats_import(PG_FUNCTION_ARGS)
 						   "ON (w.nspname = cn.nspname AND w.relname = c.relname "
 							   "AND (w.attname = a.attname OR w.attname = '')) "
 						"WHERE w.nspname = $1 AND w.relname = $2 "
-						  "AND a.attnum > 0"
+						  "AND a.attnum > 0 "
 						"ORDER BY 1, 3, 2",
 				2, r_types, &c_sel_plan, values, NULL, SPI_OK_SELECT);
 

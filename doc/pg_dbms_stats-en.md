@@ -18,7 +18,7 @@
 
 </div>
 
-# pg_dbms_stats 14.0
+# pg_dbms_stats 15.0
 ---
 
 ## NAME
@@ -456,7 +456,7 @@ You can inject values by the following three steps.
 ## ENVIRONMENT
 
 PostgreSQL  
-14
+15
 
 OS  
 RHEL 7/8

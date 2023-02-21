@@ -1,4 +1,4 @@
-# pg_dbms_stats 14.0
+# pg_dbms_stats 15.0
 
 [pg_dms_stats](pg_dbms_stats-ja.md) -> [Appendix A. オブジェクト一覧](objects-ja.md)
 

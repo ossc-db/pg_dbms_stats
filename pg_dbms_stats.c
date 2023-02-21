@@ -1653,7 +1653,7 @@ init_rel_stats_entry(StatsRelationEntry *entry, Oid relid)
  * the attribute widths for estimation purposes.
  *
  * Note: This function is copied from plancat.c in core source tree of version
- * 14, and customized for pg_dbms_stats.  Changes from original one are:
+ * 15, and customized for pg_dbms_stats.  Changes from original one are:
  *   - rename by prefixing dbms_stats_
  *   - add 1 parameters (curpage) to pass dummy curpage values.
  *   - Get current # of pages only when supplied curpages is InvalidBlockNumber
@@ -1669,125 +1669,110 @@ dbms_stats_estimate_rel_size(Relation rel, int32 *attr_widths,
 	BlockNumber relallvisible;
 	double		density;
 
-	switch (rel->rd_rel->relkind)
+	if (RELKIND_HAS_TABLE_AM(rel->rd_rel->relkind))
 	{
-		case RELKIND_RELATION:
-		case RELKIND_MATVIEW:
-		case RELKIND_TOASTVALUE:
-			/* it has storage, ok to call the smgr */
-			if (curpages == InvalidBlockNumber)
-				curpages = RelationGetNumberOfBlocks(rel);
+		if (curpages == InvalidBlockNumber)
+			curpages = RelationGetNumberOfBlocks(rel);
+		dbms_stats_table_relation_estimate_size(rel, attr_widths, pages, tuples,
+									 allvisfrac,
+									 HEAP_OVERHEAD_BYTES_PER_TUPLE,
+									 HEAP_USABLE_BYTES_PER_PAGE,
+									 curpages);
+	}
+	else if (rel->rd_rel->relkind == RELKIND_INDEX)
+	{
+		/*
+		 * XXX: It'd probably be good to move this into a callback, individual
+		 * index types e.g. know if they have a metapage.
+		 */
 
-			dbms_stats_table_relation_estimate_size(rel, attr_widths, pages, tuples,
-										 allvisfrac,
-										 HEAP_OVERHEAD_BYTES_PER_TUPLE,
-										 HEAP_USABLE_BYTES_PER_PAGE,
-										 curpages);
-			break;
+		/* it has storage, ok to call the smgr */
+		if (curpages == InvalidBlockNumber)
+			curpages = RelationGetNumberOfBlocks(rel);
 
-		case RELKIND_INDEX:
-
-			/*
-			 * XXX: It'd probably be good to move this into a callback,
-			 * individual index types e.g. know if they have a metapage.
-			 */
-
-			/* it has storage, ok to call the smgr */
-			if (curpages == InvalidBlockNumber)
-				curpages = RelationGetNumberOfBlocks(rel);
-
-			/* report estimated # pages */
-			*pages = curpages;
-			/* quick exit if rel is clearly empty */
-			if (curpages == 0)
-			{
-				*tuples = 0;
-				*allvisfrac = 0;
-				break;
-			}
-
-			/* coerce values in pg_class to more desirable types */
-			relpages = (BlockNumber) rel->rd_rel->relpages;
-			reltuples = (double) rel->rd_rel->reltuples;
-			relallvisible = (BlockNumber) rel->rd_rel->relallvisible;
-
-			/*
-			 * Discount the metapage while estimating the number of tuples.
-			 * This is a kluge because it assumes more than it ought to about
-			 * index structure.  Currently it's OK for btree, hash, and GIN
-			 * indexes but suspect for GiST indexes.
-			 */
-			if (relpages > 0)
-			{
-				curpages--;
-				relpages--;
-			}
-
-
-			/* estimate number of tuples from previous tuple density */
-			if (reltuples >= 0 && relpages > 0)
-				density = reltuples / (double) relpages;
-			else
-			{
-				/*
-				 * If we have no data because the relation was never vacuumed,
-				 * estimate tuple width from attribute datatypes.  We assume
-				 * here that the pages are completely full, which is OK for
-				 * tables (since they've presumably not been VACUUMed yet) but
-				 * is probably an overestimate for indexes.  Fortunately
-				 * get_relation_info() can clamp the overestimate to the
-				 * parent table's size.
-				 *
-				 * Note: this code intentionally disregards alignment
-				 * considerations, because (a) that would be gilding the lily
-				 * considering how crude the estimate is, and (b) it creates
-				 * platform dependencies in the default plans which are kind
-				 * of a headache for regression testing.
-				 *
-				 * XXX: Should this logic be more index specific?
-				 */
-				int32		tuple_width;
-
-				tuple_width = dbms_stats_get_rel_data_width(rel, attr_widths);
-				tuple_width += MAXALIGN(SizeofHeapTupleHeader);
-				tuple_width += sizeof(ItemIdData);
-				/* note: integer division is intentional here */
-				density = (BLCKSZ - SizeOfPageHeaderData) / tuple_width;
-			}
-			*tuples = rint(density * (double) curpages);
-
-			/*
-			 * We use relallvisible as-is, rather than scaling it up like we
-			 * do for the pages and tuples counts, on the theory that any
-			 * pages added since the last VACUUM are most likely not marked
-			 * all-visible.  But costsize.c wants it converted to a fraction.
-			 */
-			if (relallvisible == 0 || curpages <= 0)
-				*allvisfrac = 0;
-			else if ((double) relallvisible >= curpages)
-				*allvisfrac = 1;
-			else
-				*allvisfrac = (double) relallvisible / curpages;
-			break;
-
-		case RELKIND_SEQUENCE:
-			/* Sequences always have a known size */
-			*pages = 1;
-			*tuples = 1;
-			*allvisfrac = 0;
-			break;
-		case RELKIND_FOREIGN_TABLE:
-			/* Just use whatever's in pg_class */
-			*pages = rel->rd_rel->relpages;
-			*tuples = rel->rd_rel->reltuples;
-			*allvisfrac = 0;
-			break;
-		default:
-			/* else it has no disk storage; probably shouldn't get here? */
-			*pages = 0;
+		/* report estimated # pages */
+		*pages = curpages;
+		/* quick exit if rel is clearly empty */
+		if (curpages == 0)
+		{
 			*tuples = 0;
 			*allvisfrac = 0;
-			break;
+			return;
+		}
+
+		/* coerce values in pg_class to more desirable types */
+		relpages = (BlockNumber) rel->rd_rel->relpages;
+		reltuples = (double) rel->rd_rel->reltuples;
+		relallvisible = (BlockNumber) rel->rd_rel->relallvisible;
+
+		/*
+		 * Discount the metapage while estimating the number of tuples. This
+		 * is a kluge because it assumes more than it ought to about index
+		 * structure.  Currently it's OK for btree, hash, and GIN indexes but
+		 * suspect for GiST indexes.
+		 */
+		if (relpages > 0)
+		{
+			curpages--;
+			relpages--;
+		}
+
+		/* estimate number of tuples from previous tuple density */
+		if (reltuples >= 0 && relpages > 0)
+			density = reltuples / (double) relpages;
+		else
+		{
+			/*
+			 * If we have no data because the relation was never vacuumed,
+			 * estimate tuple width from attribute datatypes.  We assume here
+			 * that the pages are completely full, which is OK for tables
+			 * (since they've presumably not been VACUUMed yet) but is
+			 * probably an overestimate for indexes.  Fortunately
+			 * get_relation_info() can clamp the overestimate to the parent
+			 * table's size.
+			 *
+			 * Note: this code intentionally disregards alignment
+			 * considerations, because (a) that would be gilding the lily
+			 * considering how crude the estimate is, and (b) it creates
+			 * platform dependencies in the default plans which are kind of a
+			 * headache for regression testing.
+			 *
+			 * XXX: Should this logic be more index specific?
+			 */
+			int32		tuple_width;
+
+			tuple_width = dbms_stats_get_rel_data_width(rel, attr_widths);
+			tuple_width += MAXALIGN(SizeofHeapTupleHeader);
+			tuple_width += sizeof(ItemIdData);
+			/* note: integer division is intentional here */
+			density = (BLCKSZ - SizeOfPageHeaderData) / tuple_width;
+		}
+		*tuples = rint(density * (double) curpages);
+
+		/*
+		 * We use relallvisible as-is, rather than scaling it up like we do
+		 * for the pages and tuples counts, on the theory that any pages added
+		 * since the last VACUUM are most likely not marked all-visible.  But
+		 * costsize.c wants it converted to a fraction.
+		 */
+		if (relallvisible == 0 || curpages <= 0)
+			*allvisfrac = 0;
+		else if ((double) relallvisible >= curpages)
+			*allvisfrac = 1;
+		else
+			*allvisfrac = (double) relallvisible / curpages;
+	}
+	else
+	{
+		/*
+		 * Just use whatever's in pg_class.  This covers foreign tables,
+		 * sequences, and also relkinds without storage (shouldn't get here?);
+		 * see initializations in AddNewRelationTuple().  Note that FDW must
+		 * cope if reltuples is -1!
+		 */
+		*pages = rel->rd_rel->relpages;
+		*tuples = rel->rd_rel->reltuples;
+		*allvisfrac = 0;
 	}
 }
 
@@ -1805,7 +1790,7 @@ dbms_stats_estimate_rel_size(Relation rel, int32 *attr_widths,
  * necessarily the wrong thing anyway.
  *
  * Note: This function is copied from plancat.c in core source tree of version
- * 14, and just renamed.
+ * 15, and just renamed.
  */
 static int32
 dbms_stats_get_rel_data_width(Relation rel, int32 *attr_widths)
@@ -1866,7 +1851,7 @@ dbms_stats_get_rel_data_width(Relation rel, int32 *attr_widths)
  * special space.
  *
  * Note: This function is copied from tableam.c in core source tree of version
- * 14, and just renamed.Changes from original one are:
+ * 15, and just renamed.Changes from original one are:
  *   - rename by prefixing dbms_stats_
  *   - add 1 parameters (curpage) to pass dummy curpage values.
  *

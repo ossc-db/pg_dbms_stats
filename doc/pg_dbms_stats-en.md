@@ -317,6 +317,8 @@ CAVEAT: The base script uses binary format of COPY command so import
 might fail if the format is incompatible with the export side. See [COPY
 command](http://www.postgresql.jp/document/current/html/sql-copy.html) for details.
 
+Import of exported statistics into PostgreSQL servers of different major versions is not supported. Even if the import appears to be successful, there is a good chance that the subsequent server operation will be unstable and the expected execution plan will not be obtained.
+
 ## RESTRICTIONS
 
 There are some important poins and restrictions to use pg_dbms_stats.
